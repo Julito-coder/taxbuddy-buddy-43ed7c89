@@ -106,19 +106,26 @@ export const KPICardsGrid: React.FC<KPICardsGridProps> = ({
 }) => {
   const r = results;
   
-  // Calculate additional metrics
-  const roi = financing.down_payment > 0 
-    ? ((r.net_patrimony - financing.down_payment) / financing.down_payment * 100) 
+  // BUG FIX #7 : utiliser le cash réellement investi (apport + frais)
+  const cashInvested = r.cash_invested ?? financing.down_payment;
+
+  // ROI : (patrimoine net - cash investi) / cash investi
+  const roi = cashInvested > 0
+    ? ((r.net_patrimony - cashInvested) / cashInvested * 100)
     : 0;
-  
-  const leverageRatio = acquisition.price_net_seller > 0 
-    ? (financing.loan_amount / acquisition.price_net_seller * 100) 
+
+  // LTV : prêt / (prix + notaire) — pratique bancaire
+  const ltvBase = (acquisition.price_net_seller || 0);
+  const leverageRatio = ltvBase > 0
+    ? (financing.loan_amount / ltvBase * 100)
     : 0;
-  
-  const annualCashflow = (r.monthly_cashflow_after_tax || 0) * 12;
-  const cashOnCash = financing.down_payment > 0 
-    ? (annualCashflow / financing.down_payment * 100) 
-    : 0;
+
+  // Cash-on-cash : préférer la valeur calculée par l'engine (basée sur cash investi réel)
+  const cashOnCash = r.cash_on_cash_yield ?? (
+    cashInvested > 0
+      ? ((r.monthly_cashflow_after_tax || 0) * 12 / cashInvested * 100)
+      : 0
+  );
 
   const locatifKPIs: KPICardData[] = [
     {
@@ -140,9 +147,9 @@ export const KPICardsGrid: React.FC<KPICardsGridProps> = ({
     {
       title: 'Rentabilité nette-nette',
       value: `${(r.net_net_yield || 0).toFixed(2)}%`,
-      subtitle: 'Après impôts',
+      subtitle: 'Après charges + impôt',
       icon: <BarChart3 className="h-5 w-5 text-chart-3" />,
-      tooltip: 'Rentabilité réelle après toutes charges et fiscalité. C\'est le rendement effectif de votre investissement.',
+      tooltip: 'Rendement réel de l\'actif : (NOI - impôt) / coût total. Ne tient pas compte du financement (sinon c\'est du cash-on-cash).',
       status: r.net_net_yield >= 4 ? 'excellent' : r.net_net_yield >= 2.5 ? 'good' : r.net_net_yield >= 1 ? 'warning' : 'bad',
     },
     {
@@ -156,25 +163,33 @@ export const KPICardsGrid: React.FC<KPICardsGridProps> = ({
     {
       title: 'DSCR',
       value: (r.dscr || 0).toFixed(2),
-      subtitle: 'Ratio couverture dette',
+      subtitle: 'Couverture dette',
       icon: <Shield className="h-5 w-5 text-warning" />,
-      tooltip: 'Debt Service Coverage Ratio : NOI / Annuité crédit. Un ratio > 1.2 est généralement exigé par les banques.',
+      tooltip: 'Debt Service Coverage Ratio : NOI (loyer net de vacance/impayés - charges) / annuité crédit (capital + intérêts). Banques exigent >= 1,2.',
       status: r.dscr >= 1.3 ? 'excellent' : r.dscr >= 1.2 ? 'good' : r.dscr >= 1 ? 'warning' : 'bad',
+    },
+    {
+      title: 'Taux d\'effort banque',
+      value: r.dti_bank !== undefined ? `${r.dti_bank.toFixed(1)}%` : '—',
+      subtitle: 'HCSF (loyer 70%)',
+      icon: <Percent className="h-5 w-5 text-chart-2" />,
+      tooltip: 'DTI bancaire calculé selon HCSF : (crédits + nouvelle mensualité) / (revenus + 70% du loyer net). Seuil : 35%.',
+      status: r.dti_bank === undefined ? undefined : r.dti_bank <= 30 ? 'excellent' : r.dti_bank <= 35 ? 'good' : r.dti_bank <= 40 ? 'warning' : 'bad',
     },
     {
       title: 'TRI (IRR)',
       value: `${(r.irr || 0).toFixed(1)}%`,
       subtitle: 'Sur l\'horizon',
       icon: <Calculator className="h-5 w-5 text-chart-4" />,
-      tooltip: 'Taux de Rentabilité Interne : mesure la performance globale incluant plus-value, cashflows et effet de levier.',
+      tooltip: 'Taux de Rentabilité Interne calculé sur le cash réellement investi à T0 (apport + frais non financés), incluant cashflows et plus-value nette.',
       status: r.irr >= 10 ? 'excellent' : r.irr >= 6 ? 'good' : r.irr >= 3 ? 'warning' : 'bad',
     },
     {
       title: 'Cash-on-Cash',
       value: `${cashOnCash.toFixed(1)}%`,
-      subtitle: 'Rendement sur apport',
+      subtitle: 'Sur cash investi',
       icon: <Euro className="h-5 w-5 text-success" />,
-      tooltip: 'Rendement annuel sur votre apport personnel (cashflow annuel / apport). Mesure l\'efficacité de votre capital.',
+      tooltip: `Rendement annuel sur le cash réellement investi (${formatCurrency(cashInvested)}). Mesure l'efficacité de votre capital après dette.`,
       status: cashOnCash >= 10 ? 'excellent' : cashOnCash >= 5 ? 'good' : cashOnCash >= 0 ? 'warning' : 'bad',
     },
     {
@@ -183,7 +198,7 @@ export const KPICardsGrid: React.FC<KPICardsGridProps> = ({
       subtitle: 'À horizon',
       icon: <Building2 className="h-5 w-5 text-primary" />,
       tooltip: 'Valeur estimée du bien à l\'horizon moins dette restante plus cashflows cumulés. C\'est votre enrichissement total.',
-      status: r.net_patrimony > financing.down_payment * 2 ? 'excellent' : r.net_patrimony > financing.down_payment ? 'good' : 'warning',
+      status: r.net_patrimony > cashInvested * 2 ? 'excellent' : r.net_patrimony > cashInvested ? 'good' : 'warning',
     },
     {
       title: 'Effet de levier',
@@ -206,15 +221,15 @@ export const KPICardsGrid: React.FC<KPICardsGridProps> = ({
       value: formatCurrency(r.break_even_rent || 0),
       subtitle: 'Break-even',
       icon: <Target className="h-5 w-5 text-warning" />,
-      tooltip: 'Loyer minimum pour atteindre l\'équilibre (cashflow = 0). Plus votre loyer actuel est au-dessus, plus tu as de marge.',
+      tooltip: 'Loyer minimum pour atteindre l\'équilibre (cashflow = 0), calculé avec ton régime fiscal réel. Plus ton loyer actuel est au-dessus, plus tu as de marge.',
       status: rental && r.break_even_rent < rental.rent_monthly * 0.8 ? 'excellent' : rental && r.break_even_rent < rental.rent_monthly ? 'good' : 'warning',
     },
     {
       title: 'ROI total',
       value: `${roi.toFixed(0)}%`,
-      subtitle: 'Sur apport initial',
+      subtitle: 'Sur cash investi',
       icon: <TrendingUp className="h-5 w-5 text-emerald-500" />,
-      tooltip: 'Retour sur investissement : (Patrimoine final - Apport) / Apport. Mesure votre multiplication de capital.',
+      tooltip: 'Retour sur investissement : (Patrimoine final - cash investi) / cash investi. Mesure votre multiplication de capital.',
       status: roi >= 100 ? 'excellent' : roi >= 50 ? 'good' : roi >= 0 ? 'warning' : 'bad',
     },
   ];

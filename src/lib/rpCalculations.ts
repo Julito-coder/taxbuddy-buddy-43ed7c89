@@ -2,6 +2,8 @@
 // These functions are used by both RPResultsDashboard and rpPdfExport to ensure consistency
 
 import { FullProjectData } from './realEstateTypes';
+import { calculateTotalProjectCost } from './simulationEngine';
+import { HCSF, getMinResteAVivre } from './realEstate/standards';
 
 export interface HouseholdMember {
   id?: string;
@@ -84,62 +86,67 @@ export function calculateRPMetrics(
   // === BANKING METRICS ===
   // Total credits = existing + new loan payment
   const totalCreditsAfterProject = totalExistingCredits + monthlyPayment;
-  
-  // Debt-to-Income ratio: (credits / income) * 100
-  // IMPORTANT: Use total credits including new loan payment
-  const debtRatio = totalHouseholdIncome > 0 
-    ? (totalCreditsAfterProject / totalHouseholdIncome) * 100 
+
+  // Debt-to-Income ratio (HCSF) : (crédits totaux / revenus) * 100
+  const debtRatio = totalHouseholdIncome > 0
+    ? (totalCreditsAfterProject / totalHouseholdIncome) * 100
     : 0;
-  
-  // Reste à vivre: income - all credits - other charges
+
+  // Reste à vivre : revenus - crédits - autres charges
   const otherCharges = household.otherChargesMonthly || 0;
   const resteAVivre = totalHouseholdIncome - totalCreditsAfterProject - otherCharges;
-  
+
   // Monthly effort vs avoided rent
   const avoidedRent = owner_occupier?.avoided_rent_monthly || 0;
   const monthlyEffort = totalHousingCostMonthly - avoidedRent;
-  
-  // LTV ratio
-  const ltv = acquisition.price_net_seller > 0 
-    ? (financing.loan_amount / acquisition.price_net_seller) * 100 
+
+  // BUG FIX #10 : LTV = prêt / (prix + notaire) — pratique bancaire standard
+  const ltvBase = (acquisition.price_net_seller || 0) + (acquisition.notary_fee_amount || 0);
+  const ltv = ltvBase > 0
+    ? (financing.loan_amount / ltvBase) * 100
     : 0;
-  
+
   // === PATRIMONY ===
-  const totalProjectCost = acquisition.total_project_cost || 
-    (acquisition.price_net_seller + (acquisition.agency_fee_amount || 0) + 
-     (acquisition.notary_fee_amount || 0) + (acquisition.works_amount || 0));
-  
+  // BUG FIX #9 : source unique du coût total (cohérent avec simulationEngine)
+  const totalProjectCost = calculateTotalProjectCost(acquisition);
+
   const horizonYears = project.horizon_years || 20;
   const lastPatrimony = results?.patrimony_series?.[results.patrimony_series.length - 1];
   const netPatrimonyAtHorizon = lastPatrimony?.net_patrimony || results?.net_patrimony || 0;
   const propertyValueAtHorizon = lastPatrimony?.property_value || acquisition.price_net_seller;
   const remainingDebtAtHorizon = lastPatrimony?.remaining_debt || 0;
-  
+
   const totalCreditCost = (financing.total_interest || 0) + (financing.total_insurance || 0);
-  
+
   // === STATUS EVALUATION ===
-  // HCSF rule: DTI should be <= 35%
-  // Reste à vivre: minimum ~400€ per person
-  const minResteAVivre = 400 * memberCount;
-  
+  // BUG FIX #2 : reste à vivre par typologie (adulte 1 / adulte 2 / enfant)
+  // Adultes = référent + membres marqués comme conjoint/co-emprunteur ; enfants = autres
+  const adultRelations = ['conjoint', 'co_emprunteur', 'partenaire', 'concubin'];
+  const adults = 1 + (household.members || []).filter(m =>
+    adultRelations.includes((m.relation || '').toLowerCase())
+  ).length;
+  const children = Math.max(0, memberCount - adults);
+  const minResteAVivre = getMinResteAVivre(adults, children);
+  const dangerResteAVivre = minResteAVivre * 0.6;
+
   let statusLevel: 'success' | 'warning' | 'danger';
   let statusMessage: string;
   let isViable: boolean;
-  
-  if (debtRatio > 40 || resteAVivre < 300 * memberCount) {
+
+  if (debtRatio > HCSF.MAX_DTI_DEROGATION_PCT || resteAVivre < dangerResteAVivre) {
     statusLevel = 'danger';
     statusMessage = 'Dossier sous tension';
     isViable = false;
-  } else if (debtRatio > 35 || resteAVivre < minResteAVivre) {
+  } else if (debtRatio > HCSF.MAX_DTI_PCT || resteAVivre < minResteAVivre) {
     statusLevel = 'warning';
-    statusMessage = 'Dossier sous vigilance';
+    statusMessage = 'Dossier sous vigilance (dérogation HCSF possible)';
     isViable = false;
   } else {
     statusLevel = 'success';
     statusMessage = 'Dossier équilibré';
     isViable = true;
   }
-  
+
   return {
     // Income totals
     totalHouseholdIncome,

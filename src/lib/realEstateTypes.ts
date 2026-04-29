@@ -187,21 +187,38 @@ export interface ZoneData {
   charges_estimate: number;
 }
 
+export interface CapitalGainTaxDetail {
+  ir: number;
+  ps: number;
+  total: number;
+  abatement_ir_pct: number;
+  abatement_ps_pct: number;
+}
+
 export interface SimulationResults {
   id?: string;
   project_id: string;
   gross_yield: number;
   net_yield: number;
   net_net_yield: number;
+  /** Rendement annuel sur cash investi (apport + frais non financés). */
+  cash_on_cash_yield?: number;
+  /** Cash réellement investi à T0 (apport + tous les frais payés cash). */
+  cash_invested?: number;
   monthly_cashflow_before_tax: number;
   monthly_cashflow_after_tax: number;
   monthly_effort: number;
   irr: number;
   net_patrimony: number;
   dscr: number;
+  /** Taux d'effort bancaire (DTI) — Locatif : revenus pondérés à 70%. */
+  dti_bank?: number;
+  /** Reste à vivre mensuel du ménage (Locatif). */
+  reste_a_vivre?: number;
   break_even_rent: number;
   break_even_price: number;
   break_even_rate: number;
+  capital_gain_tax_detail?: CapitalGainTaxDetail;
   cashflow_series: CashflowYear[];
   patrimony_series: PatrimonyYear[];
   sensitivity_data: SensitivityData;
