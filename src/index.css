@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Sora reste chargé pour le reste de l'app interne (50+ pages utilisent
+   font-sans), Inter est servi via index.html en preload. */
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
 
 @layer base {
@@ -42,76 +44,76 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 210 53% 23%;
 
-    /* ─────────────────────── Design system tokens (landing premium)
-       Préfixe --ds-* pour ne pas entrer en collision avec shadcn.
-       Seules les classes .btn-ds-*, .card-ds, .text-ds-* les consomment.
-    */
+    /* ─────────────────────── Design system v2 (landing premium)
+       Préfixe --v2-* pour ne pas entrer en collision avec shadcn.
+       Utilisé exclusivement par Welcome.tsx et Legal.tsx. */
 
-    /* Brand */
-    --ds-color-primary: #1C3B5A;
-    --ds-color-primary-hover: #15304A;
-    --ds-color-accent: #8B6914;        /* Gold WCAG AA compliant pour texte */
-    --ds-color-accent-light: #D4A94B;  /* Décoratif fonds sombres uniquement */
+    /* Font */
+    --v2-font: 'Inter', system-ui, -apple-system, sans-serif;
 
-    /* Text */
-    --ds-color-text-primary: #203146;
-    --ds-color-text-secondary: #4A5568;
-    --ds-color-text-tertiary: #8896A6;
-    --ds-color-text-inverse: #FFFFFF;
+    /* Palette navy */
+    --navy-950: #0B1929;
+    --navy-900: #0F2137;
+    --navy-800: #1C3B5A;
+    --navy-700: #24506F;
+    --navy-600: #2D6A8A;
+    --navy-100: #D4E4F1;
+    --navy-50:  #EDF4FA;
 
-    /* Backgrounds */
-    --ds-color-bg-primary: #FCFAF8;
-    --ds-color-bg-secondary: #F5F1EC;
-    --ds-color-bg-tertiary: #FFFFFF;
-    --ds-color-bg-dark: #1C3B5A;
+    /* Palette coral — accent ownable */
+    --coral-500: #F06449;
+    --coral-400: #F2806A;
+    --coral-300: #F5A08E;
+    --coral-100: #FDE8E4;
+    --coral-50:  #FFF5F3;
 
-    /* Borders */
-    --ds-color-border-light: #E8E4DF;
-    --ds-color-border-default: #D1CCC6;
+    /* Texte */
+    --text-primary:   #0F2137;
+    --text-secondary: #475569;
+    --text-tertiary:  #94A3B8;
+    --text-inverse:   #FFFFFF;
 
-    /* Semantic */
-    --ds-color-success: #16A34A;
-    --ds-color-error: #DC2626;
-    --ds-color-warning: #D97706;
+    /* Surfaces */
+    --surface-0: #FFFFFF;
+    --surface-1: #FAFAF9;
+    --surface-2: #F5F3F0;
+    --surface-3: #EDEBE8;
 
-    /* Typography (échelle 1.25) */
-    --ds-text-xs: 0.75rem;
-    --ds-text-sm: 0.875rem;
-    --ds-text-base: 1rem;
-    --ds-text-lg: 1.125rem;
-    --ds-text-xl: 1.25rem;
-    --ds-text-2xl: 1.5rem;
-    --ds-text-3xl: 1.875rem;
-    --ds-text-4xl: 3rem;
+    /* Bordures */
+    --v2-border-light: rgba(0, 0, 0, 0.06);
+    --v2-border-default: rgba(0, 0, 0, 0.10);
 
-    --ds-fw-regular: 400;
-    --ds-fw-medium: 500;
-    --ds-fw-semibold: 600;
-    --ds-fw-bold: 700;
+    /* Statut */
+    --green-500: #10B981;
+    --green-100: #D1FAE5;
 
-    --ds-lh-tight: 1.2;
-    --ds-lh-normal: 1.5;
-    --ds-lh-relaxed: 1.7;
+    /* Espacement (4px grid) */
+    --s1: 4px;   --s2: 8px;   --s3: 12px;  --s4: 16px;
+    --s5: 20px;  --s6: 24px;  --s8: 32px;  --s10: 40px;
+    --s12: 48px; --s16: 64px; --s20: 80px; --s24: 96px;
+    --s32: 128px;
 
-    /* Spacing (4px base) */
-    --ds-space-1: 0.25rem;
-    --ds-space-2: 0.5rem;
-    --ds-space-3: 0.75rem;
-    --ds-space-4: 1rem;
-    --ds-space-5: 1.25rem;
-    --ds-space-6: 1.5rem;
-    --ds-space-8: 2rem;
-    --ds-space-10: 2.5rem;
-    --ds-space-12: 3rem;
-    --ds-space-16: 4rem;
-    --ds-space-20: 5rem;
-    --ds-space-24: 6rem;
+    /* Radius */
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-lg: 16px;
+    --r-xl: 20px;
+    --r-2xl: 24px;
+    --r-3xl: 32px;
+    --r-pill: 9999px;
 
-    --ds-radius-sm: 8px;
-    --ds-radius-md: 12px;
-    --ds-radius-lg: 16px;
-    --ds-radius-xl: 24px;
-    --ds-radius-pill: 9999px;
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+    --shadow-glow-coral: 0 0 40px rgba(240, 100, 73, 0.25);
+    --shadow-glow-navy:  0 0 40px rgba(28, 59, 90, 0.20);
+
+    /* Motion */
+    --v2-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --v2-duration: 300ms;
   }
 }
 
@@ -125,14 +127,23 @@
     font-family: 'Sora', system-ui, sans-serif;
   }
 
-  /* Focus-visible global — accessibilité clavier */
-  :focus-visible {
-    outline: 2px solid var(--ds-color-primary);
-    outline-offset: 2px;
-    border-radius: 2px;
+  /* La landing v2 et les pages légales basculent en Inter via une classe racine */
+  .v2-root {
+    font-family: var(--v2-font);
+    color: var(--text-primary);
+    background: var(--surface-1);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
-  /* Reduced motion respect — applique à toute l'app */
+  /* A11y globaux */
+  :focus-visible {
+    outline: 2px solid var(--coral-500);
+    outline-offset: 3px;
+    border-radius: var(--r-sm);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -181,137 +192,129 @@
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold text-primary-foreground rounded-lg transition-all duration-200;
     background: linear-gradient(135deg, hsl(210 53% 23%), hsl(37 55% 51%));
   }
-
   .btn-primary:hover {
     @apply opacity-90 scale-[1.02];
     box-shadow: 0 0 30px -5px hsl(210 53% 23% / 0.3);
   }
-
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-medium text-foreground bg-muted hover:bg-muted/80 rounded-lg border border-border transition-all duration-200;
   }
-
   .metric-card {
     @apply bg-card rounded-xl p-6 border border-border transition-all duration-300 hover:border-primary/30 shadow-sm;
   }
 
-  /* ─────────────────────── Design system landing — composants premium
-     Préfixe ds-* pour ne pas écraser .btn-primary historique.
-  */
+  /* ─────────────────────── Design system landing v2 — composants premium */
 
-  .skip-link {
+  .v2-skip-link {
     position: absolute;
     top: -100%;
-    left: var(--ds-space-4);
-    padding: var(--ds-space-2) var(--ds-space-4);
-    background: var(--ds-color-primary);
-    color: var(--ds-color-text-inverse);
-    border-radius: var(--ds-radius-md);
+    left: var(--s4);
+    padding: var(--s2) var(--s4);
+    background: var(--navy-900);
+    color: var(--text-inverse);
+    border-radius: var(--r-pill);
     z-index: 1000;
-    font-size: var(--ds-text-sm);
-    font-weight: var(--ds-fw-medium);
+    font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
-    transition: top 0.2s ease;
+    transition: top 200ms var(--v2-ease);
   }
-  .skip-link:focus {
-    top: var(--ds-space-2);
+  .v2-skip-link:focus {
+    top: var(--s4);
   }
 
-  .ds-btn {
+  .v2-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--ds-space-2);
-    height: 48px;
-    padding: 0 var(--ds-space-6);
+    gap: 10px;
+    height: 52px;
+    padding: 0 32px;
     font-family: inherit;
-    font-size: var(--ds-text-sm);
-    font-weight: var(--ds-fw-medium);
-    border-radius: var(--ds-radius-pill);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-radius: var(--r-pill);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--v2-duration) var(--v2-ease);
     text-decoration: none;
     border: none;
     white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+  }
+  .v2-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: transform var(--v2-duration) var(--v2-ease);
+  }
+  .v2-btn:hover svg {
+    transform: translateX(3px);
   }
 
-  .ds-btn-primary {
-    background: var(--ds-color-primary);
-    color: var(--ds-color-text-inverse);
+  .v2-btn-primary {
+    background: var(--navy-900);
+    color: var(--text-inverse);
   }
-  .ds-btn-primary:hover {
-    background: var(--ds-color-primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(28, 59, 90, 0.25);
+  .v2-btn-primary:hover {
+    background: var(--navy-950);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-navy);
   }
 
-  .ds-btn-secondary {
+  .v2-btn-coral {
+    background: var(--coral-500);
+    color: var(--text-inverse);
+  }
+  .v2-btn-coral:hover {
+    background: #E8553D;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-coral);
+  }
+
+  .v2-btn-secondary {
+    background: var(--surface-0);
+    color: var(--text-primary);
+    border: 1.5px solid var(--v2-border-default);
+  }
+  .v2-btn-secondary:hover {
+    border-color: var(--navy-800);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .v2-btn-ghost {
     background: transparent;
-    color: var(--ds-color-text-primary);
-    border: 1.5px solid var(--ds-color-border-default);
+    color: var(--text-secondary);
+    height: 52px;
+    padding: 0 20px;
   }
-  .ds-btn-secondary:hover {
-    border-color: var(--ds-color-primary);
-    color: var(--ds-color-primary);
-  }
-
-  .ds-btn-ghost {
-    background: transparent;
-    color: var(--ds-color-primary);
-    padding: 0 var(--ds-space-4);
-    height: 48px;
-  }
-  .ds-btn-ghost:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-thickness: 2px;
+  .v2-btn-ghost:hover {
+    color: var(--text-primary);
   }
 
-  .ds-btn-inverse {
-    background: var(--ds-color-text-inverse);
-    color: var(--ds-color-primary);
+  .v2-btn-white {
+    background: var(--surface-0);
+    color: var(--text-primary);
   }
-  .ds-btn-inverse:hover {
-    background: rgba(255, 255, 255, 0.92);
-    transform: translateY(-1px);
-  }
-
-  .ds-card {
-    background: var(--ds-color-bg-tertiary);
-    border: 1px solid var(--ds-color-border-light);
-    border-radius: var(--ds-radius-lg);
-    padding: var(--ds-space-6);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .ds-card:hover {
-    border-color: var(--ds-color-border-default);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  .v2-btn-white:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
   }
 
-  .ds-card-elevated {
-    background: var(--ds-color-bg-tertiary);
-    border: 2px solid var(--ds-color-accent);
-    border-radius: var(--ds-radius-lg);
-    padding: var(--ds-space-8);
-    box-shadow: 0 8px 28px rgba(28, 59, 90, 0.10);
-    transform: translateY(-4px);
+  /* Animations partagées */
+  @keyframes v2-fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-
-  .ds-nav-link {
-    display: inline-flex;
-    align-items: center;
-    height: 48px;
-    padding: 0 var(--ds-space-3);
-    font-size: var(--ds-text-base);
-    font-weight: var(--ds-fw-medium);
-    color: var(--ds-color-text-secondary);
-    text-decoration: none;
-    transition: color 0.2s ease;
+  @keyframes v2-floatUp {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
   }
-  .ds-nav-link:hover {
-    color: var(--ds-color-primary);
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-thickness: 2px;
+  @keyframes v2-pulseDot {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+  }
+  .v2-fade-in {
+    animation: v2-fadeInUp 0.7s var(--v2-ease) both;
   }
 }
