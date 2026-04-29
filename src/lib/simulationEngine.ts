@@ -15,6 +15,44 @@ import {
   SaleData,
   RealEstateProject,
 } from './realEstateTypes';
+import { calculateCapitalGainTax, HCSF, getMinResteAVivre } from './realEstate/standards';
+
+// ============= Source unique du coût total projet =============
+/**
+ * Calcule le coût total du projet (acquisition + frais).
+ * Utilisé partout pour éviter les divergences (engine vs RP vs PDF).
+ */
+export function calculateTotalProjectCost(acquisition: AcquisitionData): number {
+  if (acquisition.total_project_cost && acquisition.total_project_cost > 0) {
+    return acquisition.total_project_cost;
+  }
+  return (
+    (acquisition.price_net_seller || 0) +
+    (acquisition.agency_fee_amount || 0) +
+    (acquisition.notary_fee_amount || 0) +
+    (acquisition.works_amount || 0) +
+    (acquisition.furniture_amount || 0) +
+    (acquisition.bank_fees || 0) +
+    (acquisition.guarantee_fees || 0) +
+    (acquisition.brokerage_fees || 0)
+  );
+}
+
+/**
+ * Calcule le cash réellement investi à T0 = coût total - emprunt.
+ * Sert de base pour IRR (L0) et cash-on-cash. Toujours >= apport.
+ */
+export function calculateCashInvested(
+  acquisition: AcquisitionData,
+  financing: FinancingData,
+): number {
+  const total = calculateTotalProjectCost(acquisition);
+  const loan = financing.loan_amount || 0;
+  const cashFromProject = Math.max(0, total - loan);
+  // Garde-fou : jamais inférieur à l'apport déclaré (cas où meubles/travaux financés ailleurs)
+  return Math.max(cashFromProject, financing.down_payment || 0);
+}
+
 
 // Calculate monthly loan payment (annuity formula)
 export function calculateMonthlyPayment(
