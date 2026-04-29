@@ -2,6 +2,8 @@
 // These functions are used by both RPResultsDashboard and rpPdfExport to ensure consistency
 
 import { FullProjectData } from './realEstateTypes';
+import { calculateTotalProjectCost } from './simulationEngine';
+import { HCSF, getMinResteAVivre } from './realEstate/standards';
 
 export interface HouseholdMember {
   id?: string;
