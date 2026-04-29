@@ -101,6 +101,9 @@ const Bulletin = () => {
           weeklyDeltaCents={data?.weeklyDeltaCents || 0}
         />
 
+        {/* Synthèse fiscale issue des transactions bancaires (tags) */}
+        <BankFiscalSummary />
+
         {/* Carte Coach épinglée — la « glu » entre les piliers */}
         <CoachPinnedCard />
 
