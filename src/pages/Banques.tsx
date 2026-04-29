@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,10 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import {
-  Building2, RefreshCw, Plug, Trash2, ArrowLeft, Loader2,
-  Landmark, Sparkles, CalendarClock, Zap, Shield, CreditCard,
-  Wifi, Home, FileText, MoreHorizontal, Power, TrendingDown,
-  Clock
+  Building2, RefreshCw, Plug, Trash2, Loader2,
+  Wallet, Sparkles, CalendarClock, Zap, Shield, CreditCard,
+  Wifi, Home, FileText, MoreHorizontal, Power,
+  Clock,
 } from 'lucide-react';
 import {
   getConnectionStatus,
@@ -31,6 +31,11 @@ import {
   type PowensConnectionStatus,
   type RecurringDeadline,
 } from '@/lib/bankService';
+import { useMonthlyTaxSavings } from '@/hooks/useMonthlyTaxSavings';
+import { TaxSavingsChart } from '@/components/finances/TaxSavingsChart';
+import { OptimisationsFeed } from '@/components/finances/OptimisationsFeed';
+import { TransactionFiscalBadge } from '@/components/finances/TransactionFiscalBadge';
+import { runCategorization, type OptimisationItem } from '@/lib/financesService';
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: typeof Zap; color: string }> = {
   energie: { label: 'Énergie', icon: Zap, color: 'text-amber-600 bg-amber-50' },
@@ -48,17 +53,21 @@ const FREQ_LABELS: Record<string, string> = {
   annually: 'Annuel',
 };
 
-const BanquesPage = () => {
+const FinancesPage = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState<'connect' | 'sync' | 'disconnect' | 'detect' | null>(null);
+  const [busy, setBusy] = useState<'connect' | 'sync' | 'disconnect' | 'detect' | 'analyze' | null>(null);
   const [status, setStatus] = useState<PowensConnectionStatus>({ connected: false, last_sync_at: null, connections_count: 0 });
   const [accounts, setAccounts] = useState<BankAccount[]>([]);
   const [transactions, setTransactions] = useState<BankTransaction[]>([]);
   const [recurring, setRecurring] = useState<RecurringDeadline[]>([]);
-  const [activeTab, setActiveTab] = useState('comptes');
+  const [activeTab, setActiveTab] = useState('optimisations');
+
+  const taxSavings = useMonthlyTaxSavings();
+  const optimisationsByTxId = new Map<string, OptimisationItem>(
+    taxSavings.optimisations.map((o) => [o.transactionId, o]),
+  );
 
   const refresh = useCallback(async () => {
     if (!user) return;
@@ -91,7 +100,7 @@ const BanquesPage = () => {
   const handleConnect = async () => {
     setBusy('connect');
     try {
-      const redirectUri = `${window.location.origin}/outils/banques`;
+      const redirectUri = `${window.location.origin}/finances`;
       const { webview_url } = await startWebview(redirectUri);
       window.location.href = webview_url;
     } catch (e) {
@@ -110,9 +119,29 @@ const BanquesPage = () => {
       if (r.urssaf_marked) parts.push(`${r.urssaf_marked} cotisation(s) URSSAF marquée(s) payée(s)`);
       toast.success(parts.join(' · '));
       await refresh();
+      // après une synchro, on relance l'analyse fiscale en best-effort
+      runCategorization().then(() => taxSavings.refresh()).catch(() => {});
     } catch (e) {
       console.error(e);
       toast.error('La synchronisation a échoué.');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleAnalyzeFiscal = async () => {
+    setBusy('analyze');
+    try {
+      const r = await runCategorization();
+      if (r.tagged === 0) {
+        toast.info('Aucune nouvelle optimisation détectée.');
+      } else {
+        toast.success(`${r.tagged} optimisation(s) détectée(s) sur ${r.analyzed} opération(s).`);
+      }
+      await taxSavings.refresh();
+    } catch (e) {
+      console.error(e);
+      toast.error('Analyse fiscale impossible.');
     } finally {
       setBusy(null);
     }
@@ -176,14 +205,12 @@ const BanquesPage = () => {
 
   const totalBalance = accounts.reduce((s, a) => s + Number(a.balance || 0), 0);
 
-  // Group accounts by bank
   const bankGroups = accounts.reduce<Record<string, BankAccount[]>>((acc, a) => {
     const key = a.bank_name || 'Banque inconnue';
     (acc[key] = acc[key] || []).push(a);
     return acc;
   }, {});
 
-  // Group recurring by category
   const recurringByCategory = recurring.reduce<Record<string, RecurringDeadline[]>>((acc, r) => {
     (acc[r.category] = acc[r.category] || []).push(r);
     return acc;
@@ -202,21 +229,14 @@ const BanquesPage = () => {
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-6">
-        <button
-          onClick={() => navigate('/outils')}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" /> Outils
-        </button>
-
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-3">
           <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Landmark className="h-6 w-6 text-primary" />
+            <Wallet className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Mes comptes bancaires</h1>
+            <h1 className="text-2xl font-bold text-foreground">Mes finances</h1>
             <p className="text-sm text-muted-foreground">
-              Connecte tes banques en sécurité (DSP2) pour qu'Élio comprenne tes flux et trouve plus d'optimisations.
+              Élio analyse tes flux bancaires pour transformer chaque euro déductible en économie d'impôt.
             </p>
           </div>
         </motion.div>
@@ -243,6 +263,15 @@ const BanquesPage = () => {
           </Card>
         ) : (
           <>
+            {/* Game-changer #2 : Tax savings chart */}
+            <TaxSavingsChart
+              months={taxSavings.months}
+              totalCentsYTD={taxSavings.totalCentsYTD}
+              totalCentsCurrentMonth={taxSavings.totalCentsCurrentMonth}
+              totalCentsPrevMonth={taxSavings.totalCentsPrevMonth}
+              loading={taxSavings.loading}
+            />
+
             {/* Summary bar */}
             <Card className="shadow-sm">
               <CardContent className="p-6">
@@ -278,7 +307,13 @@ const BanquesPage = () => {
             </Card>
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid grid-cols-3 w-full">
+              <TabsList className="grid grid-cols-4 w-full">
+                <TabsTrigger value="optimisations">
+                  Optimisations
+                  {taxSavings.optimisations.length > 0 && (
+                    <Badge variant="secondary" className="ml-1.5 text-[10px] px-1.5">{taxSavings.optimisations.length}</Badge>
+                  )}
+                </TabsTrigger>
                 <TabsTrigger value="comptes">Comptes</TabsTrigger>
                 <TabsTrigger value="prelevements">
                   Prélèvements
@@ -288,6 +323,16 @@ const BanquesPage = () => {
                 </TabsTrigger>
                 <TabsTrigger value="operations">Opérations</TabsTrigger>
               </TabsList>
+
+              {/* TAB: Optimisations détectées */}
+              <TabsContent value="optimisations" className="space-y-4 mt-4">
+                <OptimisationsFeed
+                  optimisations={taxSavings.optimisations}
+                  onCategorize={handleAnalyzeFiscal}
+                  onChange={taxSavings.refresh}
+                  busy={busy === 'analyze'}
+                />
+              </TabsContent>
 
               {/* TAB: Comptes */}
               <TabsContent value="comptes" className="space-y-4 mt-4">
@@ -334,7 +379,6 @@ const BanquesPage = () => {
 
               {/* TAB: Prélèvements récurrents */}
               <TabsContent value="prelevements" className="space-y-4 mt-4">
-                {/* Summary cards */}
                 <div className="grid grid-cols-2 gap-3">
                   <Card className="shadow-sm">
                     <CardContent className="p-4 text-center">
@@ -452,19 +496,31 @@ const BanquesPage = () => {
                     {transactions.length === 0 ? (
                       <p className="text-sm text-muted-foreground py-4 text-center">Aucune opération sur 90 jours.</p>
                     ) : (
-                      transactions.map((t) => (
-                        <div key={t.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-foreground truncate">{t.label || 'Opération'}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(t.tx_date).toLocaleDateString('fr-FR')} {t.category && `· ${t.category}`}
+                      transactions.map((t) => {
+                        const tag = optimisationsByTxId.get(t.id);
+                        return (
+                          <div key={t.id} className="flex items-start justify-between py-2 border-b border-border last:border-0 gap-3">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-foreground truncate">{t.label || 'Opération'}</p>
+                              <div className="flex items-center gap-2 flex-wrap mt-0.5">
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(t.tx_date).toLocaleDateString('fr-FR')} {t.category && `· ${t.category}`}
+                                </p>
+                                {tag && (
+                                  <TransactionFiscalBadge
+                                    category={tag.category}
+                                    savingsCents={tag.estimatedSavingsCents}
+                                    confirmed={tag.confirmed}
+                                  />
+                                )}
+                              </div>
+                            </div>
+                            <p className={`text-sm font-semibold shrink-0 ${Number(t.amount) < 0 ? 'text-destructive' : 'text-success'}`}>
+                              {Number(t.amount).toLocaleString('fr-FR', { style: 'currency', currency: t.currency || 'EUR' })}
                             </p>
                           </div>
-                          <p className={`text-sm font-semibold shrink-0 ml-3 ${Number(t.amount) < 0 ? 'text-destructive' : 'text-success'}`}>
-                            {Number(t.amount).toLocaleString('fr-FR', { style: 'currency', currency: t.currency || 'EUR' })}
-                          </p>
-                        </div>
-                      ))
+                        );
+                      })
                     )}
                   </CardContent>
                 </Card>
@@ -481,4 +537,4 @@ const BanquesPage = () => {
   );
 };
 
-export default BanquesPage;
+export default FinancesPage;
