@@ -323,18 +323,11 @@ export function calculateIRR(cashflows: number[], maxIterations: number = 1000):
 // Main simulation calculation
 export function calculateSimulation(data: FullProjectData): SimulationResults {
   const { project, acquisition, financing, rental, owner_occupier, operating_costs, tax_config, sale_data } = data;
-  
-  const totalCost = acquisition.total_project_cost || (
-    acquisition.price_net_seller + 
-    acquisition.agency_fee_amount + 
-    acquisition.notary_fee_amount + 
-    acquisition.works_amount + 
-    acquisition.furniture_amount + 
-    acquisition.bank_fees + 
-    acquisition.guarantee_fees + 
-    acquisition.brokerage_fees
-  );
-  
+
+  // Source unique du coût total + cash investi (T0)
+  const totalCost = calculateTotalProjectCost(acquisition);
+  const cashInvested = calculateCashInvested(acquisition, financing);
+
   // Generate amortization table
   const amortizationTable = generateAmortizationTable(
     financing.loan_amount,
@@ -345,42 +338,45 @@ export function calculateSimulation(data: FullProjectData): SimulationResults {
     financing.deferment_type,
     financing.deferment_months
   );
-  
+
   // Calculate totals from amortization
   const totalInterest = amortizationTable.reduce((sum, row) => sum + row.interest, 0);
   const totalInsurance = amortizationTable.reduce((sum, row) => sum + row.insurance, 0);
   const monthlyPayment = amortizationTable[0]?.payment || 0;
-  
+
   // Calculate annual series
   const cashflowSeries: CashflowYear[] = [];
   const patrimonySeries: PatrimonyYear[] = [];
-  const irrCashflows: number[] = [-financing.down_payment]; // Initial investment
-  
+  // BUG FIX #7 : T0 = cash réellement investi (apport + frais non financés)
+  const irrCashflows: number[] = [-cashInvested];
+
   let cumulativeCashflow = 0;
-  
+
   for (let year = 1; year <= project.horizon_years; year++) {
     let rentalIncome = 0;
     if (project.type === 'LOCATIF' && rental) {
       rentalIncome = calculateAdjustedRentalIncome(rental, year);
     }
-    
+
     const annualOperatingCosts = calculateAnnualOperatingCosts(operating_costs, rentalIncome, year);
-    
+
     // Get loan payments for this year
     const startMonth = (year - 1) * 12;
     const endMonth = Math.min(year * 12, amortizationTable.length);
     let yearlyLoanPayment = 0;
     let yearlyInterest = 0;
-    
+    let yearlyPrincipal = 0;
+
     for (let m = startMonth; m < endMonth; m++) {
       if (amortizationTable[m]) {
         yearlyLoanPayment += amortizationTable[m].payment;
         yearlyInterest += amortizationTable[m].interest;
+        yearlyPrincipal += amortizationTable[m].principal;
       }
     }
-    
+
     const cashflowBeforeTax = rentalIncome - annualOperatingCosts - yearlyLoanPayment;
-    
+
     // Calculate amortization for tax purposes
     const yearlyAmortization = calculateYearlyAmortization(
       tax_config,
@@ -389,7 +385,7 @@ export function calculateSimulation(data: FullProjectData): SimulationResults {
       acquisition.works_amount,
       year
     );
-    
+
     // Calculate tax
     const tax = calculateAnnualTax(
       rentalIncome,
@@ -398,10 +394,10 @@ export function calculateSimulation(data: FullProjectData): SimulationResults {
       tax_config,
       yearlyAmortization
     );
-    
+
     const cashflowAfterTax = cashflowBeforeTax - tax;
     cumulativeCashflow += cashflowAfterTax;
-    
+
     cashflowSeries.push({
       year,
       rental_income: rentalIncome,
@@ -411,7 +407,7 @@ export function calculateSimulation(data: FullProjectData): SimulationResults {
       tax,
       cashflow_after_tax: cashflowAfterTax,
     });
-    
+
     // Property value and patrimony
     const propertyValue = calculatePropertyValue(
       acquisition.price_net_seller,
@@ -420,7 +416,7 @@ export function calculateSimulation(data: FullProjectData): SimulationResults {
     );
     const remainingDebt = getRemainingDebtAtYear(amortizationTable, year);
     const netPatrimony = propertyValue - remainingDebt + cumulativeCashflow;
-    
+
     patrimonySeries.push({
       year,
       property_value: propertyValue,
@@ -428,12 +424,14 @@ export function calculateSimulation(data: FullProjectData): SimulationResults {
       cumulative_cashflow: cumulativeCashflow,
       net_patrimony: netPatrimony,
     });
-    
+
     irrCashflows.push(cashflowAfterTax);
   }
-  
-  // Add resale proceeds to IRR calculation
+
+  // Add resale proceeds to IRR calculation (avec abattements plus-value 2025)
   const resaleYear = sale_data.resale_year;
+  let capitalGainTaxDetail: SimulationResults['capital_gain_tax_detail'] | undefined;
+
   if (resaleYear <= project.horizon_years) {
     const finalPropertyValue = calculatePropertyValue(
       acquisition.price_net_seller,
@@ -442,76 +440,125 @@ export function calculateSimulation(data: FullProjectData): SimulationResults {
     );
     const resaleFees = finalPropertyValue * (sale_data.resale_agency_pct / 100) + sale_data.resale_other_fees;
     const remainingDebt = getRemainingDebtAtYear(amortizationTable, resaleYear);
-    
-    // Capital gain tax (simplified)
-    const capitalGain = finalPropertyValue - acquisition.price_net_seller - acquisition.works_amount;
-    const capitalGainTax = Math.max(0, capitalGain * (sale_data.capital_gain_tax_rate / 100));
-    
+
+    // BUG FIX #8 : plus-value avec abattements pour durée de détention.
+    // RP exonérée. Locatif : régime réel (CGI art. 150 VC).
+    const grossGain = Math.max(0, finalPropertyValue - acquisition.price_net_seller - acquisition.works_amount);
+    let capitalGainTax = 0;
+    if (project.type === 'RP') {
+      capitalGainTax = 0;
+      capitalGainTaxDetail = { ir: 0, ps: 0, total: 0, abatement_ir_pct: 100, abatement_ps_pct: 100 };
+    } else if (tax_config.capital_gain_mode === 'simple') {
+      // Mode simple : taux à plat (rétro-compatibilité)
+      capitalGainTax = grossGain * (sale_data.capital_gain_tax_rate / 100);
+    } else {
+      const detail = calculateCapitalGainTax(grossGain, resaleYear);
+      capitalGainTax = detail.total;
+      capitalGainTaxDetail = {
+        ir: detail.ir, ps: detail.ps, total: detail.total,
+        abatement_ir_pct: detail.abatement_ir_pct,
+        abatement_ps_pct: detail.abatement_ps_pct,
+      };
+    }
+
     const netSaleProceeds = finalPropertyValue - resaleFees - remainingDebt - capitalGainTax;
-    
-    // Add to last IRR cashflow
+
     if (irrCashflows.length > resaleYear) {
       irrCashflows[resaleYear] += netSaleProceeds;
     }
   }
-  
-  // Calculate KPIs
+
+  // ============= KPIs =============
   const annualRent = rental ? rental.rent_monthly * 12 : 0;
   const grossYield = totalCost > 0 ? (annualRent / totalCost) * 100 : 0;
-  
-  const firstYearCosts = calculateAnnualOperatingCosts(operating_costs, annualRent, 1);
-  const noi = annualRent * (1 - (rental?.vacancy_rate || 0) / 100) - firstYearCosts;
+
+  // BUG FIX #4 : NOI utilise loyer ajusté (vacance + impayés + saisonnier)
+  const adjustedFirstYearRent = (project.type === 'LOCATIF' && rental)
+    ? calculateAdjustedRentalIncome(rental, 1)
+    : annualRent;
+  const firstYearCosts = calculateAnnualOperatingCosts(operating_costs, adjustedFirstYearRent, 1);
+  const noi = adjustedFirstYearRent - firstYearCosts;
   const netYield = totalCost > 0 ? (noi / totalCost) * 100 : 0;
-  
-  const avgCashflowAfterTax = cashflowSeries.length > 0 
-    ? cashflowSeries.reduce((sum, cf) => sum + cf.cashflow_after_tax, 0) / cashflowSeries.length 
-    : 0;
-  const netNetYield = totalCost > 0 ? (avgCashflowAfterTax / totalCost) * 100 : 0;
-  
+
+  // BUG FIX #5 : net-net = (NOI - impôt année 1) / coût total, SANS service dette.
+  // Le rendement après dette s'appelle "cash-on-cash" (sur cash investi).
+  const firstYearTax = cashflowSeries[0]?.tax ?? 0;
+  const netNetYield = totalCost > 0 ? ((noi - firstYearTax) / totalCost) * 100 : 0;
+
+  // Cash-on-cash : rendement annuel sur cash investi (apport + frais)
+  const firstYearCashflowAfterTax = cashflowSeries[0]?.cashflow_after_tax ?? 0;
+  const cashOnCashYield = cashInvested > 0 ? (firstYearCashflowAfterTax / cashInvested) * 100 : 0;
+
   const monthlyCashflowBeforeTax = cashflowSeries[0] ? cashflowSeries[0].cashflow_before_tax / 12 : 0;
   const monthlyCashflowAfterTax = cashflowSeries[0] ? cashflowSeries[0].cashflow_after_tax / 12 : 0;
-  
-  // Effort d'épargne (for RP)
+
+  // Effort d'épargne
   const monthlyEffort = project.type === 'RP' ? monthlyPayment : Math.abs(Math.min(0, monthlyCashflowAfterTax));
-  
-  // DSCR (Debt Service Coverage Ratio)
-  const annualDebtService = monthlyPayment * 12;
-  const dscr = annualDebtService > 0 ? noi / annualDebtService : 0;
-  
+
+  // BUG FIX #6 : DSCR = NOI / (capital + intérêts annuels du tableau d'amortissement, hors assurance).
+  // Robuste aux différés (qui faussaient `monthlyPayment * 12`).
+  let firstYearDebtService = 0;
+  for (let m = 0; m < Math.min(12, amortizationTable.length); m++) {
+    firstYearDebtService += amortizationTable[m].principal + amortizationTable[m].interest;
+  }
+  const dscr = firstYearDebtService > 0 ? noi / firstYearDebtService : 0;
+
+  // ============= Solvabilité bancaire (Locatif) =============
+  // BUG FIX #1 + #3 : DTI Locatif intègre le loyer net pondéré (70% HCSF) côté revenus.
+  let dtiBank: number | undefined;
+  let resteAVivre: number | undefined;
+  if (project.type === 'LOCATIF' && rental) {
+    const householdIncomeMonthly = (owner_occupier?.household_income_monthly) || 0;
+    const existingCreditsMonthly = (owner_occupier?.existing_credits_monthly) || 0;
+    const otherCharges = (owner_occupier?.other_charges_monthly) || 0;
+    const monthlyAdjustedRent = adjustedFirstYearRent / 12;
+    const weightedRent = monthlyAdjustedRent * HCSF.RENTAL_INCOME_WEIGHTING;
+    const totalIncome = householdIncomeMonthly + weightedRent;
+    const totalCharges = existingCreditsMonthly + monthlyPayment;
+    dtiBank = totalIncome > 0 ? (totalCharges / totalIncome) * 100 : 0;
+    resteAVivre = totalIncome - totalCharges - otherCharges;
+  }
+
   // IRR
   const irr = calculateIRR(irrCashflows);
-  
+
   // Net patrimony at horizon
   const netPatrimony = patrimonySeries[patrimonySeries.length - 1]?.net_patrimony || 0;
-  
+
   // Break-even calculations
   const breakEvenRent = calculateBreakEvenRent(totalCost, financing, operating_costs, tax_config);
   const breakEvenPrice = calculateBreakEvenPrice(annualRent, financing, operating_costs, tax_config);
   const breakEvenRate = calculateBreakEvenRate(financing.loan_amount, financing.duration_months, annualRent, firstYearCosts);
-  
+
   // Sensitivity analysis
   const sensitivityData = calculateSensitivity(data);
-  
+
   return {
     project_id: project.id,
     gross_yield: Math.round(grossYield * 100) / 100,
     net_yield: Math.round(netYield * 100) / 100,
     net_net_yield: Math.round(netNetYield * 100) / 100,
+    cash_on_cash_yield: Math.round(cashOnCashYield * 100) / 100,
+    cash_invested: Math.round(cashInvested),
     monthly_cashflow_before_tax: Math.round(monthlyCashflowBeforeTax * 100) / 100,
     monthly_cashflow_after_tax: Math.round(monthlyCashflowAfterTax * 100) / 100,
     monthly_effort: Math.round(monthlyEffort * 100) / 100,
     irr: isNaN(irr) ? 0 : irr,
     net_patrimony: Math.round(netPatrimony * 100) / 100,
     dscr: Math.round(dscr * 100) / 100,
+    dti_bank: dtiBank !== undefined ? Math.round(dtiBank * 100) / 100 : undefined,
+    reste_a_vivre: resteAVivre !== undefined ? Math.round(resteAVivre) : undefined,
     break_even_rent: Math.round(breakEvenRent * 100) / 100,
     break_even_price: Math.round(breakEvenPrice * 100) / 100,
     break_even_rate: Math.round(breakEvenRate * 100) / 100,
+    capital_gain_tax_detail: capitalGainTaxDetail,
     cashflow_series: cashflowSeries,
     patrimony_series: patrimonySeries,
     sensitivity_data: sensitivityData,
     calculated_at: new Date().toISOString(),
   };
 }
+
 
 // Calculate break-even rent (cashflow = 0)
 function calculateBreakEvenRent(
