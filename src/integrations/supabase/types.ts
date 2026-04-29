@@ -1749,6 +1749,59 @@ export type Database = {
         }
         Relationships: []
       }
+      transaction_fiscal_tags: {
+        Row: {
+          category: string
+          confidence: number
+          confirmed: boolean
+          created_at: string
+          deduction_rate: number
+          deduction_type: string
+          estimated_savings_cents: number
+          id: string
+          source: string
+          transaction_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          confidence?: number
+          confirmed?: boolean
+          created_at?: string
+          deduction_rate?: number
+          deduction_type?: string
+          estimated_savings_cents?: number
+          id?: string
+          source?: string
+          transaction_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          confidence?: number
+          confirmed?: boolean
+          created_at?: string
+          deduction_rate?: number
+          deduction_type?: string
+          estimated_savings_cents?: number
+          id?: string
+          source?: string
+          transaction_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_fiscal_tags_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: true
+            referencedRelation: "bank_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       urssaf_contributions: {
         Row: {
           contribution_amount: number
@@ -2009,7 +2062,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      monthly_tax_savings: {
+        Row: {
+          confirmed_count: number | null
+          confirmed_savings_cents: number | null
+          month: string | null
+          total_savings_cents: number | null
+          transactions_count: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
