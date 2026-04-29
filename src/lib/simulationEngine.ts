@@ -567,6 +567,8 @@ function calculateBreakEvenRent(
   costs: OperatingCosts,
   taxConfig: TaxConfig
 ): number {
+  // BUG FIX #11 : dichotomie utilisant `calculateAnnualTax` réel
+  // (au lieu de l'approximation tmi*0.7 qui ignorait micro-BIC, LMNP, etc.).
   const monthlyPayment = calculateMonthlyPayment(
     financing.loan_amount,
     financing.nominal_rate,
@@ -574,26 +576,24 @@ function calculateBreakEvenRent(
   );
   const insurance = calculateInsurance(financing.loan_amount, financing.insurance_mode, financing.insurance_value);
   const annualDebt = (monthlyPayment + insurance) * 12;
-  
-  // Fixed costs (not dependent on rent)
-  const fixedCosts = 
-    costs.property_tax_annual +
-    costs.condo_nonrecoverable_annual +
-    costs.insurance_annual +
-    costs.accounting_annual +
-    costs.cfe_annual +
-    costs.utilities_annual;
-  
-  // For break-even: rent - vacancy - management - maintenance - fixed - debt - tax = 0
-  // Simplified calculation
-  const vacancyFactor = 1 - 0.05; // 5% vacancy
-  const managementFactor = 1 - (costs.management_pct / 100);
-  const taxFactor = 1 - ((taxConfig.tmi_rate + taxConfig.social_rate) / 100) * 0.7; // Approximate
-  
-  const effectiveFactor = vacancyFactor * managementFactor * taxFactor;
-  const breakEvenRent = (annualDebt + fixedCosts) / effectiveFactor / 12;
-  
-  return breakEvenRent;
+
+  const cashflowAtRent = (monthlyRent: number): number => {
+    const annualRent = monthlyRent * 12;
+    const opCosts = calculateAnnualOperatingCosts(costs, annualRent, 1);
+    const tax = calculateAnnualTax(annualRent, 0, opCosts, taxConfig, 0);
+    return annualRent - opCosts - annualDebt - tax;
+  };
+
+  // Recherche dichotomique entre 0 et 50 000 €/mois
+  let low = 0;
+  let high = 50000;
+  for (let i = 0; i < 60; i++) {
+    const mid = (low + high) / 2;
+    if (cashflowAtRent(mid) < 0) low = mid;
+    else high = mid;
+    if (high - low < 0.5) break;
+  }
+  return (low + high) / 2;
 }
 
 // Calculate break-even price (cashflow = 0 at current rent)
