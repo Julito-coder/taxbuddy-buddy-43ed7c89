@@ -2,35 +2,44 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   Newspaper,
   Sparkles,
-  Wrench,
-  UserCircle,
+  Wallet,
   Calendar,
-  ScanSearch,
-  Building2,
-  PiggyBank,
-  FolderLock,
+  UserCircle,
+  HandCoins,
+  Calculator,
   Settings,
   LogOut,
+  Compass,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ElioLogo } from './ElioLogo';
+import { SidebarSection } from './SidebarSection';
 
-const mainNav = [
+type NavItem = {
+  path: string;
+  icon: React.ElementType;
+  label: string;
+  exact?: boolean;
+};
+
+const accueilNav: NavItem[] = [
   { path: '/bulletin', icon: Newspaper, label: 'Bulletin du jour' },
+  { path: '/coach', icon: Compass, label: 'Coach' },
   { path: '/agent', icon: Sparkles, label: 'Élio Agent' },
 ];
 
-const outilsNav = [
-  { path: '/outils', icon: Wrench, label: 'Tous les outils', exact: true },
-  { path: '/outils/calendrier', icon: Calendar, label: 'Calendrier' },
-  { path: '/outils/scanner', icon: ScanSearch, label: 'Scanner fiscal' },
-  { path: '/outils/simulateur', icon: Building2, label: 'Simulateur immo' },
-  { path: '/outils/epargne', icon: PiggyBank, label: 'Épargne' },
-  { path: '/outils/coffre', icon: FolderLock, label: 'Coffre-fort' },
+const financesNav: NavItem[] = [
+  { path: '/finances', icon: Wallet, label: 'Mes finances', exact: true },
 ];
 
-const profilNav = [
-  { path: '/profil', icon: UserCircle, label: 'Mon profil fiscal' },
+const pilotageNav: NavItem[] = [
+  { path: '/calendrier', icon: Calendar, label: 'Calendrier fiscal' },
+  { path: '/profil', icon: UserCircle, label: 'Profil fiscal' },
+  { path: '/aides', icon: HandCoins, label: 'Aides & dispositifs' },
+];
+
+const simulationsNav: NavItem[] = [
+  { path: '/simulations', icon: Calculator, label: 'Toutes les simulations', exact: true },
 ];
 
 export const Sidebar = () => {
@@ -43,7 +52,7 @@ export const Sidebar = () => {
     return location.pathname.startsWith(path);
   };
 
-  const renderLink = (item: { path: string; icon: React.ElementType; label: string; exact?: boolean }) => {
+  const renderLink = (item: NavItem) => {
     const active = isActive(item.path, item.exact);
     return (
       <NavLink
@@ -71,24 +80,26 @@ export const Sidebar = () => {
       </div>
 
       <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
-        <div className="space-y-1">
-          {mainNav.map(renderLink)}
-        </div>
+        <SidebarSection label="Accueil">
+          {accueilNav.map(renderLink)}
+        </SidebarSection>
 
-        <div className="space-y-1">
-          <p className="px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Outils</p>
-          {outilsNav.map(renderLink)}
-        </div>
+        <SidebarSection label="Mes finances">
+          {financesNav.map(renderLink)}
+        </SidebarSection>
 
-        <div className="space-y-1">
-          <p className="px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Compte</p>
-          {profilNav.map(renderLink)}
-        </div>
+        <SidebarSection label="Pilotage">
+          {pilotageNav.map(renderLink)}
+        </SidebarSection>
+
+        <SidebarSection label="Simulations" collapsible defaultOpen={false}>
+          {simulationsNav.map(renderLink)}
+        </SidebarSection>
       </nav>
 
       <div className="p-4 border-t border-sidebar-border space-y-1">
         <NavLink
-          to="/profil"
+          to="/profil/parametres"
           className="flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all"
         >
           <Settings className="h-5 w-5 text-muted-foreground" />
