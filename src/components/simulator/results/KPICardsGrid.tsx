@@ -106,19 +106,26 @@ export const KPICardsGrid: React.FC<KPICardsGridProps> = ({
 }) => {
   const r = results;
   
-  // Calculate additional metrics
-  const roi = financing.down_payment > 0 
-    ? ((r.net_patrimony - financing.down_payment) / financing.down_payment * 100) 
+  // BUG FIX #7 : utiliser le cash réellement investi (apport + frais)
+  const cashInvested = r.cash_invested ?? financing.down_payment;
+
+  // ROI : (patrimoine net - cash investi) / cash investi
+  const roi = cashInvested > 0
+    ? ((r.net_patrimony - cashInvested) / cashInvested * 100)
     : 0;
-  
-  const leverageRatio = acquisition.price_net_seller > 0 
-    ? (financing.loan_amount / acquisition.price_net_seller * 100) 
+
+  // LTV : prêt / (prix + notaire) — pratique bancaire
+  const ltvBase = (acquisition.price_net_seller || 0);
+  const leverageRatio = ltvBase > 0
+    ? (financing.loan_amount / ltvBase * 100)
     : 0;
-  
-  const annualCashflow = (r.monthly_cashflow_after_tax || 0) * 12;
-  const cashOnCash = financing.down_payment > 0 
-    ? (annualCashflow / financing.down_payment * 100) 
-    : 0;
+
+  // Cash-on-cash : préférer la valeur calculée par l'engine (basée sur cash investi réel)
+  const cashOnCash = r.cash_on_cash_yield ?? (
+    cashInvested > 0
+      ? ((r.monthly_cashflow_after_tax || 0) * 12 / cashInvested * 100)
+      : 0
+  );
 
   const locatifKPIs: KPICardData[] = [
     {
