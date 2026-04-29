@@ -59,7 +59,10 @@ function inferMarginalRate(profile: Record<string, unknown> | null): number {
 
 function estimateSavingsCents(type: DeductionType, rate: number, amountCents: number, tmi: number): number {
   if (type === 'reduction' || type === 'credit') return Math.round(amountCents * rate);
-  if (type === 'deduction_revenu') return Math.round(amountCents * tmi);
+  // Pour une déduction du revenu imposable, on respecte aussi le taux de la
+  // règle (rate=0 pour une simple souscription SCPI hors dispositif fiscal,
+  // rate=1 pour un versement PER intégralement déductible, etc.).
+  if (type === 'deduction_revenu') return Math.round(amountCents * rate * tmi);
   return 0;
 }
 
