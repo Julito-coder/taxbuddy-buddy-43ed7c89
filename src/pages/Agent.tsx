@@ -28,6 +28,7 @@ import {
   deleteConversation,
   type ConversationSummary,
 } from '@/lib/agentConversationsService';
+import { CoachInlineBadge } from '@/components/coach/CoachInlineBadge';
 
 interface Suggestion {
   label: string;
@@ -219,6 +220,7 @@ const AgentPage = () => {
             <>
               <ElioSymbol size={32} />
               <h1 className="text-xl font-semibold text-[#1B3A5C]">Élio Agent</h1>
+              <CoachInlineBadge className="ml-2" />
               {typeof remainingToday === 'number' && (
                 <span className="ml-auto text-xs text-[#6B7A8D]">{remainingToday} restant·s aujourd'hui</span>
               )}
