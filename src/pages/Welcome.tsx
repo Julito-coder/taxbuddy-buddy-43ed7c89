@@ -27,10 +27,10 @@ const SIGNUP_HREF = '/quiz';
 const LOGIN_HREF = '/auth?mode=login&from=welcome';
 
 const fadeUp = {
-  initial: { opacity: 0, y: 24 },
+  initial: { opacity: 0, y: 16 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: '-80px' },
-  transition: { duration: 0.5, ease: 'easeOut' as const },
+  transition: { duration: 0.4, ease: 'easeOut' as const },
 } as const;
 
 // ─────────────────────────────────────── Nav
