@@ -30,6 +30,7 @@ import FiscalProfile from "./pages/FiscalProfile";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import Legal from "./pages/Legal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/quiz" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
+            <Route path="/legal/:key" element={<Legal />} />
 
             {/* Accueil (pillar 1) */}
             <Route path="/bulletin" element={<ProtectedRoute><Bulletin /></ProtectedRoute>} />
