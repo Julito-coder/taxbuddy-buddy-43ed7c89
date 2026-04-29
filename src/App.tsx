@@ -11,7 +11,7 @@ import Welcome from "./pages/Welcome";
 import Bulletin from "./pages/Bulletin";
 import HomePage from "./pages/Home";
 import AgentPage from "./pages/Agent";
-import OutilsPage from "./pages/Outils";
+import Simulations from "./pages/Simulations";
 import ProfilPage from "./pages/Profil";
 import CoffreFortPage from "./pages/CoffreFort";
 import CalendarPage from "./pages/Calendar";
@@ -21,7 +21,6 @@ import NewSimulation from "./pages/simulator/NewSimulation";
 import SimulationDetails from "./pages/simulator/SimulationDetails";
 import CompareSimulations from "./pages/simulator/CompareSimulations";
 import SavingsSimulator from "./pages/SavingsSimulator";
-import Simulateurs from "./pages/Simulateurs";
 import PacsSimulator from "./pages/simulators/PacsSimulator";
 import FreelanceSimulator from "./pages/simulators/FreelanceSimulator";
 import AidesDetector from "./pages/AidesDetector";
@@ -51,30 +50,57 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
 
-            {/* Protected routes */}
+            {/* Accueil (pillar 1) */}
             <Route path="/bulletin" element={<ProtectedRoute><Bulletin /></ProtectedRoute>} />
-            <Route path="/dashboard" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-            <Route path="/tableau-de-bord" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-            <Route path="/agent" element={<ProtectedRoute><AgentPage /></ProtectedRoute>} />
-            <Route path="/outils" element={<ProtectedRoute><OutilsPage /></ProtectedRoute>} />
-            <Route path="/outils/calendrier" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
-            <Route path="/outils/scanner" element={<ProtectedRoute><Scanner /></ProtectedRoute>} />
-            <Route path="/outils/simulateur" element={<ProtectedRoute><RealEstateSimulator /></ProtectedRoute>} />
-            <Route path="/outils/simulateur/new" element={<ProtectedRoute><NewSimulation /></ProtectedRoute>} />
-            <Route path="/outils/simulateur/edit/:id" element={<ProtectedRoute><NewSimulation /></ProtectedRoute>} />
-            <Route path="/outils/simulateur/compare" element={<ProtectedRoute><CompareSimulations /></ProtectedRoute>} />
-            <Route path="/outils/simulateur/:id" element={<ProtectedRoute><SimulationDetails /></ProtectedRoute>} />
-            <Route path="/outils/epargne" element={<ProtectedRoute><SavingsSimulator /></ProtectedRoute>} />
-            <Route path="/simulateurs" element={<ProtectedRoute><Simulateurs /></ProtectedRoute>} />
-            <Route path="/simulateurs/pacs" element={<ProtectedRoute><PacsSimulator /></ProtectedRoute>} />
-            <Route path="/simulateurs/freelance" element={<ProtectedRoute><FreelanceSimulator /></ProtectedRoute>} />
-            <Route path="/outils/aides" element={<ProtectedRoute><AidesDetector /></ProtectedRoute>} />
-            <Route path="/outils/banques" element={<ProtectedRoute><Banques /></ProtectedRoute>} />
             <Route path="/coach" element={<ProtectedRoute><Coach /></ProtectedRoute>} />
-            <Route path="/outils/coffre" element={<ProtectedRoute><CoffreFortPage /></ProtectedRoute>} />
+            <Route path="/agent" element={<ProtectedRoute><AgentPage /></ProtectedRoute>} />
+
+            {/* Mes finances (pillar 2) */}
+            <Route path="/finances" element={<ProtectedRoute><Banques /></ProtectedRoute>} />
+
+            {/* Pilotage (pillar 3) */}
+            <Route path="/calendrier" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
+            <Route path="/aides" element={<ProtectedRoute><AidesDetector /></ProtectedRoute>} />
             <Route path="/profil" element={<ProtectedRoute><ProfilPage /></ProtectedRoute>} />
             <Route path="/profil/fiscal" element={<ProtectedRoute><FiscalProfile /></ProtectedRoute>} />
             <Route path="/profil/parametres" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+
+            {/* Simulations (pillar 4) - hub fusionné */}
+            <Route path="/simulations" element={<ProtectedRoute><Simulations /></ProtectedRoute>} />
+            <Route path="/simulations/immobilier" element={<ProtectedRoute><RealEstateSimulator /></ProtectedRoute>} />
+            <Route path="/simulations/immobilier/new" element={<ProtectedRoute><NewSimulation /></ProtectedRoute>} />
+            <Route path="/simulations/immobilier/edit/:id" element={<ProtectedRoute><NewSimulation /></ProtectedRoute>} />
+            <Route path="/simulations/immobilier/compare" element={<ProtectedRoute><CompareSimulations /></ProtectedRoute>} />
+            <Route path="/simulations/immobilier/:id" element={<ProtectedRoute><SimulationDetails /></ProtectedRoute>} />
+            <Route path="/simulations/epargne" element={<ProtectedRoute><SavingsSimulator /></ProtectedRoute>} />
+            <Route path="/simulations/scanner" element={<ProtectedRoute><Scanner /></ProtectedRoute>} />
+            <Route path="/simulations/pacs" element={<ProtectedRoute><PacsSimulator /></ProtectedRoute>} />
+            <Route path="/simulations/freelance" element={<ProtectedRoute><FreelanceSimulator /></ProtectedRoute>} />
+
+            {/* Coffre-fort (utility, hors nav principale) */}
+            <Route path="/coffre" element={<ProtectedRoute><CoffreFortPage /></ProtectedRoute>} />
+
+            {/* Tableau de bord legacy */}
+            <Route path="/dashboard" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+            <Route path="/tableau-de-bord" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+
+            {/* Backward-compat redirects (anciens chemins → nouveaux) */}
+            <Route path="/outils" element={<Navigate to="/simulations" replace />} />
+            <Route path="/outils/calendrier" element={<Navigate to="/calendrier" replace />} />
+            <Route path="/outils/scanner" element={<Navigate to="/simulations/scanner" replace />} />
+            <Route path="/outils/simulateur" element={<Navigate to="/simulations/immobilier" replace />} />
+            <Route path="/outils/simulateur/new" element={<Navigate to="/simulations/immobilier/new" replace />} />
+            <Route path="/outils/simulateur/compare" element={<Navigate to="/simulations/immobilier/compare" replace />} />
+            <Route path="/outils/simulateur/edit/:id" element={<Navigate to="/simulations/immobilier/edit/:id" replace />} />
+            <Route path="/outils/simulateur/:id" element={<Navigate to="/simulations/immobilier/:id" replace />} />
+            <Route path="/outils/epargne" element={<Navigate to="/simulations/epargne" replace />} />
+            <Route path="/outils/aides" element={<Navigate to="/aides" replace />} />
+            <Route path="/outils/banques" element={<Navigate to="/finances" replace />} />
+            <Route path="/outils/coffre" element={<Navigate to="/coffre" replace />} />
+            <Route path="/simulateurs" element={<Navigate to="/simulations" replace />} />
+            <Route path="/simulateurs/pacs" element={<Navigate to="/simulations/pacs" replace />} />
+            <Route path="/simulateurs/freelance" element={<Navigate to="/simulations/freelance" replace />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

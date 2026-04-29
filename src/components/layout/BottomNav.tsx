@@ -1,10 +1,11 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Newspaper, MessageCircle, Wrench, UserCircle } from 'lucide-react';
+import { Newspaper, Compass, Wallet, Sparkles, UserCircle } from 'lucide-react';
 
 const tabs = [
-  { path: '/bulletin', icon: Newspaper, label: 'Accueil' },
-  { path: '/agent', icon: MessageCircle, label: 'Élio Agent' },
-  { path: '/outils', icon: Wrench, label: 'Outils' },
+  { path: '/bulletin', icon: Newspaper, label: 'Bulletin' },
+  { path: '/coach', icon: Compass, label: 'Coach' },
+  { path: '/finances', icon: Wallet, label: 'Finances' },
+  { path: '/agent', icon: Sparkles, label: 'Élio' },
   { path: '/profil', icon: UserCircle, label: 'Profil' },
 ];
 
@@ -34,7 +35,7 @@ export const BottomNav = () => {
                 strokeWidth={active ? 2.5 : 2}
                 style={tab.path === '/agent' && active ? { color: 'hsl(37 55% 51%)' } : undefined}
               />
-              <span className="text-xs font-medium">{tab.label}</span>
+              <span className="text-[10px] font-medium">{tab.label}</span>
             </NavLink>
           );
         })}

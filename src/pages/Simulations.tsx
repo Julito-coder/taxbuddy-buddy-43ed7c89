@@ -4,7 +4,7 @@ import {
   Heart, Briefcase, Building2, PiggyBank, Sun,
   ArrowRight, Sparkles, Check, Clock, Baby, Users, HandCoins,
   Coins, FileText, TrendingUp, Wallet, Bitcoin, Home, Hammer,
-  Calendar as CalendarIcon, LogOut,
+  Calendar as CalendarIcon, LogOut, ScanSearch, FolderLock,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -12,7 +12,7 @@ type Status = 'available' | 'agent' | 'soon';
 
 interface SubItem {
   label: string;
-  icon: any;
+  icon: React.ElementType;
   status: Status;
   to?: string;
   prompt?: string;
@@ -21,7 +21,7 @@ interface SubItem {
 interface Section {
   title: string;
   subtitle: string;
-  icon: any;
+  icon: React.ElementType;
   accent: string;
   items: SubItem[];
 }
@@ -33,7 +33,7 @@ const sections: Section[] = [
     icon: Heart,
     accent: 'bg-[#1B3A5C]/10 text-[#1B3A5C]',
     items: [
-      { label: 'PACS / Mariage', icon: Heart, status: 'available', to: '/simulateurs/pacs' },
+      { label: 'PACS / Mariage', icon: Heart, status: 'available', to: '/simulations/pacs' },
       { label: 'Régime matrimonial', icon: Users, status: 'agent', prompt: 'Compare les régimes matrimoniaux (communauté réduite, séparation de biens, participation aux acquêts) dans ma situation.' },
       { label: 'Naissance / quotient familial', icon: Baby, status: 'agent', prompt: 'Quel est l\'impact fiscal d\'une naissance sur mon quotient familial et mon impôt ?' },
       { label: 'Garde alternée', icon: Users, status: 'agent', prompt: 'Explique l\'impact fiscal d\'une garde alternée (demi-parts) dans ma situation.' },
@@ -50,7 +50,7 @@ const sections: Section[] = [
     icon: Briefcase,
     accent: 'bg-[#C8943E]/15 text-[#C8943E]',
     items: [
-      { label: 'CDI vs Freelance', icon: Briefcase, status: 'available', to: '/simulateurs/freelance' },
+      { label: 'CDI vs Freelance', icon: Briefcase, status: 'available', to: '/simulations/freelance' },
       { label: 'Choix IR vs IS', icon: FileText, status: 'agent', prompt: 'Mon entreprise doit-elle être à l\'IR ou à l\'IS ? Compare les deux dans ma situation.' },
       { label: 'Dividendes vs salaire', icon: Coins, status: 'agent', prompt: 'En SASU/EURL, vaut-il mieux me verser un salaire ou des dividendes ?' },
       { label: 'Versement libératoire micro', icon: FileText, status: 'agent', prompt: 'Le versement libératoire de l\'impôt en micro-entreprise est-il intéressant pour moi ?' },
@@ -67,10 +67,10 @@ const sections: Section[] = [
     icon: Building2,
     accent: 'bg-[#4B8264]/15 text-[#4B8264]',
     items: [
-      { label: 'Simulateur immobilier complet', icon: Building2, status: 'available', to: '/outils/simulateur' },
-      { label: 'Résidence principale vs location', icon: Home, status: 'available', to: '/outils/simulateur' },
-      { label: 'Locatif nu (micro-foncier vs réel)', icon: Building2, status: 'available', to: '/outils/simulateur' },
-      { label: 'Locatif meublé (LMNP/LMP)', icon: Building2, status: 'available', to: '/outils/simulateur' },
+      { label: 'Simulateur immobilier complet', icon: Building2, status: 'available', to: '/simulations/immobilier' },
+      { label: 'Résidence principale vs location', icon: Home, status: 'available', to: '/simulations/immobilier' },
+      { label: 'Locatif nu (micro-foncier vs réel)', icon: Building2, status: 'available', to: '/simulations/immobilier' },
+      { label: 'Locatif meublé (LMNP/LMP)', icon: Building2, status: 'available', to: '/simulations/immobilier' },
       { label: 'Meublé tourisme / Airbnb', icon: Home, status: 'agent', prompt: 'Quels sont les nouveaux seuils 2025 pour la location meublée touristique (Airbnb) ?' },
       { label: 'SCI à l\'IR vs IS', icon: FileText, status: 'agent', prompt: 'SCI à l\'IR ou à l\'IS : que choisir dans ma situation ?' },
       { label: 'Travaux / déficit foncier', icon: Hammer, status: 'agent', prompt: 'Comment optimiser mes travaux locatifs avec le déficit foncier et MaPrimeRénov\' ?' },
@@ -85,12 +85,12 @@ const sections: Section[] = [
     icon: PiggyBank,
     accent: 'bg-[#1B3A5C]/10 text-[#1B3A5C]',
     items: [
-      { label: 'Simulateur épargne PEA / PER', icon: PiggyBank, status: 'available', to: '/outils/epargne' },
+      { label: 'Simulateur épargne PEA / PER', icon: PiggyBank, status: 'available', to: '/simulations/epargne' },
       { label: 'Versement PER (déduction IR)', icon: Wallet, status: 'agent', prompt: 'Combien verser sur mon PER pour optimiser ma déduction d\'impôt ?' },
       { label: 'Assurance-vie (rachat / clause)', icon: FileText, status: 'agent', prompt: 'Comment optimiser mes rachats sur assurance-vie et la clause bénéficiaire ?' },
       { label: 'Arbitrage CTO → PEA', icon: TrendingUp, status: 'agent', prompt: 'Vaut-il mieux investir via mon CTO ou ouvrir un PEA ?' },
       { label: 'SCPI (direct, AV, démembrement)', icon: Building2, status: 'agent', prompt: 'Compare les façons d\'investir en SCPI : en direct, via AV, en démembrement.' },
-      { label: 'Crypto (déclaration 2086)', icon: Bitcoin, status: 'available', to: '/outils/scanner' },
+      { label: 'Crypto (déclaration 2086)', icon: Bitcoin, status: 'available', to: '/simulations/scanner' },
       { label: 'Épargne salariale (PEE/PERCO)', icon: Wallet, status: 'agent', prompt: 'Comment optimiser mon épargne salariale (PEE, PERCO, intéressement, participation) ?' },
       { label: 'Dons aux œuvres (66% / 75%)', icon: HandCoins, status: 'agent', prompt: 'Quelle réduction d\'impôt puis-je obtenir avec mes dons aux œuvres ?' },
       { label: 'FCPI / FIP', icon: TrendingUp, status: 'soon' },
@@ -109,6 +109,16 @@ const sections: Section[] = [
       { label: 'Prime / bonus exceptionnel', icon: Coins, status: 'agent', prompt: 'J\'ai reçu une prime exceptionnelle. Comment lisser l\'impôt ou la verser sur un PER ?' },
       { label: 'Vente d\'entreprise (150-0 B ter)', icon: TrendingUp, status: 'soon' },
       { label: 'Pacte Dutreil', icon: FileText, status: 'soon' },
+    ],
+  },
+  {
+    title: 'Outils annuels',
+    subtitle: 'Déclaration, documents, archivage',
+    icon: ScanSearch,
+    accent: 'bg-warning/10 text-warning',
+    items: [
+      { label: 'Scanner fiscal (déclaration)', icon: ScanSearch, status: 'available', to: '/simulations/scanner' },
+      { label: 'Coffre-fort documents', icon: FolderLock, status: 'available', to: '/coffre' },
     ],
   },
 ];
@@ -135,7 +145,7 @@ const StatusBadge = ({ status }: { status: Status }) => {
   );
 };
 
-const Simulateurs = () => {
+const Simulations = () => {
   const navigate = useNavigate();
 
   const handleClick = (item: SubItem) => {
@@ -153,17 +163,16 @@ const Simulateurs = () => {
     <AppLayout>
       <div className="max-w-4xl mx-auto space-y-6 pb-12">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-bold text-foreground">Simulateurs de vie</h1>
+          <h1 className="text-3xl font-bold text-foreground">Simulations</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Anticipe l'impact fiscal de tes grandes décisions, du PACS à la retraite.
           </p>
         </motion.div>
 
-        {/* HERO - Simulateur immo */}
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          onClick={() => navigate('/outils/simulateur')}
+          onClick={() => navigate('/simulations/immobilier')}
           className="w-full bg-gradient-to-br from-[#1B3A5C] to-[#2A5A8C] text-white rounded-2xl p-6 text-left shadow-md hover:shadow-lg transition-all group"
         >
           <div className="flex items-start justify-between gap-4">
@@ -188,7 +197,6 @@ const Simulateurs = () => {
           </div>
         </motion.button>
 
-        {/* Sections */}
         {sections.map((section, sIdx) => (
           <motion.section
             key={section.title}
@@ -245,4 +253,4 @@ const Simulateurs = () => {
   );
 };
 
-export default Simulateurs;
+export default Simulations;

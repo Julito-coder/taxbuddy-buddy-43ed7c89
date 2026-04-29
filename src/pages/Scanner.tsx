@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ScannerQuestionnaire } from '@/components/scanner/ScannerQuestionnaire';
 import { ScannerResults } from '@/components/scanner/ScannerResults';
@@ -8,14 +9,25 @@ import { TaxScannerInput, DEFAULT_TAX_INPUT, ScanResult } from '@/data/taxScanne
 import { detectTaxErrors } from '@/lib/taxErrorDetector';
 import { detectOptimizations, calculateTaxScore } from '@/lib/taxOptimizationEngine';
 import { saveScanToHistory } from '@/lib/scanHistoryService';
-import { FileSearch, Shield, AlertTriangle, Upload, ClipboardList, History } from 'lucide-react';
+import { FileSearch, Shield, AlertTriangle, Upload, ClipboardList, History, Compass } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+
+const FOCUS_LABELS: Record<string, string> = {
+  dons: 'tes dons',
+  garde: 'tes frais de garde / emploi à domicile',
+  per: 'tes versements PER',
+  ik: 'tes frais kilométriques',
+};
 
 type ScannerStep = 'intro' | 'questionnaire' | 'upload' | 'results' | 'history';
 
 const Scanner = () => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const fromCoach = searchParams.get('from') === 'coach';
+  const focus = searchParams.get('focus') || '';
+  const amountCents = Number(searchParams.get('amount_cents') || 0);
   const [step, setStep] = useState<ScannerStep>('intro');
   const [input, setInput] = useState<TaxScannerInput>(DEFAULT_TAX_INPUT);
   const [result, setResult] = useState<ScanResult | null>(null);
@@ -87,6 +99,34 @@ const Scanner = () => {
   return (
     <AppLayout>
       <div className="max-w-5xl mx-auto">
+        {step === 'intro' && fromCoach && (
+          <div className="bg-secondary/10 border border-secondary/30 rounded-2xl p-4 mb-6 flex items-start gap-3">
+            <div className="h-10 w-10 rounded-xl bg-secondary/15 flex items-center justify-center shrink-0">
+              <Compass className="h-5 w-5 text-secondary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">
+                Tu arrives depuis ton Coach
+                {FOCUS_LABELS[focus] ? <> · focus sur <span className="text-secondary">{FOCUS_LABELS[focus]}</span></> : null}
+              </p>
+              {amountCents > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Montant détecté : <span className="font-semibold text-foreground">
+                    {(amountCents / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}
+                  </span>
+                  {' '}— pense à le reporter dans le questionnaire.
+                </p>
+              )}
+            </div>
+            <button
+              onClick={() => setStep('questionnaire')}
+              className="text-xs font-semibold bg-secondary text-secondary-foreground hover:bg-secondary/90 px-3 py-1.5 rounded-full transition-colors shrink-0"
+            >
+              Lancer →
+            </button>
+          </div>
+        )}
+
         {step === 'intro' && (
           <div className="text-center py-12">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 mb-6">
