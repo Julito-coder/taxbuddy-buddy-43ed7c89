@@ -8,6 +8,7 @@ import { BulletinFooter } from '@/components/bulletin/BulletinFooter';
 import { BulletinSkeleton } from '@/components/bulletin/BulletinSkeleton';
 import { BulletinEmptyState } from '@/components/bulletin/BulletinEmptyState';
 import { CoachPinnedCard } from '@/components/coach/CoachPinnedCard';
+import { BankFiscalSummary } from '@/components/bulletin/BankFiscalSummary';
 import { useDailyBulletin } from '@/hooks/useDailyBulletin';
 import { History } from 'lucide-react';
 import { useState } from 'react';
