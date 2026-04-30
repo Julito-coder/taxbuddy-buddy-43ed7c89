@@ -1,18 +1,30 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Newspaper, Compass, Wallet, Sparkles, UserCircle } from 'lucide-react';
+import { Newspaper, Compass, Wallet, Sparkles, UserCircle, LayoutGrid } from 'lucide-react';
 
-const tabs = [
+interface Tab {
+  path: string;
+  icon: React.ElementType;
+  label: string;
+}
+
+const tabs: Tab[] = [
   { path: '/bulletin', icon: Newspaper, label: 'Bulletin' },
   { path: '/coach', icon: Compass, label: 'Coach' },
-  { path: '/finances', icon: Wallet, label: 'Finances' },
   { path: '/agent', icon: Sparkles, label: 'Élio' },
+  { path: '/finances', icon: Wallet, label: 'Finances' },
   { path: '/profil', icon: UserCircle, label: 'Profil' },
 ];
 
-export const BottomNav = () => {
+interface Props {
+  toolsOpen: boolean;
+  onToolsOpenChange: (open: boolean) => void;
+}
+
+export const BottomNav = ({ toolsOpen, onToolsOpenChange }: Props) => {
   const location = useLocation();
 
   const isActive = (path: string) => {
+    if (toolsOpen) return false;
     if (path === '/bulletin') return location.pathname === '/bulletin';
     return location.pathname.startsWith(path);
   };
@@ -26,7 +38,7 @@ export const BottomNav = () => {
             <NavLink
               key={tab.path}
               to={tab.path}
-              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${
+              className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-all ${
                 active ? 'text-primary' : 'text-muted-foreground'
               }`}
             >
@@ -39,6 +51,21 @@ export const BottomNav = () => {
             </NavLink>
           );
         })}
+        <button
+          type="button"
+          onClick={() => onToolsOpenChange(!toolsOpen)}
+          aria-label="Ouvrir tous les outils"
+          aria-expanded={toolsOpen}
+          className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-all ${
+            toolsOpen ? 'text-primary' : 'text-muted-foreground'
+          }`}
+        >
+          <LayoutGrid
+            className="h-5 w-5"
+            strokeWidth={toolsOpen ? 2.5 : 2}
+          />
+          <span className="text-[10px] font-medium">Outils</span>
+        </button>
       </div>
     </nav>
   );
