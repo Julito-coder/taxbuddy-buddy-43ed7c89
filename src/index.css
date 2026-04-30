@@ -570,4 +570,146 @@
   @media (min-width: 768px) {
     .lp-mobile-menu { display: none; }
   }
+
+  /* ─────────────────────── Landing : Hero (texte) — phone mockup Batch 4 */
+
+  .lp-hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--ds-color-bg-primary);
+  }
+  .lp-hero::before,
+  .lp-hero::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .lp-hero::before {
+    top: -200px;
+    right: -100px;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(240, 100, 73, 0.08) 0%, transparent 70%);
+  }
+  .lp-hero::after {
+    bottom: -300px;
+    left: -200px;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(28, 59, 90, 0.06) 0%, transparent 70%);
+  }
+
+  .lp-hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--s24) var(--s6);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s16);
+    align-items: center;
+  }
+  @media (max-width: 1024px) {
+    .lp-hero-inner {
+      grid-template-columns: 1fr;
+      gap: var(--s12);
+      text-align: center;
+      padding: var(--s20) var(--s4);
+    }
+  }
+
+  .lp-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s5);
+  }
+  @media (max-width: 1024px) {
+    .lp-hero-content { align-items: center; }
+  }
+
+  .lp-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    padding: 8px var(--s3);
+    background: var(--coral-50);
+    color: var(--coral-500);
+    border: 1px solid rgba(240, 100, 73, 0.15);
+    border-radius: var(--r-pill);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .lp-hero-h1 {
+    margin: 0;
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--ds-color-text-primary);
+  }
+
+  .lp-hero-description {
+    margin: 0;
+    max-width: 500px;
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--ds-color-text-secondary);
+  }
+  .lp-hero-description strong {
+    color: var(--ds-color-text-primary);
+    font-weight: 600;
+  }
+
+  .lp-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s3);
+    margin-top: var(--s2);
+  }
+  @media (max-width: 1024px) {
+    .lp-hero-actions { justify-content: center; }
+  }
+  @media (max-width: 480px) {
+    .lp-hero-actions { width: 100%; flex-direction: column; }
+    .lp-hero-actions > * { width: 100%; }
+  }
+
+  .lp-hero-subtext {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ds-color-text-tertiary);
+  }
+
+  .lp-hero-visual {
+    /* Placeholder — phone mockup ajouté au Batch 4. */
+    min-height: 1px;
+  }
+  @media (max-width: 1024px) {
+    .lp-hero-visual { display: none; }
+  }
+
+  /* Layout intermédiaire : tant que .lp-hero-visual est vide (Batch 3),
+     on rend le hero sur 1 colonne centrée (max-width réduit pour focus
+     de lecture). Ajouter du contenu dans .lp-hero-visual au Batch 4
+     désactive automatiquement ces règles via :has(:empty). Fallback
+     navigateurs sans :has() = layout 2-cols avec colonne droite vide. */
+  .lp-hero-inner:has(.lp-hero-visual:empty) {
+    grid-template-columns: 1fr;
+    max-width: 720px;
+  }
+  .lp-hero-inner:has(.lp-hero-visual:empty) .lp-hero-content {
+    align-items: center;
+    text-align: center;
+  }
+  .lp-hero-inner:has(.lp-hero-visual:empty) .lp-hero-actions {
+    justify-content: center;
+  }
+  .lp-hero-inner:has(.lp-hero-visual:empty) .lp-hero-visual {
+    display: none;
+  }
 }
