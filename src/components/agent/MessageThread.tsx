@@ -96,35 +96,20 @@ export const MessageThread = ({
               );
             }
 
-            // Assistant
-            if (m.status === 'error') {
+            // Assistant — carte d'erreur structurée
+            if (m.error) {
               return (
                 <div key={m.id} className="flex items-start gap-2">
-                  <ElioMascot3D state="idle" size={mascotSize} />
-                  <div
-                    className="rounded-[var(--radius)] border p-3 text-sm"
-                    style={{
-                      maxWidth: '90%',
-                      backgroundColor: 'hsl(var(--destructive) / 0.1)',
-                      borderColor: 'hsl(var(--destructive) / 0.3)',
-                      color: 'hsl(var(--destructive))',
-                    }}
-                  >
-                    <div className="flex items-start gap-2">
-                      <AlertCircle size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-                      <div>
-                        <p style={{ fontSize: '15px', lineHeight: 1.5 }}>{m.content}</p>
-                        {m.errorKind === 'limit' && (
-                          <button
-                            type="button"
-                            onClick={() => navigate('/profil')}
-                            className="mt-2 text-sm font-medium underline underline-offset-4"
-                          >
-                            Voir mon abonnement
-                          </button>
-                        )}
-                      </div>
-                    </div>
+                  <div className="shrink-0 pt-0.5">
+                    <ElioMascot3D state="idle" size={mascotSize} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <ErrorCard
+                      kind={m.error.kind}
+                      message={m.error.message}
+                      meta={m.error.meta}
+                      onRetry={onRetry}
+                    />
                   </div>
                 </div>
               );
