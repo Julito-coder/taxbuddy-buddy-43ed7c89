@@ -35,8 +35,49 @@ export function LandingHero() {
           <p className="lp-hero-subtext">Sans CB · Diagnostic offert · 2 minutes</p>
         </div>
 
-        <div className="lp-hero-visual" aria-hidden="true">
-          {/* Phone mockup 3D — Batch 4 */}
+        <div
+          className="lp-hero-visual"
+          role="img"
+          aria-label="Aperçu de l'application Élio : action du jour, score Élio et montant récupérable"
+        >
+          <div className="lp-phone-wrap" aria-hidden="true">
+            <div className="lp-phone-frame">
+              <div className="lp-phone-notch" />
+              <div className="lp-phone-screen">
+                <div className="lp-phone-greeting">
+                  <p className="lp-phone-date">Aujourd'hui</p>
+                  <p className="lp-phone-name">Bonjour Léa</p>
+                </div>
+
+                <div className="lp-phone-action">
+                  <p className="lp-phone-action-eyebrow">Tu peux récupérer</p>
+                  <p className="lp-phone-action-title">1 240 € de prime d'activité</p>
+                  <p className="lp-phone-action-desc">Demande à faire avant le 15 mai.</p>
+                  <span className="lp-phone-action-cta">Lancer la démarche →</span>
+                </div>
+
+                <div className="lp-phone-stats">
+                  <div className="lp-phone-stat">
+                    <p className="lp-phone-stat-label">Score Élio</p>
+                    <p className="lp-phone-stat-value">72</p>
+                  </div>
+                  <div className="lp-phone-stat">
+                    <p className="lp-phone-stat-label">Récupérable</p>
+                    <p className="lp-phone-stat-value coral">2 140 €</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="lp-floating-card top">
+              <span className="lp-floating-dot green" />
+              +420 € détectés
+            </div>
+            <div className="lp-floating-card bottom">
+              <span className="lp-floating-dot coral" />
+              3 nouvelles aides éligibles
+            </div>
+          </div>
         </div>
       </div>
     </section>

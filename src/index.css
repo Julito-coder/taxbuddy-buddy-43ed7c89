@@ -712,4 +712,201 @@
   .lp-hero-inner:has(.lp-hero-visual:empty) .lp-hero-visual {
     display: none;
   }
+
+  /* ─────────────────────── Landing : Hero — Phone mockup (Batch 4) */
+
+  .lp-hero-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 720px;
+    position: relative;
+  }
+  .lp-phone-wrap {
+    position: relative;
+    width: 340px;
+  }
+
+  .lp-phone-frame {
+    position: relative;
+    width: 340px;
+    background: #FFFFFF;
+    border-radius: 36px;
+    padding: 12px;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.04),
+      0 16px 48px rgba(0, 0, 0, 0.12),
+      0 40px 80px rgba(0, 0, 0, 0.08);
+    transform: perspective(1200px) rotateY(-8deg) rotateX(2deg);
+    transform-origin: center center;
+  }
+
+  .lp-phone-notch {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 24px;
+    background: var(--navy-900);
+    border-radius: 0 0 16px 16px;
+    z-index: 2;
+  }
+
+  .lp-phone-screen {
+    background: var(--surface-1);
+    border-radius: 24px;
+    padding: var(--s5);
+    padding-top: calc(12px + var(--s5));
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4);
+  }
+
+  .lp-phone-greeting {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .lp-phone-date {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ds-color-text-tertiary);
+  }
+  .lp-phone-name {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy-900);
+    letter-spacing: -0.02em;
+  }
+
+  .lp-phone-action {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--navy-900), var(--navy-700));
+    border-radius: var(--r-xl);
+    padding: var(--s5);
+    color: var(--ds-color-text-inverse);
+  }
+  .lp-phone-action::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(240, 100, 73, 0.22) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .lp-phone-action > * {
+    position: relative;
+    z-index: 1;
+  }
+  .lp-phone-action-eyebrow {
+    margin: 0 0 var(--s2);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--coral-300);
+  }
+  .lp-phone-action-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .lp-phone-action-desc {
+    margin: 4px 0 var(--s4);
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .lp-phone-action-cta {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 var(--s4);
+    background: var(--coral-500);
+    color: var(--ds-color-text-inverse);
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--r-pill);
+  }
+
+  .lp-phone-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s3);
+  }
+  .lp-phone-stat {
+    background: var(--surface-2);
+    border: 1px solid var(--border-light);
+    border-radius: var(--r-md);
+    padding: var(--s3) var(--s4);
+  }
+  .lp-phone-stat-label {
+    margin: 0 0 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ds-color-text-tertiary);
+  }
+  .lp-phone-stat-value {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--navy-900);
+  }
+  .lp-phone-stat-value.coral {
+    color: var(--coral-500);
+  }
+
+  /* Floating cards */
+  .lp-floating-card {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    padding: var(--s3) var(--s4);
+    background: #FFFFFF;
+    border: 1px solid var(--border-light);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy-900);
+    white-space: nowrap;
+    animation: lp-floatUp 5s var(--ease) infinite;
+  }
+  .lp-floating-card.top {
+    top: 20px;
+    right: -30px;
+    animation-delay: 0s;
+  }
+  .lp-floating-card.bottom {
+    bottom: 40px;
+    left: -40px;
+    animation-delay: 2.5s;
+  }
+
+  .lp-floating-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .lp-floating-dot.green {
+    background: var(--green-500);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  }
+  .lp-floating-dot.coral {
+    background: var(--coral-500);
+    box-shadow: 0 0 0 4px rgba(240, 100, 73, 0.15);
+  }
+
+  @keyframes lp-floatUp {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+  }
 }
