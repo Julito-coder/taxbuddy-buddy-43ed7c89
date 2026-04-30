@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
+import { MobileTopBar } from './MobileTopBar';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -14,6 +15,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       </div>
 
       <main className="lg:ml-64 min-h-screen pb-20 lg:pb-0 overflow-x-hidden">
+        <MobileTopBar />
         <div className="relative overflow-x-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-full h-[300px] pointer-events-none" style={{ background: 'radial-gradient(ellipse at top, rgba(27,58,92,0.08), transparent 50%)' }} />
           <div className="relative p-4 lg:p-8">
@@ -26,3 +28,4 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     </div>
   );
 };
+
