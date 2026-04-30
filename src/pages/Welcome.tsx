@@ -18,6 +18,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { LandingHeader } from '@/components/landing/Header';
 import { LandingHero } from '@/components/landing/Hero';
+import { LandingStats } from '@/components/landing/Stats';
 import { Loader2 } from 'lucide-react';
 
 const SIGNUP_HREF = '/quiz';
@@ -29,27 +30,6 @@ const fadeUp = {
   viewport: { once: true, margin: '-80px' },
   transition: { duration: 0.4, ease: 'easeOut' as const },
 } as const;
-
-// ─────────────────────────────────────── Social proof
-function SocialProof() {
-  const stats = [
-    { value: '10 Md€', label: "d'aides non réclamées chaque année en France" },
-    { value: '2 000 €', label: 'récupérables en moyenne par foyer' },
-    { value: '90 s', label: 'pour ton premier diagnostic' },
-  ];
-  return (
-    <section className="border-y border-ds-border-light bg-ds-bg-secondary/50">
-      <div className="mx-auto grid max-w-7xl gap-ds-8 px-ds-4 py-ds-12 sm:grid-cols-3 sm:px-ds-6">
-        {stats.map((s, i) => (
-          <motion.div key={i} {...fadeUp} transition={{ ...fadeUp.transition, delay: i * 0.1 }} className="text-center">
-            <p className="text-ds-3xl font-bold text-ds-primary">{s.value}</p>
-            <p className="mt-ds-2 text-ds-sm text-ds-text-secondary">{s.label}</p>
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────── How it works
 function HowItWorks() {
@@ -542,7 +522,7 @@ const Welcome = () => {
       <LandingHeader />
       <main id="main-content">
         <LandingHero />
-        <SocialProof />
+        <LandingStats />
         <HowItWorks />
         <FeaturesGrid />
         <Pricing />
