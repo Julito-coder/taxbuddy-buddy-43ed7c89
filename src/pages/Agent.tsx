@@ -15,6 +15,7 @@ const AgentPage = () => {
     messages,
     isLoading,
     sendMessage,
+    retryLastMessage,
     confirmProfileUpdates,
   } = useElioAgent();
 
@@ -29,7 +30,11 @@ const AgentPage = () => {
         id = `${idx}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         idMapRef.current.set(m as unknown as object, id);
       }
-      return { ...m, id, status: 'ok' as const };
+      return {
+        ...m,
+        id,
+        status: m.error ? ('error' as const) : ('ok' as const),
+      };
     });
   }, [messages]);
 
@@ -111,6 +116,7 @@ const AgentPage = () => {
                 isStreaming={isLoading}
                 onRunPrompt={handlePromptSelect}
                 onConfirmProfileUpdate={confirmProfileUpdates}
+                onRetry={retryLastMessage}
               />
             </motion.div>
           )}

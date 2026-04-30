@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { AlertCircle } from 'lucide-react';
 import { ElioMascot3D } from './ElioMascot3D';
+import { ErrorCard } from './ErrorCard';
 import { RichViewRenderer } from '@/components/elio-agent/RichViewRenderer';
-import type { AgentMessage } from '@/hooks/useElioAgent';
+import type { AgentMessage, AgentErrorPayload } from '@/hooks/useElioAgent';
 
 export interface UIMessage extends AgentMessage {
   id: string;
   status?: 'ok' | 'error';
-  errorKind?: 'network' | 'limit';
+  /** Détails d'erreur structurés (network / quota / profile_incomplete / generic) */
+  error?: AgentErrorPayload | null;
 }
 
 interface Props {
@@ -17,6 +17,7 @@ interface Props {
   isStreaming: boolean;
   onRunPrompt?: (prompt: string) => void;
   onConfirmProfileUpdate?: (updates: Array<{ field: string; value: any }>) => void;
+  onRetry?: () => void;
 }
 
 export const MessageThread = ({
@@ -24,9 +25,9 @@ export const MessageThread = ({
   isStreaming,
   onRunPrompt,
   onConfirmProfileUpdate,
+  onRetry,
 }: Props) => {
   const reduce = useReducedMotion();
-  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [stickToBottom, setStickToBottom] = useState(true);
@@ -95,35 +96,20 @@ export const MessageThread = ({
               );
             }
 
-            // Assistant
-            if (m.status === 'error') {
+            // Assistant — carte d'erreur structurée
+            if (m.error) {
               return (
                 <div key={m.id} className="flex items-start gap-2">
-                  <ElioMascot3D state="idle" size={mascotSize} />
-                  <div
-                    className="rounded-[var(--radius)] border p-3 text-sm"
-                    style={{
-                      maxWidth: '90%',
-                      backgroundColor: 'hsl(var(--destructive) / 0.1)',
-                      borderColor: 'hsl(var(--destructive) / 0.3)',
-                      color: 'hsl(var(--destructive))',
-                    }}
-                  >
-                    <div className="flex items-start gap-2">
-                      <AlertCircle size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-                      <div>
-                        <p style={{ fontSize: '15px', lineHeight: 1.5 }}>{m.content}</p>
-                        {m.errorKind === 'limit' && (
-                          <button
-                            type="button"
-                            onClick={() => navigate('/profil')}
-                            className="mt-2 text-sm font-medium underline underline-offset-4"
-                          >
-                            Voir mon abonnement
-                          </button>
-                        )}
-                      </div>
-                    </div>
+                  <div className="shrink-0 pt-0.5">
+                    <ElioMascot3D state="idle" size={mascotSize} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <ErrorCard
+                      kind={m.error.kind}
+                      message={m.error.message}
+                      meta={m.error.meta}
+                      onRetry={onRetry}
+                    />
                   </div>
                 </div>
               );
