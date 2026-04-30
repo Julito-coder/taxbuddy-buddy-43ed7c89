@@ -302,6 +302,7 @@ export const useElioAgent = () => {
     conversationId,
     remainingToday,
     sendMessage,
+    retryLastMessage,
     confirmProfileUpdates,
     startNewConversation,
     loadExistingConversation,
