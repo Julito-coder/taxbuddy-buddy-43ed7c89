@@ -1,40 +1,64 @@
-## Plan — Menu mobile complet (burger drawer plein écran)
+## Plan — Burger en bottom nav + overlay plein écran fluide
 
-### Constat
-- Sur desktop (`Sidebar`), tous les outils sont accessibles : Bulletin, Coach, Élio, Finances, Calendrier fiscal, Profil fiscal, Aides, Simulations, Paramètres, Déconnexion.
-- Sur mobile (`BottomNav`), seuls 5 onglets sont exposés : Bulletin, Coach, Finances, Élio, Profil.
-- Calendrier, Aides, Simulations (et toute l'arborescence /simulations/*), Paramètres, Déconnexion ne sont accessibles que depuis des liens internes ponctuels — beaucoup d'outils sont donc inaccessibles directement.
+### Changements de surface
+- Supprimer le `MobileTopBar` (et son bouton burger en haut). Le burger devient un onglet du `BottomNav`.
+- Le `Sheet` latéral est remplacé par un overlay **plein écran** qui s'ouvre depuis le bas avec une animation fluide (slide-up + fade), couvrant toute la zone (sauf safe-area système).
 
-### Objectif
-Sur mobile/tablette, ajouter un bouton "burger" toujours visible qui ouvre un panneau plein écran (overlay au-dessus de toute la page) listant tous les outils, regroupés par section comme dans la sidebar desktop, avec un accès direct à chaque page.
+### Nouveau BottomNav (mobile)
+6 onglets, le burger remplace l'onglet le plus secondaire pour rester lisible :
+1. Bulletin
+2. Coach
+3. Élio (centre)
+4. Finances
+5. Profil
+6. **Outils** (icône grille / Menu) → ouvre l'overlay plein écran
 
-### Contenu du drawer (mêmes sections que la sidebar)
-1. **Accueil** : Bulletin du jour, Coach, Élio Agent
-2. **Mes finances** : Mes finances
-3. **Pilotage** : Calendrier fiscal, Profil fiscal, Aides & dispositifs
-4. **Simulations** : 
-   - Toutes les simulations (hub)
-   - Sous-segments principaux : Immobilier, Épargne PEA/PER, PACS/Mariage, CDI vs Freelance, Scanner fiscal, Coffre-fort
-5. **Compte** : Paramètres, Déconnexion
+Le bouton "Outils" n'est pas un `NavLink` mais un bouton qui bascule l'overlay. État actif visuel quand l'overlay est ouvert.
 
-Chaque entrée affiche son icône, son label, et ferme le drawer après navigation.
+### Overlay plein écran "Tous les outils"
+Composant unique `MobileToolsOverlay` :
+- `position: fixed inset-0`, `z-[60]` (au-dessus du BottomNav).
+- Animation : slide-in depuis le bas + fade overlay (durée 300ms, ease-out).
+- Header sticky : titre "Tous les outils" à gauche, bouton X (h-11 w-11) à droite.
+- Body scrollable plein écran avec sections empilées.
+
+### Contenu segmenté
+Sections affichées comme **cartes-titres uniquement** (pas de sous-items déroulés) — un tap ouvre/déplie la carte ou navigue selon le cas :
+
+**Sections directes (un seul outil → navigation immédiate)** :
+- Bulletin du jour → /bulletin
+- Coach → /coach
+- Élio Agent → /agent
+- Mes finances → /finances
+- Calendrier fiscal → /calendrier
+- Profil fiscal → /profil
+- Aides & dispositifs → /aides
+- Coffre-fort → /coffre
+- Paramètres → /profil/parametres
+
+**Sections "Simulations" (collapsibles)** — uniquement les **6 titres de segment** au repos, pour ne pas surcharger :
+- Famille & Couple
+- Vie professionnelle
+- Immobilier
+- Épargne & placements
+- Retraite & événements
+- Outils annuels
+
+Au tap sur un titre de segment → la carte se déplie en place (Collapsible animé) et expose les sous-items (label + statut Disponible/Via Élio/Bientôt). Tap sur un sous-item disponible → navigue (et ferme l'overlay) ; statut "agent" → navigue vers `/agent` avec prompt ; "soon" → désactivé. Réutilise les mêmes données que `src/pages/Simulations.tsx` (extraction dans un fichier partagé `src/data/simulationsCatalog.ts`).
+
+Pied : bouton "Déconnexion" discret.
 
 ### Comportement
-- Bouton burger placé dans une **TopBar mobile** fixe (visible uniquement `lg:hidden`), à gauche, avec à droite le logo Élio.
-- Au clic : ouverture d'un **Sheet (shadcn) côté gauche, plein hauteur, largeur ~85vw** avec overlay sombre.
-- Fermeture : clic overlay, swipe, bouton X, ou choix d'un item.
-- Le `BottomNav` reste inchangé (5 onglets principaux) — le burger est complémentaire.
-- Sur desktop (`lg:`), aucun changement (la sidebar reste).
-
-### Implémentation
-- Nouveau composant `src/components/layout/MobileTopBar.tsx` avec bouton burger + logo, monté dans `AppLayout` (visible `lg:hidden` uniquement).
-- Nouveau composant `src/components/layout/MobileMenuDrawer.tsx` basé sur `Sheet` shadcn (`side="left"`), structurant les sections comme la `Sidebar` desktop.
-- Réutilisation des mêmes routes et icônes Lucide que `Sidebar.tsx` pour cohérence.
-- Ajustement minime du padding-top dans `AppLayout` pour accommoder la TopBar mobile (≈56px), sans toucher au desktop.
+- Ouverture/fermeture animée (Framer Motion AnimatePresence) — slide vertical fluide.
+- Fermeture sur : bouton X, Escape, swipe vers le bas, navigation (route change), back système (popstate).
+- Body scroll lock pendant l'ouverture.
+- Focus trap simple via `inert` sur le reste de la page.
+- Aucune sidebar/desktop touchée (overlay reste `lg:hidden`).
 
 ### Détails techniques
-- Sheet contrôlé par `useState(open)`. `<NavLink>` ferme le drawer via `onClick`.
-- Active state via `useLocation` (même logique que `Sidebar`).
-- Section "Simulations" rendue en accordéon (`Collapsible` shadcn) pour exposer les sous-segments sans surcharger.
-- Bouton "Déconnexion" appelle `signOut()` du `AuthContext`.
-- Z-index : TopBar `z-40`, Sheet (overlay+content) au-dessus via Radix portal natif.
+- Nouveau fichier `src/data/simulationsCatalog.ts` exportant `sections` (déplacé depuis `Simulations.tsx`, importé aussi par cette page).
+- Nouveau composant `src/components/layout/MobileToolsOverlay.tsx` (plein écran, animé, segments collapsibles).
+- `BottomNav` : passe à 6 cellules, ajoute le bouton "Outils" qui contrôle un état remonté via contexte léger ou via prop drilling depuis `AppLayout`.
+- `AppLayout` : monte `MobileToolsOverlay` et possède l'état `toolsOpen`. Passe `toolsOpen` + `onToolsOpenChange` au `BottomNav`. Supprime `MobileTopBar`.
+- Suppression des fichiers `MobileTopBar.tsx` et `MobileMenuDrawer.tsx` (remplacés).
+- Mise à jour mémoire : remplacer "Mobile Burger Drawer" par "Mobile Tools Overlay (bottom nav)".
