@@ -70,9 +70,11 @@ const AgentPage = () => {
   return (
     <AppLayout>
       <div
-        className="flex flex-col"
+        className="flex flex-col overflow-x-hidden"
         style={{
           height: '100dvh',
+          width: '100%',
+          maxWidth: '100vw',
           background:
             'radial-gradient(120% 60% at 50% 0%, rgba(240, 100, 73, 0.06) 0%, rgba(240, 100, 73, 0) 60%), hsl(var(--background))',
         }}
@@ -87,7 +89,7 @@ const AgentPage = () => {
               initial={false}
               exit={reduce ? { opacity: 0 } : { opacity: 0, y: -16 }}
               transition={{ duration: fadeDuration, ease: [0.22, 1, 0.36, 1] }}
-              className="flex-1 overflow-y-auto"
+              className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden"
             >
               <div className="mx-auto w-full max-w-[760px] px-3 py-4 sm:px-4">
                 <AgentHero />
@@ -109,7 +111,7 @@ const AgentPage = () => {
                 ease: [0.22, 1, 0.36, 1],
                 delay: enterDelay,
               }}
-              className="flex flex-1 min-h-0 flex-col"
+              className="flex flex-1 min-h-0 min-w-0 flex-col overflow-x-hidden"
             >
               <MessageThread
                 messages={uiMessages}
