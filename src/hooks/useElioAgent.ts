@@ -55,11 +55,78 @@ export const useElioAgent = () => {
     ]);
   }, []);
 
+  const lastUserTextRef = useRef<string | null>(null);
+
+  const pushErrorCard = useCallback((payload: AgentErrorPayload) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: 'assistant',
+        content: '',
+        rich_view: null,
+        error: payload,
+      },
+    ]);
+  }, []);
+
+  const classifyError = useCallback(
+    (error: unknown, fallbackMessage?: string): AgentErrorPayload => {
+      const ctx = (error as any)?.context;
+      const status = ctx?.status ?? (error as any)?.status;
+      const serverMsg: string | undefined =
+        ctx?.error?.message ?? ctx?.error ?? fallbackMessage;
+      const serverCode: string | undefined = ctx?.error?.code ?? ctx?.code;
+      const missingFields: string[] | undefined = ctx?.error?.missing_fields ?? ctx?.missing_fields;
+
+      // Profil incomplet (renvoyé par l'edge function avec status 422 ou code dédié)
+      if (status === 422 || serverCode === 'profile_incomplete' || (missingFields && missingFields.length)) {
+        return {
+          kind: 'profile_incomplete',
+          message: serverMsg ?? '',
+          meta: { code: String(status ?? serverCode ?? ''), missingFields, rawMessage: serverMsg },
+        };
+      }
+
+      // Quota / paiement
+      if (status === 402 || status === 429 || serverCode === 'quota_exceeded' || serverCode === 'free_tier_limit') {
+        return {
+          kind: 'quota',
+          message: serverMsg ?? '',
+          meta: { code: String(status ?? serverCode ?? '') },
+        };
+      }
+
+      // Réseau : pas de réponse ou erreur de fetch
+      const name = (error as any)?.name;
+      const msg = (error as any)?.message ?? '';
+      const isNetwork =
+        name === 'TypeError' ||
+        name === 'FetchError' ||
+        /network|fetch|failed to fetch|load failed|offline/i.test(String(msg)) ||
+        typeof status === 'undefined';
+      if (isNetwork) {
+        return {
+          kind: 'network',
+          message: '',
+          meta: { code: status ? String(status) : 'no_response', rawMessage: serverMsg ?? msg },
+        };
+      }
+
+      return {
+        kind: 'generic',
+        message: serverMsg ?? '',
+        meta: { code: String(status ?? 'unknown'), rawMessage: serverMsg },
+      };
+    },
+    [],
+  );
+
   const sendMessage = useCallback(
     async (text: string) => {
       const trimmed = text.trim();
       if (!trimmed || isLoading) return;
 
+      lastUserTextRef.current = trimmed;
       const userMsg: AgentMessage = { role: 'user', content: trimmed };
       setMessages((prev) => [...prev, userMsg]);
       setIsLoading(true);
@@ -70,39 +137,41 @@ export const useElioAgent = () => {
         });
 
         if (error) {
-          const status = (error as any).context?.status ?? (error as any).status;
-          if (status === 429) {
-            toast({
-              title: 'Trop de requêtes',
-              description: 'Élio reçoit beaucoup de demandes. Réessaie dans quelques secondes.',
-              variant: 'destructive',
-            });
-          } else {
-            toast({
-              title: 'Erreur',
-              description: 'Élio est momentanément indisponible. Réessaie dans un instant.',
-              variant: 'destructive',
-            });
-          }
-          setMessages((prev) => prev.slice(0, -1));
+          pushErrorCard({ ...classifyError(error), retryText: trimmed });
           return;
         }
 
         handleResponse(data);
       } catch (e) {
         console.error('[useElioAgent] error', e);
-        toast({
-          title: 'Erreur',
-          description: 'Impossible de contacter Élio.',
-          variant: 'destructive',
-        });
-        setMessages((prev) => prev.slice(0, -1));
+        pushErrorCard({ ...classifyError(e), retryText: trimmed });
       } finally {
         setIsLoading(false);
       }
     },
-    [conversationId, isLoading, handleResponse],
+    [conversationId, isLoading, handleResponse, pushErrorCard, classifyError],
   );
+
+  /**
+   * Réessaie le dernier message utilisateur. Retire la dernière carte d'erreur
+   * puis renvoie le texte au backend.
+   */
+  const retryLastMessage = useCallback(() => {
+    const text = lastUserTextRef.current;
+    if (!text) return;
+    setMessages((prev) => {
+      // Retire la dernière carte d'erreur (en queue) ET le user msg associé pour éviter le doublon
+      const out = [...prev];
+      while (out.length && out[out.length - 1].role === 'assistant' && (out[out.length - 1] as AgentMessage).error) {
+        out.pop();
+      }
+      if (out.length && out[out.length - 1].role === 'user' && out[out.length - 1].content === text) {
+        out.pop();
+      }
+      return out;
+    });
+    sendMessage(text);
+  }, [sendMessage]);
 
   /**
    * Confirme et applique les mises à jour de profil proposées par l'agent.
