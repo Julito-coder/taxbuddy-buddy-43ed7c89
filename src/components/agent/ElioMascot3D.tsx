@@ -105,6 +105,8 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
           width: '100%',
           height: '100%',
           transformStyle: 'preserve-3d',
+          willChange: 'transform',
+          backfaceVisibility: 'hidden',
           filter:
             'drop-shadow(0 8px 24px rgba(28, 59, 90, 0.25)) drop-shadow(0 16px 48px rgba(240, 100, 73, 0.15))',
         }}
