@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
@@ -47,27 +47,87 @@
        Seules les classes .btn-ds-*, .card-ds, .text-ds-* les consomment.
     */
 
-    /* Brand */
-    --ds-color-primary: #1C3B5A;
-    --ds-color-primary-hover: #15304A;
-    --ds-color-accent: #8B6914;        /* Gold WCAG AA compliant pour texte */
-    --ds-color-accent-light: #D4A94B;  /* Décoratif fonds sombres uniquement */
+    /* === V4 BRAND REFRESH (avril 2026) === */
+    /* Navy — palette étendue */
+    --navy-950: #0B1929;
+    --navy-900: #0F2137;
+    --navy-800: #1C3B5A;
+    --navy-700: #24506F;
+    --navy-600: #2D6A8A;
+    --navy-100: #D4E4F1;
+    --navy-50:  #EDF4FA;
 
-    /* Text */
-    --ds-color-text-primary: #203146;
-    --ds-color-text-secondary: #4A5568;
-    --ds-color-text-tertiary: #8896A6;
-    --ds-color-text-inverse: #FFFFFF;
+    /* Coral — accent ownable, remplace le gold */
+    --coral-500: #F06449;
+    --coral-400: #F2806A;
+    --coral-300: #F5A08E;
+    --coral-100: #FDE8E4;
+    --coral-50:  #FFF5F3;
 
-    /* Backgrounds */
-    --ds-color-bg-primary: #FCFAF8;
-    --ds-color-bg-secondary: #F5F1EC;
-    --ds-color-bg-tertiary: #FFFFFF;
-    --ds-color-bg-dark: #1C3B5A;
+    /* Texte (v4) */
+    --text-primary: #0F2137;
+    --text-secondary: #475569;
+    --text-tertiary: #94A3B8;
+    --text-inverse: #FFFFFF;
 
-    /* Borders */
-    --ds-color-border-light: #E8E4DF;
-    --ds-color-border-default: #D1CCC6;
+    /* Surfaces (v4) */
+    --surface-0: #FFFFFF;
+    --surface-1: #FAFAF9;
+    --surface-2: #F5F3F0;
+    --surface-3: #EDEBE8;
+
+    /* Bordures (v4) */
+    --border-light: rgba(0, 0, 0, 0.06);
+    --border-default: rgba(0, 0, 0, 0.10);
+
+    /* Statut (v4) */
+    --green-500: #10B981;
+    --green-100: #D1FAE5;
+
+    /* Espacement grille 4px (v4) */
+    --s1: 4px;   --s2: 8px;   --s3: 12px;  --s4: 16px;
+    --s5: 20px;  --s6: 24px;  --s8: 32px;  --s10: 40px;
+    --s12: 48px; --s16: 64px; --s20: 80px; --s24: 96px;  --s32: 128px;
+
+    /* Rayons (v4) */
+    --r-sm: 8px;     --r-md: 12px;   --r-lg: 16px;
+    --r-xl: 20px;    --r-2xl: 24px;  --r-3xl: 32px;
+    --r-pill: 9999px;
+
+    /* Ombres (v4) */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+    --shadow-glow-coral: 0 0 40px rgba(240, 100, 73, 0.25);
+    --shadow-glow-navy:  0 0 40px rgba(28, 59, 90, 0.20);
+
+    /* Motion (v4) */
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration: 300ms;
+
+    /* Brand legacy --ds-* (rétrocompatibilité, redirigés vers tokens v4) */
+    --ds-color-primary: var(--navy-800);
+    --ds-color-primary-hover: var(--navy-900);
+    --ds-color-accent: var(--coral-500);
+    --ds-color-accent-light: var(--coral-400);
+
+    /* Text legacy --ds-* */
+    --ds-color-text-primary: var(--text-primary);
+    --ds-color-text-secondary: var(--text-secondary);
+    --ds-color-text-tertiary: var(--text-tertiary);
+    --ds-color-text-inverse: var(--text-inverse);
+
+    /* Backgrounds legacy --ds-* */
+    --ds-color-bg-primary: var(--surface-1);
+    --ds-color-bg-secondary: var(--surface-2);
+    --ds-color-bg-tertiary: var(--surface-0);
+    --ds-color-bg-dark: var(--navy-800);
+
+    /* Borders legacy --ds-* */
+    --ds-color-border-light: var(--border-light);
+    --ds-color-border-default: var(--border-default);
 
     /* Semantic */
     --ds-color-success: #16A34A;
@@ -122,14 +182,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Sora', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
-  /* Focus-visible global — accessibilité clavier */
+  /* Focus-visible global — accessibilité clavier (v4 coral) */
   :focus-visible {
-    outline: 2px solid var(--ds-color-primary);
-    outline-offset: 2px;
-    border-radius: 2px;
+    outline: 2px solid var(--coral-500);
+    outline-offset: 3px;
+    border-radius: var(--r-sm);
   }
 
   /* Reduced motion respect — applique à toute l'app */
@@ -222,58 +282,89 @@
     align-items: center;
     justify-content: center;
     gap: var(--ds-space-2);
-    height: 48px;
-    padding: 0 var(--ds-space-6);
+    height: 52px;
+    padding: 0 32px;
     font-family: inherit;
-    font-size: var(--ds-text-sm);
-    font-weight: var(--ds-fw-medium);
-    border-radius: var(--ds-radius-pill);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-radius: var(--r-pill);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--duration) var(--ease);
     text-decoration: none;
     border: none;
     white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+  }
+  .ds-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: transform var(--duration) var(--ease);
+  }
+  .ds-btn:hover svg {
+    transform: translateX(3px);
   }
 
   .ds-btn-primary {
-    background: var(--ds-color-primary);
-    color: var(--ds-color-text-inverse);
+    background: var(--navy-900);
+    color: var(--text-inverse);
   }
   .ds-btn-primary:hover {
-    background: var(--ds-color-primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(28, 59, 90, 0.25);
+    background: var(--navy-950);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-navy);
+  }
+
+  .ds-btn-coral {
+    background: var(--coral-500);
+    color: var(--text-inverse);
+  }
+  .ds-btn-coral:hover {
+    background: #E8553D;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-coral);
   }
 
   .ds-btn-secondary {
-    background: transparent;
-    color: var(--ds-color-text-primary);
-    border: 1.5px solid var(--ds-color-border-default);
+    background: var(--surface-0);
+    color: var(--text-primary);
+    border: 1.5px solid var(--border-default);
   }
   .ds-btn-secondary:hover {
-    border-color: var(--ds-color-primary);
-    color: var(--ds-color-primary);
+    border-color: var(--navy-800);
+    box-shadow: var(--shadow-sm);
   }
 
   .ds-btn-ghost {
     background: transparent;
-    color: var(--ds-color-primary);
-    padding: 0 var(--ds-space-4);
-    height: 48px;
+    color: var(--text-secondary);
+    padding: 0 var(--s4);
   }
   .ds-btn-ghost:hover {
+    color: var(--navy-800);
     text-decoration: underline;
     text-underline-offset: 4px;
     text-decoration-thickness: 2px;
   }
 
+  .ds-btn-white {
+    background: var(--surface-0);
+    color: var(--text-primary);
+  }
+  .ds-btn-white:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Alias rétrocompatibilité — ne pas supprimer (utilisé par Legal.tsx) */
   .ds-btn-inverse {
-    background: var(--ds-color-text-inverse);
-    color: var(--ds-color-primary);
+    background: var(--surface-0);
+    color: var(--text-primary);
   }
   .ds-btn-inverse:hover {
-    background: rgba(255, 255, 255, 0.92);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
   }
 
   .ds-card {
