@@ -247,15 +247,20 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
             animate={{ clipPath: `circle(${revealMaxRadius} at ${revealOrigin})` }}
             exit={{ clipPath: `circle(0px at ${revealOrigin})` }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
           >
-            {/* Drag handle hint */}
-            <div className="pt-2 pb-1 flex justify-center" aria-hidden="true">
-              <span className="block h-1 w-10 rounded-full bg-muted-foreground/30" />
-            </div>
-            {/* Header */}
-            <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between">
+            {/* Drag-to-close zone: handle + sticky header. Touch handlers
+                live HERE, not on the panel, so the scrollable body keeps
+                a fully natural scroll. */}
+            <div
+              onTouchStart={onHeaderTouchStart}
+              onTouchEnd={onHeaderTouchEnd}
+              className="touch-pan-y"
+            >
+              <div className="pt-2 pb-1 flex justify-center cursor-grab active:cursor-grabbing" aria-hidden="true">
+                <span className="block h-1 w-10 rounded-full bg-muted-foreground/30" />
+              </div>
+              {/* Header */}
+              <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between">
               <div>
                 <h2 className="text-base font-bold text-foreground">Tous les outils</h2>
                 <p className="text-[11px] text-muted-foreground">Navigation et simulations</p>
