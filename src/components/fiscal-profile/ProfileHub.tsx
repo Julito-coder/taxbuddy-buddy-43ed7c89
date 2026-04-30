@@ -51,7 +51,15 @@ export const ProfileHub = () => {
     () =>
       data
         ? computeOverallProgress(data)
-        : { percentage: 0, qualitativeLabel: 'À démarrer', remainingGain: 0, nextModuleId: undefined as ModuleId | undefined, progresses: [] },
+        : {
+            percentage: 0,
+            qualitativeLabel: 'À démarrer',
+            remainingGain: 0,
+            nextModuleId: undefined as ModuleId | undefined,
+            nextModuleTitle: undefined as string | undefined,
+            nextModuleGain: 0,
+            progresses: [],
+          },
     [data]
   );
 
