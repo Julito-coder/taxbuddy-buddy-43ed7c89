@@ -1,7 +1,6 @@
 import { AppLayout } from '@/components/layout/AppLayout';
-import { FiscalProfileForm } from '@/components/fiscal-profile/FiscalProfileForm';
+import { ProfileHub } from '@/components/fiscal-profile/ProfileHub';
 import { motion } from 'framer-motion';
-import { UserCircle } from 'lucide-react';
 
 const FiscalProfile = () => {
   return (
@@ -9,21 +8,21 @@ const FiscalProfile = () => {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
+        className="space-y-6 max-w-5xl mx-auto"
       >
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-primary/20 flex items-center justify-center">
-            <UserCircle className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Mon profil fiscal</h1>
-            <p className="text-sm text-muted-foreground">
-              Complète tes informations pour des recommandations ultra précises.
-            </p>
-          </div>
-        </div>
+        <header className="space-y-1">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Profil fiscal
+          </p>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            Construis le profil qui te fait gagner de l’argent
+          </h1>
+          <p className="text-sm text-muted-foreground max-w-2xl">
+            Un module à la fois. Tu peux t’arrêter quand tu veux et reprendre plus tard, tes informations sont sauvegardées en sécurité.
+          </p>
+        </header>
 
-        <FiscalProfileForm />
+        <ProfileHub />
       </motion.div>
     </AppLayout>
   );

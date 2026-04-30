@@ -1,104 +1,107 @@
-## Contexte
+# Refonte UX du profil fiscal
 
-Le moteur de calcul immobilier vit dans deux fichiers principaux : `src/lib/simulationEngine.ts` (Locatif + base RP) et `src/lib/rpCalculations.ts` (solvabilité ménage RP). En les comparant aux normes HCSF 2025 et aux pratiques bancaires courantes, plusieurs incohérences expliquent les écarts visibles dans le dashboard.
+## Problème actuel
 
-## Bugs identifiés
+La page `/profil/fiscal` affiche **9 accordéons** simultanés bourrés de champs bruts (Input/Label) avec des emojis dans les titres. Aucun contexte, aucune motivation, aucune progression visible. L'utilisateur voit un mur de formulaire administratif décourageant.
 
-### A. Solvabilité (RP & Locatif)
+Constats précis :
+- Emojis dans tous les titres de section (🪪, 👨‍👩‍👧‍👦, 💼, 📋…) → effet "non sérieux"
+- Tous les champs sont visibles d'un coup → surcharge cognitive
+- Aucune explication du **bénéfice** (pourquoi remplir ?)
+- Pas de logique de priorisation (champs critiques noyés dans les optionnels)
+- Toast de confirmation avec emoji ✅
+- Indicateur de complétion isolé, peu engageant
 
-1. **DTI sans pondération locative** (`rpCalculations.ts` L86-92, et absence côté Locatif dans `simulationEngine.ts`)
-   - Aujourd'hui : `(crédits + nouvelle mensualité) / revenus`
-   - Norme HCSF / banque : pour un investissement Locatif, le loyer net est intégré côté revenus à **70 %** (pondération vacance + impayés) avant calcul du taux d'effort. Aucun module ne le fait.
-   - Conséquence : DTI surévalué pour Locatif, DTI correct pour RP mais **non-cohérent inter-modules**.
+## Vision cible
 
-2. **Reste à vivre — seuils non standards** (`rpCalculations.ts` L122-141)
-   - Seuils actuels : 400 €/pers (cible) et 300 €/pers (danger), comptés à plat.
-   - Standard bancaire : ~**900 € adulte 1**, **500 € adulte 2**, **400 €/enfant**. Le calcul "à plat × memberCount" sous-estime le besoin pour un couple avec enfants.
+Transformer le profil en **parcours guidé par modules thématiques**, façon "checklist sérieuse façon banque privée" :
+1. Vue d'ensemble = tableau de bord des modules avec gain € associé à chaque module complété
+2. Édition = drawer/modale plein écran focalisée sur un module à la fois, avec contexte et progression
+3. Hiérarchie : champs essentiels d'abord, détails optionnels repliés
+4. Aucun emoji, icônes Lucide uniquement, ton sobre et professionnel
 
-3. **Charges logement incomplètes pour Locatif** : la solvabilité côté Locatif n'est pas calculée ; on n'expose que `monthly_cashflow_after_tax`. Pas de DTI ni reste à vivre Locatif → incohérence dans le dashboard quand l'utilisateur a un projet RP + Locatif.
+## Structure de la nouvelle page `/profil/fiscal`
 
-### B. Rendements (Locatif)
+### 1. En-tête "Hub profil"
 
-4. **NOI utilise `annualRent` brut** (`simulationEngine.ts` L424-426)
-   - `noi = annualRent * (1 - vacancy) - firstYearCosts`
-   - Manque l'impayé (`default_rate`) et n'utilise pas `calculateAdjustedRentalIncome` (qui gère meublé saisonnier, croissance, etc.). Pour un meublé saisonnier, le NOI est faux.
+Remplace la barre de complétion seule par un bandeau structuré :
+- Titre + sous-titre clair ("Plus ton profil est précis, plus mes recommandations te font gagner")
+- Score de complétion (anneau ProgressRing existant) + libellé qualitatif ("Profil basique / Bon / Optimisé / Expert")
+- Estimation **du gain fiscal potentiel débloqué** restant (basé sur modules manquants)
+- CTA principal : "Compléter le prochain module" → ouvre directement le module à plus fort impact
 
-5. **Rendement net-net sur moyenne des cashflows après impôt** (L428-431)
-   - `netNetYield = avgCashflowAfterTax / totalCost`
-   - Définition usuelle : `(loyer net - charges - impôts) / coût total` SANS le service de la dette (sinon on confond rendement et levier). Aujourd'hui le cashflow inclut `loan_payment`, ce qui transforme le "net-net" en "rendement après dette" → confusion utilisateur.
+### 2. Grille des modules (vue carte)
 
-6. **DSCR ne prend pas l'assurance** (L440-441)
-   - `annualDebtService = monthlyPayment * 12` ; or `monthlyPayment` du mois 1 inclut déjà l'assurance dans `generateAmortizationTable` (L84). OK pour mois normal, mais **pas** pour différé partiel/total → DSCR faussé en différé.
-   - Plus critique : `noi` ici est calculé sans `default_rate`, donc DSCR optimiste.
+Remplace l'Accordion par une grille de **cartes-modules** (1 col mobile, 2 cols desktop). Chaque carte affiche :
+- Icône Lucide (UserCircle, Users, Briefcase, Building2, Landmark, TrendingUp, Shield…)
+- Nom du module (sans emoji) : Identité · Foyer fiscal · Activité professionnelle · Revenus · Patrimoine immobilier · Patrimoine financier · Préférences & consentements
+- Mini-progression (X/Y champs remplis) avec barre fine
+- Badge d'état : `À compléter` / `Partiel` / `Complet` / `Recommandé pour toi`
+- Gain potentiel ou bénéfice concret ("Débloque +320 €/an d'optimisations détectées")
+- Clic → ouvre le drawer d'édition du module
 
-### C. IRR
+Modules conditionnels (Salarié, Indépendant, Retraité) n'apparaissent **qu'après** sélection du statut dans le module "Activité professionnelle".
 
-7. **Down payment != cash investi** (L319)
-   - `irrCashflows[0] = -financing.down_payment`
-   - Le cash investi à T0 = apport + frais notaire + frais agence + frais bancaires + frais de courtage + meubles + travaux **non financés**. Aujourd'hui on ne compte que l'apport → IRR systématiquement surévalué.
+### 3. Drawer d'édition par module
 
-8. **Plus-value : abattements pour durée de détention non appliqués** (L408-410)
-   - `capitalGainTax = capitalGain * tax_rate` à plat.
-   - Code 2025 : abattement progressif IR (6 %/an de l'année 6 à 21, puis 4 % en 22) et PS (1,65 %/an années 6-21, 1,60 % an 22, 9 % années 23-30). Surévalue largement l'impôt en sortie longue → IRR sous-évalué pour horizon > 6 ans. Incohérent avec le bug #7 (qui surévalue l'IRR).
+Composant `ProfileModuleDrawer` (basé sur `Sheet` shadcn, plein écran mobile, side panel desktop) qui contient :
+- En-tête fixe : titre du module, fil d'Ariane "Profil > Module", indicateur "Étape X/Y" si multi-étape
+- Section "Pourquoi ces infos" repliable (1 phrase + 2 puces de bénéfice concret)
+- Champs regroupés en **sous-sections logiques** avec séparateurs et titres courts
+- Champs essentiels visibles, champs optionnels dans un bloc "Détails avancés (facultatif)" replié
+- Validations en ligne (helper text sous chaque champ, tonalité positive)
+- Footer fixe : bouton "Enregistrer" + lien "Reprendre plus tard" (sauvegarde silencieuse au blur déjà implicite via state)
 
-### D. Cohérence inter-modules
+### 4. Composants réutilisables à créer
 
-9. **`totalCost` divergent** : `simulationEngine` (L289-298) somme 8 postes ; `rpCalculations` (L108-110) en somme 4. Pour un même projet RP, le coût total affiché côté KPI ≠ celui utilisé pour LTV/patrimoine.
-
-10. **LTV (`rpCalculations` L103-105)** : calculée sur `price_net_seller` seulement. Standard bancaire : LTV = `loan / (price + frais notaire)` ou `loan / valeur de gage`. Diverge de ce que la banque calcule.
-
-11. **Break-even rent (L506-509)** : `taxFactor = 1 - tmi*0.7` est une approximation grossière qui ignore le régime fiscal réel (micro vs réel, déductibilité intérêts, amortissement LMNP). Résultat incohérent avec `calculateAnnualTax`.
-
-## Plan de correction
-
-### Étape 1 — Constantes fiscales & normes (nouveau fichier)
-Créer `src/lib/realEstate/standards.ts` :
-- Seuils HCSF 2025 (DTI 35 %, durée max 25 ans, dérogation 20 %).
-- Reste à vivre par typologie (adulte 1, adulte 2, enfant).
-- Pondération loyer Locatif (70 %).
-- Barème abattements plus-value IR + PS (durée détention).
-
-### Étape 2 — Refactor `simulationEngine.ts`
-- **Bug #4** : NOI = `calculateAdjustedRentalIncome(rental, 1) - firstYearCosts` (intègre vacance + impayés + saisonnier).
-- **Bug #5** : `netNetYield = (NOI - tax_year1) / totalCost` (sans service dette). Renommer l'ancien indicateur en `cash_on_cash_yield` (rendement sur cash investi après dette).
-- **Bug #6** : DSCR = NOI corrigé / (capital + intérêts annuels du tableau d'amortissement, hors assurance).
-- **Bug #7** : `cashInvested` = down_payment + notaire + agence + frais bancaires + courtage + garantie + (meubles/travaux non financés). Utiliser pour IRR L0 et pour cash-on-cash.
-- **Bug #8** : nouvelle fonction `calculateCapitalGainTax(gain, holdingYears)` appliquant les abattements 2025.
-- **Bug #11** : break-even rent recalculé en réutilisant `calculateAnnualTax` par dichotomie (au lieu de l'approximation `tmi*0.7`).
-
-### Étape 3 — Refactor `rpCalculations.ts`
-- **Bug #2** : `minResteAVivre = 900 + 500*(adultes-1) + 400*enfants` (récupérer composition foyer depuis profile / `members`).
-- **Bug #9 & #10** : importer `calculateTotalProjectCost()` depuis `simulationEngine` (source unique). LTV = `loan / (price + notaire)`.
-- Aligner les seuils status sur HCSF (35 % cible, 40 % danger reste OK, mais expliciter la dérogation 20 %).
-
-### Étape 4 — Étendre la solvabilité au Locatif
-Ajouter dans `simulationEngine.ts` une fonction `calculateLocatifSolvency(data, household)` qui :
-- Pondère le loyer net à 70 % côté revenus.
-- Calcule DTI Locatif = `(crédits existants + nouvelle mensualité) / (revenus + 0.7*loyer_net_mensuel)`.
-- Expose dans `SimulationResults` : `dti_bank`, `reste_a_vivre`, pour cohérence inter-modules.
-
-### Étape 5 — Tests & QA
-- Vérifier sur un cas RP : couple 1 enfant, 4 500 €/mois, prêt 250 k€/25 ans → DTI ~33 %, RAV ~1 100 € → status `success`.
-- Cas Locatif : T2 800 €/mois, prêt 180 k€/20 ans, TMI 30 % → NOI cohérent avec vacance 8 %, IRR 10 ans avec abattement plus-value.
-- Comparer les KPI affichés dans `RPResultsDashboard.tsx` et `KPICardsGrid.tsx` avant/après pour valider la non-régression.
-
-### Détails techniques
-
-```text
-SimulationResults (nouveaux champs)
-├── cash_invested          // T0 réel
-├── cash_on_cash_yield     // ancien net_net renommé
-├── net_net_yield          // recalculé sans service dette
-├── dti_bank               // taux d'effort bancaire (Locatif)
-├── reste_a_vivre          // RAV mensuel ménage (Locatif)
-└── capital_gain_tax_detail // {ir, ps, abattement_ir_pct, abattement_ps_pct}
+```
+src/components/fiscal-profile/
+├── ProfileHub.tsx              (nouvelle page principale, remplace FiscalProfileForm)
+├── ProfileHubHeader.tsx        (bandeau score + gain + CTA)
+├── ProfileModuleCard.tsx       (carte module dans la grille)
+├── ProfileModuleDrawer.tsx     (Sheet d'édition)
+├── ProfileFieldGroup.tsx       (regroupement avec titre + description)
+├── ProfileField.tsx            (wrapper Input/Select avec helper, état de validation)
+├── modules/
+│   ├── identityModule.ts       (config champs + métadonnées)
+│   ├── familyModule.ts
+│   ├── professionalModule.ts
+│   ├── employeeModule.ts
+│   ├── selfEmployedModule.ts
+│   ├── retiredModule.ts
+│   ├── realEstateModule.ts
+│   ├── financialModule.ts
+│   └── consentsModule.ts
+└── moduleRegistry.ts           (liste ordonnée + logique conditionnelle + scoring gain)
 ```
 
-Fichiers touchés :
-- `src/lib/simulationEngine.ts` (refactor majeur)
-- `src/lib/rpCalculations.ts` (refactor moyen)
-- `src/lib/realEstate/standards.ts` (nouveau)
-- `src/lib/realEstateTypes.ts` (extension `SimulationResults`)
-- `src/components/simulator/results/KPICardsGrid.tsx` + `RPResultsDashboard.tsx` (afficher nouveaux KPI, renommer `net_net`)
+Les composants section existants (IdentitySection, FamilySection, etc.) sont **réécrits** pour être consommés dans le drawer avec le nouveau design (sous-sections, hiérarchisation essentiel/avancé, suppression des emojis), pas juste habillés.
 
-Aucun changement de schéma DB nécessaire (les `simulation_results.results_jsonb` sont stockés en JSONB libre).
+### 5. Suppression des emojis et ton
+
+- Toast de succès : "Profil mis à jour" (sans ✅), variant standard
+- Tous les libellés relus pour ton sobre, "tu", phrases courtes
+- Aucun emoji dans titres, sous-titres, badges, toasts, helper text
+- Icônes Lucide partout, taille et couleur cohérentes (`h-5 w-5 text-primary`)
+
+## Détails techniques
+
+- Conserve `loadFiscalProfile` / `saveFiscalProfile` / `calculateProfileCompletion` (`src/lib/fiscalProfileService.ts`) sans changement.
+- Ajoute dans `moduleRegistry.ts` une fonction `computeModuleCompletion(moduleId, data)` qui renvoie `{ filled, total, status, estimatedGainEuros }`. Le gain s'appuie sur la logique existante de `taxOptimizationEngine.ts` (lecture seule, on mappe quels modules débloquent quels gains).
+- Le drawer utilise `Sheet` (shadcn) avec `side="right"` desktop, `side="bottom"` ou plein écran mobile via `useIsMobile`.
+- État local du drawer : copie travail du module ouvert, save → merge dans state global puis `saveFiscalProfile`. Permet d'annuler sans toucher la base.
+- Animations Framer Motion réutilisées (fade + slide) pour cohérence avec le reste de l'app.
+- Respect strict des tokens design (semantic tokens HSL, pas de couleurs hardcodées). Variants Badge : `default | secondary | outline | success` (ajouter `success` si manquant via cva ou utiliser couleur primaire pour "Complet").
+- Routes inchangées : `/profil/fiscal` rend le nouveau `ProfileHub` à la place de `FiscalProfileForm`. `FiscalProfile.tsx` adapte son en-tête (titre + sous-titre, retire l'icône doublon car le hub a son propre header).
+- Mobile-first : grille 1 col < 768px, 2 cols ≥ 768px. Drawer plein écran sur mobile.
+- Aucune migration DB, aucun changement backend, aucun changement de logique métier (purement UI/UX).
+
+## Ce qui n'est PAS dans le scope
+
+- Pas de modification des sections d'onboarding `src/components/onboarding/modern/*` (autre parcours, autre demande si besoin).
+- Pas de changement du moteur de scoring, des edge functions, du schéma DB.
+- Pas de refonte du `BankFiscalSummary` ni du Bulletin.
+
+## Validation
+
+Après implémentation : visite `/profil/fiscal` au viewport actuel (982×734) puis mobile (390×844) via browser tools, vérifie qu'aucun emoji ne subsiste, que les modules s'ouvrent en drawer, que la progression et le gain s'affichent, que la sauvegarde fonctionne (toast sobre, pas d'erreur console).
