@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -9,10 +9,7 @@ import {
   Calendar,
   Calculator,
   ShieldCheck,
-  Menu,
-  X,
 } from 'lucide-react';
-import { useState } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -20,7 +17,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { useAuth } from '@/contexts/AuthContext';
-import { ElioLogo } from '@/components/layout/ElioLogo';
+import { LandingHeader } from '@/components/landing/Header';
 import { Loader2 } from 'lucide-react';
 
 const SIGNUP_HREF = '/quiz';
@@ -32,60 +29,6 @@ const fadeUp = {
   viewport: { once: true, margin: '-80px' },
   transition: { duration: 0.4, ease: 'easeOut' as const },
 } as const;
-
-// ─────────────────────────────────────── Nav
-function LandingNav({ scrolled }: { scrolled: boolean }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <header
-      className={`sticky top-0 z-50 w-full bg-background/80 backdrop-blur-xl transition-[border-color] duration-200 ${
-        scrolled ? 'border-b border-ds-border-light' : 'border-b border-transparent'
-      }`}
-    >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link to="/welcome" className="flex items-center" aria-label="Élio — Accueil">
-          <ElioLogo variant="compact" size={32} className="sm:hidden" />
-          <ElioLogo variant="compact" size={36} className="hidden sm:inline-flex" />
-        </Link>
-        <nav className="hidden items-center gap-ds-2 md:flex" aria-label="Navigation principale">
-          <a href="#features" className="ds-nav-link">Fonctionnalités</a>
-          <a href="#pricing" className="ds-nav-link">Tarifs</a>
-          <a href="#faq" className="ds-nav-link">FAQ</a>
-        </nav>
-        <div className="hidden items-center gap-ds-3 md:flex">
-          <Link to={LOGIN_HREF} className="ds-btn ds-btn-ghost">
-            Se connecter
-          </Link>
-          <Link to={SIGNUP_HREF} className="ds-btn ds-btn-primary">
-            Commencer gratuitement
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-        </div>
-        <button
-          aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
-          aria-expanded={open}
-          className="md:hidden p-2 -mr-2 text-foreground"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
-      {open && (
-        <div className="md:hidden border-t border-ds-border-light bg-background">
-          <div className="flex flex-col gap-ds-1 px-ds-4 py-ds-3">
-            <a href="#features" onClick={() => setOpen(false)} className="ds-nav-link justify-start">Fonctionnalités</a>
-            <a href="#pricing" onClick={() => setOpen(false)} className="ds-nav-link justify-start">Tarifs</a>
-            <a href="#faq" onClick={() => setOpen(false)} className="ds-nav-link justify-start">FAQ</a>
-            <div className="mt-ds-2 flex flex-col gap-ds-2 border-t border-ds-border-light pt-ds-3">
-              <Link to={LOGIN_HREF} className="ds-btn ds-btn-secondary w-full">Se connecter</Link>
-              <Link to={SIGNUP_HREF} className="ds-btn ds-btn-primary w-full">Commencer gratuitement</Link>
-            </div>
-          </div>
-        </div>
-      )}
-    </header>
-  );
-}
 
 // ─────────────────────────────────────── Hero
 function Hero() {
@@ -669,7 +612,6 @@ function LandingFooter() {
 // ─────────────────────────────────────── Page
 const Welcome = () => {
   const { user, loading } = useAuth();
-  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     document.title = 'Élio — Ne perds plus un euro par manque d\'information';
@@ -685,14 +627,6 @@ const Welcome = () => {
       'content',
       "Élio est ton copilote administratif et financier. Diagnostic gratuit en 90s. Récupère en moyenne 2 000 €/an d'aides, erreurs fiscales et contrats sous-optimisés.",
     );
-  }, []);
-
-  // Header sticky : ajoute une fine bordure dès qu'on scrolle.
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   if (loading) {
@@ -712,7 +646,7 @@ const Welcome = () => {
       <a href="#main-content" className="skip-link">
         Aller au contenu principal
       </a>
-      <LandingNav scrolled={scrolled} />
+      <LandingHeader />
       <main id="main-content">
         <Hero />
         <SocialProof />
