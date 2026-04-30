@@ -227,14 +227,27 @@ export const computeOverallProgress = (data: FiscalProfileData) => {
       return acc + (meta?.estimatedAnnualGain || 0);
     }, 0);
 
-  // Module suivant à compléter = premier non complet, trié par gain décroissant
+  // Module suivant : score composite = (gain potentiel restant) + bonus "presque fini"
+  // - On pondère le gain par la part non remplie (1 - filled/total)
+  // - On ajoute un bonus si le module est déjà entamé (partial) pour favoriser la finalisation
+  // - Les modules sans gain estimé (identité, consents) reçoivent un poids minimal
+  //   pour ne passer en tête que si tout le reste est complet.
+  const scoreModule = (p: ModuleProgress): number => {
+    const meta = MODULES.find((m) => m.id === p.id);
+    const gain = meta?.estimatedAnnualGain || 0;
+    const incompleteness = 1 - p.filled / Math.max(p.total, 1);
+    const impact = gain * incompleteness;
+    const partialBonus = p.status === 'partial' ? gain * 0.25 + 50 : 0;
+    const baseline = gain === 0 ? 1 : 100; // modules sans gain € passent en dernier
+    return impact + partialBonus + baseline;
+  };
+
   const nextModule = progresses
     .filter((p) => p.status !== 'complete')
-    .sort((a, b) => {
-      const ga = MODULES.find((m) => m.id === a.id)?.estimatedAnnualGain || 0;
-      const gb = MODULES.find((m) => m.id === b.id)?.estimatedAnnualGain || 0;
-      return gb - ga;
-    })[0];
+    .map((p) => ({ p, score: scoreModule(p) }))
+    .sort((a, b) => b.score - a.score)[0]?.p;
+
+  const nextModuleMeta = nextModule ? MODULES.find((m) => m.id === nextModule.id) : undefined;
 
   let qualitativeLabel = 'À démarrer';
   if (percentage >= 90) qualitativeLabel = 'Profil expert';
@@ -247,6 +260,8 @@ export const computeOverallProgress = (data: FiscalProfileData) => {
     qualitativeLabel,
     remainingGain,
     nextModuleId: nextModule?.id,
+    nextModuleTitle: nextModuleMeta?.title,
+    nextModuleGain: nextModuleMeta?.estimatedAnnualGain ?? 0,
     progresses,
   };
 };
