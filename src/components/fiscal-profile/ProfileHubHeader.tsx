@@ -79,14 +79,24 @@ export const ProfileHubHeader = ({
       </div>
 
       {hasNextModule && (
-        <Button
-          onClick={onContinue}
-          className="mt-5 w-full md:w-auto h-11 rounded-xl"
-          size="lg"
-        >
-          Compléter le prochain module
-          <ArrowRight className="h-4 w-4 ml-2" />
-        </Button>
+        <div className="mt-5 flex flex-col md:flex-row md:items-center gap-3">
+          <Button
+            onClick={onContinue}
+            className="h-11 rounded-xl w-full md:w-auto"
+            size="lg"
+          >
+            {nextModuleTitle ? `Continuer : ${nextModuleTitle}` : 'Compléter le prochain module'}
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+          {nextModuleGain > 0 && (
+            <span className="text-xs text-muted-foreground">
+              Impact estimé&nbsp;: jusqu’à{' '}
+              <span className="font-semibold text-primary">
+                {formatEuros(nextModuleGain)}/an
+              </span>
+            </span>
+          )}
+        </div>
       )}
     </motion.header>
   );
