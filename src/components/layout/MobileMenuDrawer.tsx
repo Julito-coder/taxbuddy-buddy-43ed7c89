@@ -5,7 +5,7 @@ import {
   Heart, Briefcase, ScanSearch, FolderLock, ChevronDown,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetOverlay, SheetPortal } from '@/components/ui/sheet';
+import { Sheet, SheetHeader, SheetTitle, SheetPortal } from '@/components/ui/sheet';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAuth } from '@/contexts/AuthContext';
