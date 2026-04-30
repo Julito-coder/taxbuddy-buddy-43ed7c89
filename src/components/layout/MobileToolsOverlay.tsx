@@ -210,44 +210,71 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
     navigate(to);
   };
 
-  // Origin of the circular reveal: roughly the "Outils" button (bottom-right of the bottom nav).
-  // BottomNav has 6 evenly-spaced cells over the viewport width, height 68px;
-  // the Outils cell center is at ~ (11/12) of width, ~34px from the bottom.
-  const revealOrigin = 'calc(100% - 8.33vw) calc(100% - 34px)';
-  // Maximum radius needed to cover the whole viewport from that origin.
-  const revealMaxRadius = '160vmax';
+  // Origin of the reveal: roughly the "Outils" button (bottom-right of the bottom nav).
+  // BottomNav has 6 evenly-spaced cells; Outils cell center sits at ~ 11/12 of width
+  // and ~34px above the bottom edge (nav is 68px tall).
+  // We position a scaling disc whose center matches that point.
+  const originRight = '8.33vw'; // distance from right edge to disc center
+  const originBottom = '34px'; // distance from bottom edge to disc center
+  // Disc large enough that scale(1) covers any phone diagonally from the origin.
+  // Largest needed radius ≈ sqrt((100vw)² + (100vh)²) ≈ 142vmax. Round up.
+  const discSize = '320vmax';
 
   return (
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-[60] lg:hidden">
-          {/* Tap-to-close backdrop. Sits behind the panel. */}
+          {/* Tap-to-close backdrop. Sits behind the panel.
+              Blur is intentionally omitted — it's expensive to animate on mobile. */}
           <motion.button
             key="overlay-bg"
             type="button"
             aria-label="Fermer le menu"
             tabIndex={-1}
-            className="absolute inset-0 bg-foreground/40 backdrop-blur-[2px] cursor-pointer"
+            className="absolute inset-0 bg-foreground/40 cursor-pointer"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
             onClick={close}
           />
-          {/* Full-screen panel revealed via a circular clip-path expanding
-              from the bottom-right (Outils button origin). */}
-          <motion.div
-            key="overlay-panel"
+          {/* Container holds the GPU-accelerated growing disc + the panel content. */}
+          <div
             ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label="Tous les outils"
-            className="absolute inset-0 bg-background shadow-2xl flex flex-col outline-none"
-            initial={{ clipPath: `circle(0px at ${revealOrigin})` }}
-            animate={{ clipPath: `circle(${revealMaxRadius} at ${revealOrigin})` }}
-            exit={{ clipPath: `circle(0px at ${revealOrigin})` }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0 outline-none"
           >
+            {/* Growing disc — pure transform:scale, fully GPU-composited.
+                Avoids clip-path which causes jank on iOS / low-end Android. */}
+            <motion.div
+              aria-hidden="true"
+              className="absolute rounded-full bg-background shadow-2xl pointer-events-none"
+              style={{
+                width: discSize,
+                height: discSize,
+                right: `calc(${originRight} - (${discSize} / 2))`,
+                bottom: `calc(${originBottom} - (${discSize} / 2))`,
+                transformOrigin: 'center center',
+                willChange: 'transform',
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+              }}
+              initial={{ transform: 'scale(0)' }}
+              animate={{ transform: 'scale(1)' }}
+              exit={{ transform: 'scale(0)' }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            />
+            {/* Actual content layer — fades in once the disc has covered the screen. */}
+            <motion.div
+              className="absolute inset-0 flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut', delay: 0.18 }}
+              style={{ willChange: 'opacity' }}
+            >
             {/* Drag-to-close zone: handle + sticky header. Touch handlers
                 live HERE, not on the panel, so the scrollable body keeps
                 a fully natural scroll. */}
