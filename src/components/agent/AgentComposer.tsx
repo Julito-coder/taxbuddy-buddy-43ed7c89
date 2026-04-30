@@ -51,10 +51,10 @@ export const AgentComposer = ({
 
   return (
     <div
-      className="sticky bottom-0 z-20 border-t border-border bg-background"
+      className="shrink-0 border-t border-border bg-background"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      <div className="mx-auto w-full max-w-[760px] px-3 py-3 sm:px-4">
+      <div className="mx-auto w-full max-w-[760px] min-w-0 px-3 py-3 sm:px-4">
         <div className="flex items-end gap-2">
           <textarea
             ref={textareaRef}

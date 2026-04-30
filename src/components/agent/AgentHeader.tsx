@@ -1,17 +1,8 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, MoreHorizontal } from 'lucide-react';
 
 export const AgentHeader = () => {
   const navigate = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   const handleBack = () => {
     if (window.history.length > 1) window.history.back();
@@ -19,15 +10,7 @@ export const AgentHeader = () => {
   };
 
   return (
-    <header
-      className="sticky top-0 z-30 h-[60px] border-b border-border"
-      style={{
-        backgroundColor: scrolled ? 'hsl(var(--background) / 0.85)' : 'hsl(var(--background))',
-        backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(180%)' : 'none',
-        transition: 'background-color var(--duration) var(--ease), backdrop-filter var(--duration) var(--ease)',
-      }}
-    >
+    <header className="shrink-0 h-[60px] border-b border-border bg-background">
       <div className="mx-auto flex h-full max-w-[760px] items-center justify-between px-2 sm:px-4">
         <button
           type="button"

@@ -106,21 +106,20 @@ export const MessageThread = ({
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-y-auto"
+      className="flex-1 min-h-0 min-w-0 overflow-y-auto overflow-x-hidden"
       role="log"
       aria-live="polite"
       aria-relevant="additions"
     >
-      <div className="mx-auto w-full max-w-[760px] px-3 py-4 sm:px-4">
-        <div className="flex flex-col gap-4">
+      <div className="mx-auto w-full max-w-[760px] min-w-0 px-3 py-4 sm:px-4">
+        <div className="flex flex-col gap-4 min-w-0">
           {messages.map((m) => {
             if (m.role === 'user') {
               return (
-                <div key={m.id} className="flex justify-end">
+                <div key={m.id} className="flex justify-end min-w-0">
                   <div
-                    className="text-white"
+                    className="text-white max-w-[85%] sm:max-w-[520px] min-w-0"
                     style={{
-                      maxWidth: '85%',
                       backgroundColor: 'hsl(var(--primary))',
                       borderRadius: 'var(--radius)',
                       borderBottomRightRadius: 4,
@@ -130,6 +129,7 @@ export const MessageThread = ({
                       lineHeight: 1.5,
                       whiteSpace: 'pre-wrap',
                       wordBreak: 'break-word',
+                      overflowWrap: 'anywhere',
                     }}
                   >
                     {m.content}
@@ -141,7 +141,7 @@ export const MessageThread = ({
             // Assistant — carte d'erreur structurée
             if (m.error) {
               return (
-                <div key={m.id} className="flex items-start gap-2">
+                <div key={m.id} className="flex items-start gap-2 min-w-0">
                   <div className="shrink-0 pt-0.5">
                     <ElioMascot3D state="idle" size={mascotSize} />
                   </div>
@@ -158,11 +158,11 @@ export const MessageThread = ({
             }
 
             return (
-              <div key={m.id} className="flex items-start gap-2">
+              <div key={m.id} className="flex items-start gap-2 min-w-0">
                 <div className="shrink-0 pt-0.5">
                   <ElioMascot3D state="idle" size={mascotSize} />
                 </div>
-                <div className="min-w-0 flex-1" style={{ maxWidth: '90%' }}>
+                <div className="min-w-0 flex-1">
                   {m.content && (
                     <p
                       className="text-foreground"
