@@ -184,6 +184,8 @@ Retourne UNIQUEMENT du JSON valide :
   } catch (err) {
     console.error('News generation failed:', err);
     return null;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
