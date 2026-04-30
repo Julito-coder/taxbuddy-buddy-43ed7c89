@@ -116,6 +116,7 @@ const AgentPage = () => {
                 isStreaming={isLoading}
                 onRunPrompt={handlePromptSelect}
                 onConfirmProfileUpdate={confirmProfileUpdates}
+                onRetry={retryLastMessage}
               />
             </motion.div>
           )}
