@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight,
   Check,
-  Sparkles,
   ScanLine,
   Calendar,
   Calculator,
@@ -18,6 +17,7 @@ import {
 } from '@/components/ui/accordion';
 import { useAuth } from '@/contexts/AuthContext';
 import { LandingHeader } from '@/components/landing/Header';
+import { LandingHero } from '@/components/landing/Hero';
 import { Loader2 } from 'lucide-react';
 
 const SIGNUP_HREF = '/quiz';
@@ -29,113 +29,6 @@ const fadeUp = {
   viewport: { once: true, margin: '-80px' },
   transition: { duration: 0.4, ease: 'easeOut' as const },
 } as const;
-
-// ─────────────────────────────────────── Hero
-function Hero() {
-  return (
-    <section className="relative overflow-hidden">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(60% 50% at 80% 0%, hsl(37 55% 51% / 0.18), transparent 60%), radial-gradient(60% 50% at 10% 20%, hsl(210 53% 23% / 0.12), transparent 60%)',
-        }}
-      />
-      <div className="relative mx-auto grid max-w-7xl gap-ds-12 px-ds-4 py-ds-16 sm:px-ds-6 sm:py-ds-20 lg:grid-cols-2 lg:gap-ds-16 lg:py-ds-24">
-        <motion.div {...fadeUp} className="flex flex-col justify-center">
-          <span
-            className="inline-flex w-fit items-center gap-ds-2 rounded-ds-pill border border-ds-accent/30 bg-ds-accent/10 px-ds-3 py-ds-1 text-ds-xs font-medium"
-            style={{ color: 'var(--ds-color-accent)' }}
-          >
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            Diagnostic gratuit en 90 secondes
-          </span>
-          <h1
-            className="mt-ds-6 text-ds-4xl font-bold tracking-tight text-ds-text-primary"
-            style={{ lineHeight: 'var(--ds-lh-tight)' }}
-          >
-            Ne perds plus un euro par{' '}
-            <span className="lp-accent-text">manque d'information.</span>
-          </h1>
-          <p className="mt-ds-5 max-w-xl text-ds-lg text-ds-text-secondary">
-            Élio est ton copilote administratif et financier. Aides oubliées, erreurs fiscales, contrats sous-optimisés — on récupère en moyenne{' '}
-            <strong className="text-ds-text-primary font-semibold">2 000 € par an</strong> pour toi.
-          </p>
-          <div className="mt-ds-8 flex flex-col gap-ds-3 sm:flex-row sm:items-center">
-            <Link to={SIGNUP_HREF} className="ds-btn ds-btn-primary w-full sm:w-auto">
-              Créer mon compte gratuit
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-            <a href="#how" className="ds-btn ds-btn-ghost w-full sm:w-auto">
-              Voir comment ça marche →
-            </a>
-          </div>
-          <div className="mt-ds-5 flex flex-wrap items-center gap-x-ds-4 gap-y-ds-2 text-ds-xs text-ds-text-tertiary">
-            <span className="inline-flex items-center gap-1">
-              <Check className="h-3.5 w-3.5 text-ds-success" aria-hidden="true" />
-              Sans CB
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <Check className="h-3.5 w-3.5 text-ds-success" aria-hidden="true" />
-              Diagnostic offert
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <Check className="h-3.5 w-3.5 text-ds-success" aria-hidden="true" />
-              2 minutes
-            </span>
-          </div>
-          <p className="mt-ds-4 text-ds-xs text-ds-text-tertiary">
-            Déjà <strong className="text-ds-text-secondary font-semibold">1 200+ diagnostics</strong> réalisés ce mois-ci.
-          </p>
-        </motion.div>
-
-        {/* Mockup — décoratif, exposé comme image unique aux lecteurs d'écran */}
-        <motion.div
-          initial={{ opacity: 0, y: 30, rotate: -1 }}
-          animate={{ opacity: 1, y: 0, rotate: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
-          className="relative flex items-center justify-center"
-          role="img"
-          aria-label="Aperçu de l'interface Élio : tableau de bord personnalisé avec score, action du jour et montant récupérable"
-        >
-          <div className="absolute inset-0 -z-10 rounded-[2rem] bg-gradient-to-br from-primary/10 via-transparent to-secondary/20 blur-2xl" aria-hidden="true" />
-          <div aria-hidden="true" className="w-full max-w-sm rounded-[2rem] border border-ds-border-light bg-ds-bg-tertiary p-ds-4 shadow-2xl">
-            <div className="rounded-2xl bg-ds-bg-primary p-ds-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-ds-xs font-medium text-ds-text-tertiary">Mardi 29 avril</p>
-                  <p className="text-ds-lg font-bold text-ds-text-primary">Bonjour Léa</p>
-                </div>
-                <div className="rounded-ds-pill bg-ds-success/15 px-ds-3 py-ds-1 text-ds-xs font-semibold" style={{ color: 'var(--ds-color-success)' }}>
-                  +420 €
-                </div>
-              </div>
-              <div className="mt-ds-4 rounded-ds-md border border-ds-border-light bg-ds-bg-tertiary p-ds-4">
-                <p className="text-ds-xs font-medium uppercase tracking-wider" style={{ color: 'var(--ds-color-accent)' }}>Action du jour</p>
-                <p className="mt-ds-1 font-semibold text-ds-text-primary">Demande l'APL étudiant</p>
-                <p className="mt-ds-1 text-ds-xs text-ds-text-secondary">Tu as droit à environ 220 €/mois.</p>
-                <div className="mt-ds-3 flex h-9 items-center justify-center rounded-ds-pill bg-ds-primary text-ds-text-inverse text-ds-xs font-medium">
-                  Faire la démarche
-                </div>
-              </div>
-              <div className="mt-ds-3 grid grid-cols-2 gap-ds-2">
-                <div className="rounded-ds-md border border-ds-border-light bg-ds-bg-tertiary p-ds-3">
-                  <p className="text-[10px] font-medium uppercase text-ds-text-tertiary">Score Élio</p>
-                  <p className="text-ds-2xl font-bold text-ds-primary">72</p>
-                </div>
-                <div className="rounded-ds-md border border-ds-border-light bg-ds-bg-tertiary p-ds-3">
-                  <p className="text-[10px] font-medium uppercase text-ds-text-tertiary">Récupérable</p>
-                  <p className="text-ds-2xl font-bold" style={{ color: 'var(--ds-color-accent)' }}>2 140 €</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────── Social proof
 function SocialProof() {
@@ -648,7 +541,7 @@ const Welcome = () => {
       </a>
       <LandingHeader />
       <main id="main-content">
-        <Hero />
+        <LandingHero />
         <SocialProof />
         <HowItWorks />
         <FeaturesGrid />
