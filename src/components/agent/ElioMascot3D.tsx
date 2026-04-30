@@ -22,22 +22,31 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
 
   const renderSize = size ?? (isMobile ? 160 : 200);
 
-  // Float animation (vertical) — amplitude plus marquée pour un effet flottant visible
+  // Float animation (vertical + 3D tilt) — continu et bien visible
   const floatAnim = reduce
     ? {}
-    : { y: [0, -16, 0, 14, 0], rotate: [0, -1.5, 0, 1.5, 0] };
+    : {
+        y: [0, -18, 0, 14, 0],
+        rotateZ: [0, -2, 0, 2, 0],
+        rotateX: [0, 6, 0, -6, 0],
+        rotateY: [0, -8, 0, 8, 0],
+      };
 
-  const floatTransition = {
-    duration: 5,
-    repeat: Infinity,
-    ease: 'easeInOut' as const,
-  };
+  const floatTransition = reduce
+    ? { duration: 0 }
+    : {
+        duration: 5.5,
+        repeat: Infinity,
+        repeatType: 'loop' as const,
+        ease: 'easeInOut' as const,
+        times: [0, 0.25, 0.5, 0.75, 1],
+      };
 
-  // Hover tilt (desktop only)
+  // Hover tilt (desktop only) — n'écrase plus l'animation continue
   const hoverProps =
     reduce || isMobile
       ? {}
-      : { whileHover: { rotateY: 8, rotateX: -4, transition: { duration: 0.4 } } };
+      : { whileHover: { scale: 1.04, transition: { duration: 0.4 } } };
 
   // Eye animation (thinking state)
   const eyeAnim =
@@ -65,7 +74,8 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
       style={{
         width: renderSize,
         height: renderSize,
-        perspective: 1000,
+        perspective: 800,
+        perspectiveOrigin: '50% 50%',
       }}
       role="img"
       aria-label="Élio, ton agent fiscal"
@@ -95,6 +105,8 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
           width: '100%',
           height: '100%',
           transformStyle: 'preserve-3d',
+          willChange: 'transform',
+          backfaceVisibility: 'hidden',
           filter:
             'drop-shadow(0 8px 24px rgba(28, 59, 90, 0.25)) drop-shadow(0 16px 48px rgba(240, 100, 73, 0.15))',
         }}
