@@ -56,6 +56,10 @@ export const MobileMenuDrawer = ({ open, onOpenChange }: Props) => {
   const [simOpen, setSimOpen] = useState(
     location.pathname.startsWith('/simulations') || location.pathname.startsWith('/coffre')
   );
+  const firstLinkRef = useRef<HTMLAnchorElement>(null);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+  const pushedHistoryRef = useRef(false);
 
   const isActive = (path: string, exact?: boolean) => {
     if (exact) return location.pathname === path;
@@ -63,6 +67,59 @@ export const MobileMenuDrawer = ({ open, onOpenChange }: Props) => {
   };
 
   const close = () => onOpenChange(false);
+
+  // Close on Android/iOS back gesture: push a history entry on open,
+  // close the drawer on popstate instead of leaving the page.
+  useEffect(() => {
+    if (!open) return;
+    const state = window.history.state;
+    if (!state || !state.__elioMenu) {
+      window.history.pushState({ ...state, __elioMenu: true }, '');
+      pushedHistoryRef.current = true;
+    }
+    const onPop = () => {
+      pushedHistoryRef.current = false;
+      onOpenChange(false);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => {
+      window.removeEventListener('popstate', onPop);
+      // If the drawer is closed for another reason (link click, escape),
+      // unwind the dummy history entry we pushed.
+      if (pushedHistoryRef.current) {
+        pushedHistoryRef.current = false;
+        if (window.history.state?.__elioMenu) {
+          window.history.back();
+        }
+      }
+    };
+  }, [open, onOpenChange]);
+
+  // Auto-close on route change (covers all NavLink clicks without per-link work)
+  useEffect(() => {
+    if (open) onOpenChange(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  // Swipe-left to close
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchStartXRef.current = t.clientX;
+    touchStartYRef.current = t.clientY;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const startX = touchStartXRef.current;
+    const startY = touchStartYRef.current;
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+    if (startX == null || startY == null) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    if (dx < -60 && Math.abs(dy) < 50) {
+      close();
+    }
+  };
 
   const renderLink = (item: NavItem) => {
     const active = isActive(item.path, item.exact);
