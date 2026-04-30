@@ -120,7 +120,7 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
             transition={smileTransition}
           />
         </svg>
-      </motion.div>
+      </div>
     </div>
   );
 };
