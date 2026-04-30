@@ -22,31 +22,8 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
 
   const renderSize = size ?? (isMobile ? 160 : 200);
 
-  // Float animation (vertical + 3D tilt) — continu et bien visible
-  const floatAnim = reduce
-    ? {}
-    : {
-        y: [0, -18, 0, 14, 0],
-        rotateZ: [0, -2, 0, 2, 0],
-        rotateX: [0, 6, 0, -6, 0],
-        rotateY: [0, -8, 0, 8, 0],
-      };
-
-  const floatTransition = reduce
-    ? { duration: 0 }
-    : {
-        duration: 5.5,
-        repeat: Infinity,
-        repeatType: 'loop' as const,
-        ease: 'easeInOut' as const,
-        times: [0, 0.25, 0.5, 0.75, 1],
-      };
-
-  // Hover tilt (desktop only) — n'écrase plus l'animation continue
-  const hoverProps =
-    reduce || isMobile
-      ? {}
-      : { whileHover: { scale: 1.04, transition: { duration: 0.4 } } };
+  // Float : géré par CSS keyframes (animate-elio-float) pour éviter toute
+  // interruption due aux re-renders React/Framer Motion.
 
   // Eye animation (thinking state)
   const eyeAnim =
@@ -97,10 +74,8 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
         }}
       />
 
-      <motion.div
-        animate={floatAnim}
-        transition={floatTransition}
-        {...hoverProps}
+      <div
+        className={reduce ? '' : 'animate-elio-float'}
         style={{
           width: '100%',
           height: '100%',
@@ -145,7 +120,7 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
             transition={smileTransition}
           />
         </svg>
-      </motion.div>
+      </div>
     </div>
   );
 };
