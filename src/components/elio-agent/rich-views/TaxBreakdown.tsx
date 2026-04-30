@@ -26,7 +26,7 @@ export const TaxBreakdown = ({ data }: TaxBreakdownProps) => {
 
   return (
     <div className="rounded-xl bg-white border border-[#E5DED3] shadow-sm p-4 mt-3">
-      <h4 className="font-semibold text-[#1B3A5C] mb-3" style={{ fontFamily: 'Sora' }}>
+      <h4 className="font-semibold text-[#1B3A5C] mb-3">
         Détail de ton impôt
       </h4>
 
@@ -61,7 +61,7 @@ export const TaxBreakdown = ({ data }: TaxBreakdownProps) => {
       <div className="border-t border-[#E5DED3] pt-3 flex items-center justify-between">
         <div>
           <p className="text-xs text-[#6B7A8D]">Impôt total estimé</p>
-          <p className="text-2xl font-semibold text-[#1B3A5C]" style={{ fontFamily: 'Sora' }}>
+          <p className="text-2xl font-semibold text-[#1B3A5C]">
             {fmt(total)}
           </p>
         </div>

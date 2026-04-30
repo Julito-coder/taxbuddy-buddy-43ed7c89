@@ -113,7 +113,7 @@ function Hero() {
             style={{ lineHeight: 'var(--ds-lh-tight)' }}
           >
             Ne perds plus un euro par{' '}
-            <span className="gradient-text">manque d'information.</span>
+            <span className="lp-accent-text">manque d'information.</span>
           </h1>
           <p className="mt-ds-5 max-w-xl text-ds-lg text-ds-text-secondary">
             Élio est ton copilote administratif et financier. Aides oubliées, erreurs fiscales, contrats sous-optimisés — on récupère en moyenne{' '}
@@ -281,13 +281,13 @@ function IllustrationBulletin() {
       <rect x="64" y="42" width="120" height="8" rx="4" fill="var(--ds-color-text-primary)" opacity="0.85" />
       <rect x="64" y="56" width="80" height="6" rx="3" fill="var(--ds-color-text-tertiary)" />
       <rect x="240" y="40" width="48" height="20" rx="10" fill="var(--ds-color-success)" opacity="0.18" />
-      <text x="264" y="54" textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--ds-color-success)" fontFamily="Sora, sans-serif">+220 €</text>
+      <text x="264" y="54" textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--ds-color-success)" fontFamily="Inter, sans-serif">+220 €</text>
       <rect x="24" y="96" width="272" height="76" rx="12" fill="var(--ds-color-bg-tertiary)" stroke="var(--ds-color-border-light)" />
       <rect x="40" y="112" width="80" height="8" rx="4" fill="var(--ds-color-accent)" />
       <rect x="40" y="128" width="180" height="10" rx="5" fill="var(--ds-color-text-primary)" />
       <rect x="40" y="146" width="140" height="6" rx="3" fill="var(--ds-color-text-tertiary)" />
       <rect x="40" y="184" width="240" height="32" rx="16" fill="var(--ds-color-primary)" />
-      <text x="160" y="204" textAnchor="middle" fontSize="11" fontWeight="600" fill="white" fontFamily="Sora, sans-serif">Faire la démarche</text>
+      <text x="160" y="204" textAnchor="middle" fontSize="11" fontWeight="600" fill="white" fontFamily="Inter, sans-serif">Faire la démarche</text>
     </svg>
   );
 }
@@ -307,9 +307,9 @@ function IllustrationAides() {
           <rect x="20" y={it.y} width="280" height="44" rx="10" fill="var(--ds-color-bg-tertiary)" stroke="var(--ds-color-border-light)" />
           <circle cx="40" cy={it.y + 22} r="8" fill={it.color} opacity="0.2" />
           <circle cx="40" cy={it.y + 22} r="3" fill={it.color} />
-          <text x="58" y={it.y + 20} fontSize="12" fontWeight="600" fill="var(--ds-color-text-primary)" fontFamily="Sora, sans-serif">{it.label}</text>
-          <text x="58" y={it.y + 35} fontSize="10" fill="var(--ds-color-text-tertiary)" fontFamily="Sora, sans-serif">Éligible</text>
-          <text x="285" y={it.y + 28} textAnchor="end" fontSize="12" fontWeight="700" fill={it.color} fontFamily="Sora, sans-serif">{it.amount}</text>
+          <text x="58" y={it.y + 20} fontSize="12" fontWeight="600" fill="var(--ds-color-text-primary)" fontFamily="Inter, sans-serif">{it.label}</text>
+          <text x="58" y={it.y + 35} fontSize="10" fill="var(--ds-color-text-tertiary)" fontFamily="Inter, sans-serif">Éligible</text>
+          <text x="285" y={it.y + 28} textAnchor="end" fontSize="12" fontWeight="700" fill={it.color} fontFamily="Inter, sans-serif">{it.amount}</text>
         </g>
       ))}
     </svg>
@@ -322,17 +322,17 @@ function IllustrationAgent() {
       <rect width="320" height="240" rx="20" fill="var(--ds-color-bg-secondary)" />
       <g>
         <rect x="20" y="24" width="200" height="48" rx="14" fill="var(--ds-color-bg-tertiary)" stroke="var(--ds-color-border-light)" />
-        <text x="36" y="44" fontSize="11" fill="var(--ds-color-text-tertiary)" fontFamily="Sora, sans-serif">Toi</text>
-        <text x="36" y="60" fontSize="12" fontWeight="500" fill="var(--ds-color-text-primary)" fontFamily="Sora, sans-serif">Combien je peux verser sur</text>
-        <text x="36" y="76" fontSize="12" fontWeight="500" fill="var(--ds-color-text-primary)" fontFamily="Sora, sans-serif">mon PER cette année ?</text>
+        <text x="36" y="44" fontSize="11" fill="var(--ds-color-text-tertiary)" fontFamily="Inter, sans-serif">Toi</text>
+        <text x="36" y="60" fontSize="12" fontWeight="500" fill="var(--ds-color-text-primary)" fontFamily="Inter, sans-serif">Combien je peux verser sur</text>
+        <text x="36" y="76" fontSize="12" fontWeight="500" fill="var(--ds-color-text-primary)" fontFamily="Inter, sans-serif">mon PER cette année ?</text>
       </g>
       <g>
         <rect x="60" y="100" width="240" height="120" rx="14" fill="var(--ds-color-primary)" />
-        <text x="80" y="122" fontSize="11" fill="white" opacity="0.7" fontFamily="Sora, sans-serif">Élio</text>
-        <text x="80" y="142" fontSize="12" fontWeight="600" fill="white" fontFamily="Sora, sans-serif">Plafond 2025 : 35 194 €</text>
-        <text x="80" y="160" fontSize="11" fill="white" opacity="0.85" fontFamily="Sora, sans-serif">Optimal pour ta TMI 30 % :</text>
-        <text x="80" y="180" fontSize="16" fontWeight="700" fill="var(--ds-color-accent-light)" fontFamily="Sora, sans-serif">3 800 €</text>
-        <text x="80" y="200" fontSize="11" fill="white" opacity="0.85" fontFamily="Sora, sans-serif">→ -1 140 € d'impôt</text>
+        <text x="80" y="122" fontSize="11" fill="white" opacity="0.7" fontFamily="Inter, sans-serif">Élio</text>
+        <text x="80" y="142" fontSize="12" fontWeight="600" fill="white" fontFamily="Inter, sans-serif">Plafond 2025 : 35 194 €</text>
+        <text x="80" y="160" fontSize="11" fill="white" opacity="0.85" fontFamily="Inter, sans-serif">Optimal pour ta TMI 30 % :</text>
+        <text x="80" y="180" fontSize="16" fontWeight="700" fill="var(--ds-color-accent-light)" fontFamily="Inter, sans-serif">3 800 €</text>
+        <text x="80" y="200" fontSize="11" fill="white" opacity="0.85" fontFamily="Inter, sans-serif">→ -1 140 € d'impôt</text>
       </g>
     </svg>
   );

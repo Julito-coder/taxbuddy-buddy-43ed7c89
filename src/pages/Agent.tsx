@@ -205,7 +205,7 @@ const AgentPage = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-[640px] mx-auto flex flex-col" style={{ fontFamily: 'Sora', minHeight: 'calc(100vh - 140px)' }}>
+      <div className="max-w-[640px] mx-auto flex flex-col" style={{ minHeight: 'calc(100vh - 140px)' }}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 px-1">
           {!isWelcome ? (
@@ -243,7 +243,7 @@ const AgentPage = () => {
               onClick={() => setHistoryOpen(false)}
               className="fixed inset-0 bg-black/30 z-40"
             />
-            <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[380px] bg-white z-50 shadow-xl flex flex-col" style={{ fontFamily: 'Sora' }}>
+            <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[380px] bg-white z-50 shadow-xl flex flex-col">
               <div className="flex items-center justify-between px-4 py-4 border-b border-[#E5DED3]">
                 <h2 className="text-lg font-semibold text-[#1B3A5C]">Tes conversations</h2>
                 <button onClick={() => setHistoryOpen(false)} className="text-[#6B7A8D] hover:text-[#1B3A5C]">
@@ -391,7 +391,6 @@ const AgentPage = () => {
               rows={1}
               disabled={isLoading}
               className="flex-1 resize-none bg-transparent px-2 py-2 text-sm text-[#1F3347] placeholder:text-[#6B7A8D] focus:outline-none max-h-32"
-              style={{ fontFamily: 'Sora' }}
             />
             <button
               onClick={handleSend}

@@ -26,7 +26,7 @@ export const RecommendationsList = ({ data, onRunPrompt }: Props) => {
           <div className="flex items-start justify-between gap-3 mb-2">
             <div className="flex items-start gap-2 flex-1">
               <Sparkles className="w-4 h-4 text-[#C8943E] mt-0.5 shrink-0" />
-              <h4 className="font-semibold text-[#1B3A5C]" style={{ fontFamily: 'Sora' }}>
+              <h4 className="font-semibold text-[#1B3A5C]">
                 {r.title}
               </h4>
             </div>
@@ -41,7 +41,6 @@ export const RecommendationsList = ({ data, onRunPrompt }: Props) => {
             <button
               onClick={() => r.action_prompt && onRunPrompt?.(r.action_prompt)}
               className="inline-flex items-center gap-1.5 text-sm font-medium text-[#C8943E] hover:text-[#1B3A5C] transition-colors"
-              style={{ fontFamily: 'Sora' }}
             >
               {r.action_label || 'Lancer avec Élio'}
               <ArrowRight className="w-3.5 h-3.5" />

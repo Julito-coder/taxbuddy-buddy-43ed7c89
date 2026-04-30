@@ -38,7 +38,7 @@ const Section = ({
 }) => {
   if (!items || items.length === 0) return null;
   return (
-    <div className="mb-3" style={{ fontFamily: 'Sora' }}>
+    <div className="mb-3">
       <div className="flex items-center gap-2 mb-2 px-1">
         <span className="text-base">{emoji}</span>
         <h3 className="text-sm font-semibold text-[#1B3A5C]">
@@ -92,14 +92,14 @@ export const AidsEligibility = ({ data }: Props) => {
   const hasAny = eligible.length + needsInfo.length + uncertain.length + notEligible.length > 0;
   if (!hasAny) {
     return (
-      <div className="mt-3 p-3 rounded-xl bg-[#F8F5F0] border border-[#E5DED3]" style={{ fontFamily: 'Sora' }}>
+      <div className="mt-3 p-3 rounded-xl bg-[#F8F5F0] border border-[#E5DED3]">
         <p className="text-sm text-[#1F3347]">Aucune analyse d'aide disponible.</p>
       </div>
     );
   }
 
   return (
-    <div className="mt-3" style={{ fontFamily: 'Sora' }}>
+    <div className="mt-3">
       <Section
         title="Tu as droit à"
         emoji="✅"

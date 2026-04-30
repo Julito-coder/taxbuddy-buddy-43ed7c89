@@ -60,10 +60,7 @@ export const ElioAgentFeed = () => {
 
   if (items.length === 0) {
     return (
-      <div
-        className="rounded-xl border border-[#E5DED3] bg-white p-5 text-center"
-        style={{ fontFamily: 'Sora' }}
-      >
+      <div className="rounded-xl border border-[#E5DED3] bg-white p-5 text-center">
         <Sparkles className="w-5 h-5 text-[#C8943E] mx-auto mb-2" />
         <p className="text-sm font-medium text-[#1B3A5C]">Tout est à jour</p>
         <p className="text-xs text-[#6B7A8D] mt-1">
@@ -74,7 +71,7 @@ export const ElioAgentFeed = () => {
   }
 
   return (
-    <div className="space-y-3" style={{ fontFamily: 'Sora' }}>
+    <div className="space-y-3">
       <h2 className="text-base font-semibold text-[#1B3A5C] flex items-center gap-2">
         <Sparkles className="w-4 h-4 text-[#C8943E]" />
         Ce qu'Élio a repéré pour toi

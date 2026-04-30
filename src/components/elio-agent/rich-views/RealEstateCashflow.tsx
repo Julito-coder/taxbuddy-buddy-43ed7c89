@@ -24,10 +24,10 @@ export const RealEstateCashflow = ({ data }: Props) => {
     <div className="grid grid-cols-2 gap-3 mt-3">
       {cards.map((c, i) => (
         <div key={i} className="rounded-xl bg-white border border-[#E5DED3] shadow-sm p-4">
-          <p className="text-xs text-[#6B7A8D] mb-1" style={{ fontFamily: 'Sora' }}>
+          <p className="text-xs text-[#6B7A8D] mb-1">
             {c.label}
           </p>
-          <p className="text-xl font-semibold" style={{ color: c.color, fontFamily: 'Sora' }}>
+          <p className="text-xl font-semibold" style={{ color: c.color }}>
             {c.value}
           </p>
         </div>
