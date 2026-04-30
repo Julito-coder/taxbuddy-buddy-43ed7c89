@@ -1,14 +1,38 @@
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Briefcase, Laptop, Sun, TrendingUp, Check } from 'lucide-react';
 import { FiscalProfileData } from '@/lib/fiscalProfileService';
-import { ProfileType, PROFILE_LABELS, PROFILE_ICONS } from '@/data/onboardingTypes';
+import { ProfileType } from '@/data/onboardingTypes';
 
 interface Props {
   data: FiscalProfileData;
   onChange: (updates: Partial<FiscalProfileData>) => void;
 }
 
-const TYPES: ProfileType[] = ['employee', 'self_employed', 'retired', 'investor'];
+const TYPES: Array<{ id: ProfileType; label: string; description: string; icon: typeof Briefcase }> = [
+  {
+    id: 'employee',
+    label: 'Salarié',
+    description: 'CDI, CDD, intérim, fonction publique.',
+    icon: Briefcase,
+  },
+  {
+    id: 'self_employed',
+    label: 'Indépendant',
+    description: 'Micro, EI, EURL, freelance, profession libérale.',
+    icon: Laptop,
+  },
+  {
+    id: 'retired',
+    label: 'Retraité',
+    description: 'Pensions, rentes et retraites complémentaires.',
+    icon: Sun,
+  },
+  {
+    id: 'investor',
+    label: 'Investisseur',
+    description: 'Revenus du patrimoine financier ou immobilier.',
+    icon: TrendingUp,
+  },
+];
 
 export const ProfessionalSection = ({ data, onChange }: Props) => {
   const toggle = (type: ProfileType) => {
@@ -20,26 +44,45 @@ export const ProfessionalSection = ({ data, onChange }: Props) => {
   };
 
   return (
-    <div className="space-y-4">
-      <Label>Types de profil (sélection multiple possible)</Label>
+    <div className="space-y-3">
+      <p className="text-xs text-muted-foreground">
+        Plusieurs choix possibles. Tes modules de revenus s’ajustent automatiquement.
+      </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {TYPES.map((type) => (
-          <label
-            key={type}
-            className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
-              data.profileTypes.includes(type)
-                ? 'border-primary/50 bg-primary/10'
-                : 'border-border hover:border-primary/30'
-            }`}
-          >
-            <Checkbox
-              checked={data.profileTypes.includes(type)}
-              onCheckedChange={() => toggle(type)}
-            />
-            <span className="text-lg">{PROFILE_ICONS[type]}</span>
-            <span className="font-medium text-sm">{PROFILE_LABELS[type]}</span>
-          </label>
-        ))}
+        {TYPES.map((type) => {
+          const Icon = type.icon;
+          const selected = data.profileTypes.includes(type.id);
+          return (
+            <button
+              key={type.id}
+              type="button"
+              onClick={() => toggle(type.id)}
+              className={`text-left flex items-start gap-3 p-4 rounded-xl border transition-all ${
+                selected
+                  ? 'border-primary bg-primary/5 shadow-sm'
+                  : 'border-border bg-card hover:border-primary/40'
+              }`}
+            >
+              <div
+                className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${
+                  selected ? 'bg-primary/10' : 'bg-muted'
+                }`}
+              >
+                {selected ? (
+                  <Check className="h-5 w-5 text-primary" />
+                ) : (
+                  <Icon className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground">{type.label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                  {type.description}
+                </p>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

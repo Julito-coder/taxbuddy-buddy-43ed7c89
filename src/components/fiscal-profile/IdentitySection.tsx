@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FiscalProfileData } from '@/lib/fiscalProfileService';
+import { ProfileFieldGroup } from './ProfileFieldGroup';
 
 interface Props {
   data: FiscalProfileData;
@@ -9,8 +10,11 @@ interface Props {
 
 export const IdentitySection = ({ data, onChange }: Props) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="space-y-2">
+    <ProfileFieldGroup
+      title="Coordonnées"
+      description="Ces informations alimentent tes documents officiels et tes courriers à l’administration fiscale."
+    >
+      <div className="space-y-2 md:col-span-2">
         <Label htmlFor="fullName">Nom complet</Label>
         <Input
           id="fullName"
@@ -27,6 +31,9 @@ export const IdentitySection = ({ data, onChange }: Props) => {
           onChange={(e) => onChange({ nif: e.target.value })}
           placeholder="13 chiffres"
         />
+        <p className="text-xs text-muted-foreground">
+          Visible en haut de ta dernière déclaration ou de ton avis d’imposition.
+        </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="birthYear">Année de naissance</Label>
@@ -74,6 +81,6 @@ export const IdentitySection = ({ data, onChange }: Props) => {
           placeholder="75001"
         />
       </div>
-    </div>
+    </ProfileFieldGroup>
   );
 };
