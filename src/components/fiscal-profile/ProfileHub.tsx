@@ -40,10 +40,29 @@ export const ProfileHub = () => {
 
   useEffect(() => {
     if (!user) return;
-    loadFiscalProfile(user.id).then((profile) => {
-      setData(profile);
-      setLoading(false);
-    });
+    let cancelled = false;
+    const load = () => {
+      loadFiscalProfile(user.id).then((profile) => {
+        if (cancelled) return;
+        setData(profile);
+        setLoading(false);
+      });
+    };
+    load();
+
+    // Recharger si une autre source (sync post-quiz, agent, etc.) modifie le profil
+    const onProfileUpdated = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { source?: string } | undefined;
+      // Ignore nos propres autosaves pour éviter une boucle inutile
+      if (detail?.source === 'autosave') return;
+      load();
+    };
+    window.addEventListener('elio:profile-updated', onProfileUpdated);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('elio:profile-updated', onProfileUpdated);
+    };
   }, [user]);
 
   const handleChange = useCallback(

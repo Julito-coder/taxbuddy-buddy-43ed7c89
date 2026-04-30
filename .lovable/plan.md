@@ -1,107 +1,70 @@
-# Refonte UX du profil fiscal
+## Diagnostic
 
-## Problème actuel
+Tu as raison : le path n'est pas en cause. Le bouton "Compléter mon profil (2 min)" du bulletin (`BulletinEmptyState`) navigue bien vers `/profil/fiscal` (le même écran que via l'onglet Profil → Mon profil fiscal).
 
-La page `/profil/fiscal` affiche **9 accordéons** simultanés bourrés de champs bruts (Input/Label) avec des emojis dans les titres. Aucun contexte, aucune motivation, aucune progression visible. L'utilisateur voit un mur de formulaire administratif décourageant.
+Le vrai bug se situe dans la **synchronisation post-quiz**.
 
-Constats précis :
-- Emojis dans tous les titres de section (🪪, 👨‍👩‍👧‍👦, 💼, 📋…) → effet "non sérieux"
-- Tous les champs sont visibles d'un coup → surcharge cognitive
-- Aucune explication du **bénéfice** (pourquoi remplir ?)
-- Pas de logique de priorisation (champs critiques noyés dans les optionnels)
-- Toast de confirmation avec emoji ✅
-- Indicateur de complétion isolé, peu engageant
+### Chaîne de l'incident
 
-## Vision cible
+1. Le quiz public stocke ses 5 réponses dans `localStorage` sous la clé `elio_quiz_data` (`storeQuizData`).
+2. `ProtectedRoute` monte le hook `usePostAuthQuizSync` à **chaque navigation entre routes protégées**.
+3. Ce hook lit `elio_quiz_data` et appelle `saveModernOnboarding(...)` qui fait un `UPDATE` sur `profiles` avec **un payload partiel issu uniquement du quiz** :
+   - `full_name`, `professional_status`, `is_employee/self_employed/retired`, `is_homeowner`, `family_status`, `age_range`, `income_range`, `children_count`, `patrimony_range`, `onboarding_completed=true`, `onboarding_partial`, `onboarding_completed_at`.
+4. Or, dans le payload, `full_name: data.fullName || null` et `family_status: data.familyStatus || 'single'` **écrasent** les champs riches saisis depuis `/profil/fiscal` (par ex. statut familial fin, prénom, statuts cumulés via `is_investor`, etc.).
+5. Le hook s'auto-protège seulement par `useRef` → ces refs sont **réinitialisés à chaque démontage**, donc dès qu'on quitte `/bulletin` et qu'on revient, la sync rejoue.
+6. Résultat : `calculateProfileCompletion(...)` recalcule à partir d'un profil amputé → retombe à ~26 %.
 
-Transformer le profil en **parcours guidé par modules thématiques**, façon "checklist sérieuse façon banque privée" :
-1. Vue d'ensemble = tableau de bord des modules avec gain € associé à chaque module complété
-2. Édition = drawer/modale plein écran focalisée sur un module à la fois, avec contexte et progression
-3. Hiérarchie : champs essentiels d'abord, détails optionnels repliés
-4. Aucun emoji, icônes Lucide uniquement, ton sobre et professionnel
+C'est pour ça que ça arrive surtout en passant par `/bulletin` : si l'EmptyState s'affiche, c'est typiquement un user dont le profil est encore léger → souvent celui qui a fait le quiz public récemment → `elio_quiz_data` est encore en localStorage.
 
-## Structure de la nouvelle page `/profil/fiscal`
+### Pourquoi ce n'est pas la route
 
-### 1. En-tête "Hub profil"
+Les deux entrées (`Profil → Mon profil fiscal` et `Bulletin → Compléter mon profil`) pointent toutes les deux vers `/profil/fiscal`. La différence c'est juste qu'en passant par Bulletin on fait au moins une transition de route protégée → re-mount du `ProtectedRoute` → re-jeu de la sync.
 
-Remplace la barre de complétion seule par un bandeau structuré :
-- Titre + sous-titre clair ("Plus ton profil est précis, plus mes recommandations te font gagner")
-- Score de complétion (anneau ProgressRing existant) + libellé qualitatif ("Profil basique / Bon / Optimisé / Expert")
-- Estimation **du gain fiscal potentiel débloqué** restant (basé sur modules manquants)
-- CTA principal : "Compléter le prochain module" → ouvre directement le module à plus fort impact
+---
 
-### 2. Grille des modules (vue carte)
+## Correctifs proposés
 
-Remplace l'Accordion par une grille de **cartes-modules** (1 col mobile, 2 cols desktop). Chaque carte affiche :
-- Icône Lucide (UserCircle, Users, Briefcase, Building2, Landmark, TrendingUp, Shield…)
-- Nom du module (sans emoji) : Identité · Foyer fiscal · Activité professionnelle · Revenus · Patrimoine immobilier · Patrimoine financier · Préférences & consentements
-- Mini-progression (X/Y champs remplis) avec barre fine
-- Badge d'état : `À compléter` / `Partiel` / `Complet` / `Recommandé pour toi`
-- Gain potentiel ou bénéfice concret ("Débloque +320 €/an d'optimisations détectées")
-- Clic → ouvre le drawer d'édition du module
+### 1. Rendre la sync post-quiz **idempotente et non destructive**
 
-Modules conditionnels (Salarié, Indépendant, Retraité) n'apparaissent **qu'après** sélection du statut dans le module "Activité professionnelle".
+Dans `src/hooks/usePostAuthQuizSync.ts` :
 
-### 3. Drawer d'édition par module
+- Avant d'appeler `saveModernOnboarding`, **vérifier en DB** que `onboarding_completed = false` (via `loadOnboardingStatus`). Si l'onboarding est déjà marqué complété → ne pas re-sync, juste `clearStoredQuizData()`. Ça empêche tout rejeu une fois que l'utilisateur a un profil.
+- Garder le `useRef` mais s'appuyer **prioritairement** sur l'état serveur, pas sur la mémoire de session.
 
-Composant `ProfileModuleDrawer` (basé sur `Sheet` shadcn, plein écran mobile, side panel desktop) qui contient :
-- En-tête fixe : titre du module, fil d'Ariane "Profil > Module", indicateur "Étape X/Y" si multi-étape
-- Section "Pourquoi ces infos" repliable (1 phrase + 2 puces de bénéfice concret)
-- Champs regroupés en **sous-sections logiques** avec séparateurs et titres courts
-- Champs essentiels visibles, champs optionnels dans un bloc "Détails avancés (facultatif)" replié
-- Validations en ligne (helper text sous chaque champ, tonalité positive)
-- Footer fixe : bouton "Enregistrer" + lien "Reprendre plus tard" (sauvegarde silencieuse au blur déjà implicite via state)
+### 2. Sécuriser `saveModernOnboarding` contre l'écrasement
 
-### 4. Composants réutilisables à créer
+Dans `src/lib/modernOnboardingService.ts` :
 
-```
-src/components/fiscal-profile/
-├── ProfileHub.tsx              (nouvelle page principale, remplace FiscalProfileForm)
-├── ProfileHubHeader.tsx        (bandeau score + gain + CTA)
-├── ProfileModuleCard.tsx       (carte module dans la grille)
-├── ProfileModuleDrawer.tsx     (Sheet d'édition)
-├── ProfileFieldGroup.tsx       (regroupement avec titre + description)
-├── ProfileField.tsx            (wrapper Input/Select avec helper, état de validation)
-├── modules/
-│   ├── identityModule.ts       (config champs + métadonnées)
-│   ├── familyModule.ts
-│   ├── professionalModule.ts
-│   ├── employeeModule.ts
-│   ├── selfEmployedModule.ts
-│   ├── retiredModule.ts
-│   ├── realEstateModule.ts
-│   ├── financialModule.ts
-│   └── consentsModule.ts
-└── moduleRegistry.ts           (liste ordonnée + logique conditionnelle + scoring gain)
-```
+- Ne plus envoyer `full_name: data.fullName || null` : si `data.fullName` est vide, **ne pas inclure la clé** dans le payload (pattern `if (data.fullName) payload.full_name = ...`), comme le fait déjà `saveFiscalProfile`.
+- Idem pour `family_status` (ne pas forcer `'single'` si déjà renseigné).
+- Avant l'`UPDATE`, faire un `select` du profil existant et **ne pas écraser** les champs déjà renseignés en base avec des valeurs vides/par défaut venant du quiz. Règle : le quiz **ne complète que ce qui est encore vide**.
 
-Les composants section existants (IdentitySection, FamilySection, etc.) sont **réécrits** pour être consommés dans le drawer avec le nouveau design (sous-sections, hiérarchisation essentiel/avancé, suppression des emojis), pas juste habillés.
+### 3. Nettoyer le localStorage plus tôt
 
-### 5. Suppression des emojis et ton
+- Appeler `clearStoredQuizData()` dès que la sync **a commencé** (avant le `then`), pour qu'un re-mount du `ProtectedRoute` pendant le requête en vol ne relance pas une 2e sync concurrente.
+- Et bien sûr, le clear final reste après succès.
 
-- Toast de succès : "Profil mis à jour" (sans ✅), variant standard
-- Tous les libellés relus pour ton sobre, "tu", phrases courtes
-- Aucun emoji dans titres, sous-titres, badges, toasts, helper text
-- Icônes Lucide partout, taille et couleur cohérentes (`h-5 w-5 text-primary`)
+### 4. (Mineur) Empêcher la course `ProtectedRoute` × `ProfileHub`
 
-## Détails techniques
+`ProfileHub` charge le profil au mount avec `loadFiscalProfile`. Si `usePostAuthQuizSync` écrit en parallèle, on peut afficher l'ancien profil puis l'autosave réémet ces anciennes valeurs. Solution simple : dans `ProfileHub`, écouter l'événement `elio:profile-updated` (déjà émis par les deux flux) pour recharger `loadFiscalProfile` et synchroniser le state local avec la DB.
 
-- Conserve `loadFiscalProfile` / `saveFiscalProfile` / `calculateProfileCompletion` (`src/lib/fiscalProfileService.ts`) sans changement.
-- Ajoute dans `moduleRegistry.ts` une fonction `computeModuleCompletion(moduleId, data)` qui renvoie `{ filled, total, status, estimatedGainEuros }`. Le gain s'appuie sur la logique existante de `taxOptimizationEngine.ts` (lecture seule, on mappe quels modules débloquent quels gains).
-- Le drawer utilise `Sheet` (shadcn) avec `side="right"` desktop, `side="bottom"` ou plein écran mobile via `useIsMobile`.
-- État local du drawer : copie travail du module ouvert, save → merge dans state global puis `saveFiscalProfile`. Permet d'annuler sans toucher la base.
-- Animations Framer Motion réutilisées (fade + slide) pour cohérence avec le reste de l'app.
-- Respect strict des tokens design (semantic tokens HSL, pas de couleurs hardcodées). Variants Badge : `default | secondary | outline | success` (ajouter `success` si manquant via cva ou utiliser couleur primaire pour "Complet").
-- Routes inchangées : `/profil/fiscal` rend le nouveau `ProfileHub` à la place de `FiscalProfileForm`. `FiscalProfile.tsx` adapte son en-tête (titre + sous-titre, retire l'icône doublon car le hub a son propre header).
-- Mobile-first : grille 1 col < 768px, 2 cols ≥ 768px. Drawer plein écran sur mobile.
-- Aucune migration DB, aucun changement backend, aucun changement de logique métier (purement UI/UX).
+---
 
-## Ce qui n'est PAS dans le scope
+## Fichiers touchés
 
-- Pas de modification des sections d'onboarding `src/components/onboarding/modern/*` (autre parcours, autre demande si besoin).
-- Pas de changement du moteur de scoring, des edge functions, du schéma DB.
-- Pas de refonte du `BankFiscalSummary` ni du Bulletin.
+- `src/lib/modernOnboardingService.ts` — payload non destructif (skip des clés vides, fusion avec valeurs existantes).
+- `src/hooks/usePostAuthQuizSync.ts` — guard `onboarding_completed` côté DB + clear du localStorage en amont.
+- `src/components/fiscal-profile/ProfileHub.tsx` — listener `elio:profile-updated` pour recharger depuis la DB et éviter de réémettre des valeurs périmées via l'autosave.
 
-## Validation
+Aucune migration DB nécessaire (tous les champs ciblés existent déjà sur `profiles`).
 
-Après implémentation : visite `/profil/fiscal` au viewport actuel (982×734) puis mobile (390×844) via browser tools, vérifie qu'aucun emoji ne subsiste, que les modules s'ouvrent en drawer, que la progression et le gain s'affichent, que la sauvegarde fonctionne (toast sobre, pas d'erreur console).
+---
+
+## Test mental
+
+- Utilisateur fait le quiz public → atterrit sur `/auth` → se connecte → sync → profil à ~26 % (normal, on vient juste d'arriver).
+- Va dans `/profil/fiscal`, ajoute son prénom, ses revenus, ses biens → autosave en DB → complétude monte à 60 %.
+- Retour sur `/bulletin` (re-mount du `ProtectedRoute`).
+  - **Avant** : sync rejoue, écrase, retombe à 26 %.
+  - **Après** : guard `onboarding_completed=true` → sync skip → `localStorage` nettoyé → complétude reste à 60 %.
+- Retour sur `/profil/fiscal` → les ajouts sont toujours là.
