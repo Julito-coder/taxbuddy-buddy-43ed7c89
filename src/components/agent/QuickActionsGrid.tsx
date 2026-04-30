@@ -75,7 +75,7 @@ export const QuickActionsGrid = ({ actions = DEFAULT_ACTIONS, onSelect }: Props)
                 : { scale: 1.02, transition: { duration: 0.2, ease: 'easeOut' } }
             }
             whileTap={reduce ? undefined : { scale: 0.98 }}
-            className="group flex min-h-[88px] flex-col items-start gap-2 rounded-[var(--radius)] border border-border bg-card p-4 text-left transition-[border-color,box-shadow] duration-200 hover:border-primary/20 hover:shadow-md"
+            className="group flex min-h-[80px] md:min-h-[88px] min-w-0 flex-col items-start gap-2 rounded-[var(--radius)] border border-border bg-card p-3 sm:p-4 text-left transition-[border-color,box-shadow] duration-200 hover:border-primary/20 hover:shadow-md"
           >
             <Icon
               className="text-primary"
