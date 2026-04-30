@@ -61,7 +61,7 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
 
   return (
     <div
-      className="relative inline-block"
+      className="relative inline-block overflow-visible"
       style={{
         width: renderSize,
         height: renderSize,
@@ -70,15 +70,16 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
       role="img"
       aria-label="Élio, ton agent fiscal"
     >
-      {/* Glow coral derrière */}
+      {/* Glow coral derrière — taille proportionnelle pour éviter de déborder
+          du viewport sur mobile lorsque la mascotte est petite (40px). */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute',
           inset: '50% 50% auto auto',
           transform: 'translate(50%, -50%)',
-          width: 220,
-          height: 220,
+          width: Math.max(renderSize * 1.6, 80),
+          height: Math.max(renderSize * 1.6, 80),
           background: 'radial-gradient(circle, var(--coral-500) 0%, rgba(240,100,73,0) 65%)',
           opacity: 0.4,
           filter: 'blur(20px)',
