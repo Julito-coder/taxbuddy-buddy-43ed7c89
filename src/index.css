@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
-
 @layer base {
   :root {
     /* ─────────────────────── shadcn / app tokens (existant — ne pas toucher) */
@@ -43,34 +41,58 @@
     --sidebar-ring: 210 53% 23%;
 
     /* ─────────────────────── Design system tokens (landing premium)
-       Préfixe --ds-* pour ne pas entrer en collision avec shadcn.
-       Seules les classes .btn-ds-*, .card-ds, .text-ds-* les consomment.
-    */
+       Prefix --ds- (existant, compat) + nouvelles palettes navy/coral,
+       shadows, motion, alias --s- et --r- (brief).
+       Seules les classes .ds-, .lp- et utilities Tailwind ds- les consomment. */
 
-    /* Brand */
-    --ds-color-primary: #1C3B5A;
+    /* Palette navy étendue */
+    --navy-950: #0B1929;
+    --navy-900: #0F2137;
+    --navy-800: #1C3B5A;
+    --navy-700: #24506F;
+    --navy-600: #2D6A8A;
+    --navy-100: #D4E4F1;
+    --navy-50:  #EDF4FA;
+
+    /* Palette coral — accent ownable (remplace l'ancien gold) */
+    --coral-500: #F06449;
+    --coral-400: #F2806A;
+    --coral-300: #F5A08E;
+    --coral-100: #FDE8E4;
+    --coral-50:  #FFF5F3;
+
+    /* Brand (legacy ds-* — accent flippé gold→coral) */
+    --ds-color-primary: var(--navy-800);
     --ds-color-primary-hover: #15304A;
-    --ds-color-accent: #8B6914;        /* Gold WCAG AA compliant pour texte */
-    --ds-color-accent-light: #D4A94B;  /* Décoratif fonds sombres uniquement */
+    --ds-color-accent: var(--coral-500);
+    --ds-color-accent-light: var(--coral-400);
 
     /* Text */
-    --ds-color-text-primary: #203146;
-    --ds-color-text-secondary: #4A5568;
+    --ds-color-text-primary: var(--navy-900);
+    --ds-color-text-secondary: #475569;
     --ds-color-text-tertiary: #8896A6;
     --ds-color-text-inverse: #FFFFFF;
 
-    /* Backgrounds */
-    --ds-color-bg-primary: #FCFAF8;
-    --ds-color-bg-secondary: #F5F1EC;
-    --ds-color-bg-tertiary: #FFFFFF;
-    --ds-color-bg-dark: #1C3B5A;
+    /* Surfaces (alias --surface-* per brief) */
+    --surface-0: #FFFFFF;
+    --surface-1: #FAFAF9;
+    --surface-2: #F5F3F0;
+    --surface-3: #EDEBE8;
+    --ds-color-bg-primary: var(--surface-1);
+    --ds-color-bg-secondary: var(--surface-2);
+    --ds-color-bg-tertiary: var(--surface-0);
+    --ds-color-bg-dark: var(--navy-900);
 
     /* Borders */
-    --ds-color-border-light: #E8E4DF;
-    --ds-color-border-default: #D1CCC6;
+    --border-light: rgba(0, 0, 0, 0.06);
+    --border-default: rgba(0, 0, 0, 0.10);
+    --ds-color-border-light: var(--border-light);
+    --ds-color-border-default: var(--border-default);
 
     /* Semantic */
-    --ds-color-success: #16A34A;
+    --green-500: #10B981;
+    --green-100: #D1FAE5;
+    --ds-color-success: var(--green-500);
     --ds-color-error: #DC2626;
     --ds-color-warning: #D97706;
 
@@ -88,30 +110,67 @@
     --ds-fw-medium: 500;
     --ds-fw-semibold: 600;
     --ds-fw-bold: 700;
+    --ds-fw-extrabold: 800;
 
     --ds-lh-tight: 1.2;
     --ds-lh-normal: 1.5;
     --ds-lh-relaxed: 1.7;
 
-    /* Spacing (4px base) */
-    --ds-space-1: 0.25rem;
-    --ds-space-2: 0.5rem;
-    --ds-space-3: 0.75rem;
-    --ds-space-4: 1rem;
-    --ds-space-5: 1.25rem;
-    --ds-space-6: 1.5rem;
-    --ds-space-8: 2rem;
-    --ds-space-10: 2.5rem;
-    --ds-space-12: 3rem;
-    --ds-space-16: 4rem;
-    --ds-space-20: 5rem;
-    --ds-space-24: 6rem;
+    /* Spacing (grille 4px — alias --s* per brief) */
+    --s1:  4px;
+    --s2:  8px;
+    --s3:  12px;
+    --s4:  16px;
+    --s5:  20px;
+    --s6:  24px;
+    --s8:  32px;
+    --s10: 40px;
+    --s12: 48px;
+    --s16: 64px;
+    --s20: 80px;
+    --s24: 96px;
+    --s32: 128px;
+    --ds-space-1: var(--s1);
+    --ds-space-2: var(--s2);
+    --ds-space-3: var(--s3);
+    --ds-space-4: var(--s4);
+    --ds-space-5: var(--s5);
+    --ds-space-6: var(--s6);
+    --ds-space-8: var(--s8);
+    --ds-space-10: var(--s10);
+    --ds-space-12: var(--s12);
+    --ds-space-16: var(--s16);
+    --ds-space-20: var(--s20);
+    --ds-space-24: var(--s24);
 
-    --ds-radius-sm: 8px;
-    --ds-radius-md: 12px;
-    --ds-radius-lg: 16px;
-    --ds-radius-xl: 24px;
-    --ds-radius-pill: 9999px;
+    /* Radius (alias --r-* per brief) */
+    --r-sm:   8px;
+    --r-md:   12px;
+    --r-lg:   16px;
+    --r-xl:   20px;
+    --r-2xl:  24px;
+    --r-3xl:  32px;
+    --r-pill: 9999px;
+    --ds-radius-sm: var(--r-sm);
+    --ds-radius-md: var(--r-md);
+    --ds-radius-lg: var(--r-lg);
+    --ds-radius-xl: var(--r-2xl);     /* legacy 24px (Welcome rounded-ds-xl) */
+    --ds-radius-2xl: var(--r-2xl);
+    --ds-radius-3xl: var(--r-3xl);
+    --ds-radius-pill: var(--r-pill);
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+    --shadow-glow-coral: 0 0 40px rgba(240, 100, 73, 0.25);
+    --shadow-glow-navy:  0 0 40px rgba(28, 59, 90, 0.20);
+
+    /* Motion */
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration: 300ms;
   }
 }
 
@@ -122,14 +181,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Sora', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   /* Focus-visible global — accessibilité clavier */
   :focus-visible {
-    outline: 2px solid var(--ds-color-primary);
-    outline-offset: 2px;
-    border-radius: 2px;
+    outline: 2px solid var(--coral-500);
+    outline-offset: 3px;
+    border-radius: var(--ds-radius-sm);
   }
 
   /* Reduced motion respect — applique à toute l'app */
@@ -149,6 +208,11 @@
   .gradient-text {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, hsl(210 53% 23%), hsl(37 55% 51%));
+  }
+
+  .lp-accent-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, var(--coral-500), var(--coral-400));
   }
 
   .glass-card {
@@ -221,59 +285,80 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--ds-space-2);
-    height: 48px;
-    padding: 0 var(--ds-space-6);
+    gap: var(--s2);
+    height: 52px;
+    padding: 0 var(--s8);
     font-family: inherit;
-    font-size: var(--ds-text-sm);
-    font-weight: var(--ds-fw-medium);
-    border-radius: var(--ds-radius-pill);
+    font-size: 15px;
+    font-weight: var(--ds-fw-semibold);
+    letter-spacing: -0.01em;
+    border-radius: var(--r-pill);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--duration) var(--ease);
     text-decoration: none;
     border: none;
     white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+  }
+  .ds-btn :where(svg) {
+    width: 18px;
+    height: 18px;
+    transition: transform var(--duration) var(--ease);
+  }
+  .ds-btn:hover :where(svg) {
+    transform: translateX(3px);
   }
 
   .ds-btn-primary {
-    background: var(--ds-color-primary);
+    background: var(--navy-900);
     color: var(--ds-color-text-inverse);
   }
   .ds-btn-primary:hover {
-    background: var(--ds-color-primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(28, 59, 90, 0.25);
+    background: var(--navy-950);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-navy);
+  }
+
+  .ds-btn-coral {
+    background: var(--coral-500);
+    color: var(--ds-color-text-inverse);
+  }
+  .ds-btn-coral:hover {
+    background: #E8553D;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-coral);
   }
 
   .ds-btn-secondary {
-    background: transparent;
+    background: var(--surface-0);
     color: var(--ds-color-text-primary);
-    border: 1.5px solid var(--ds-color-border-default);
+    border: 1.5px solid var(--border-default);
   }
   .ds-btn-secondary:hover {
-    border-color: var(--ds-color-primary);
-    color: var(--ds-color-primary);
+    border-color: var(--navy-800);
+    box-shadow: var(--shadow-sm);
   }
 
   .ds-btn-ghost {
     background: transparent;
-    color: var(--ds-color-primary);
-    padding: 0 var(--ds-space-4);
-    height: 48px;
+    color: var(--ds-color-text-secondary);
+    padding: 0 var(--s4);
   }
   .ds-btn-ghost:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-thickness: 2px;
+    color: var(--ds-color-text-primary);
   }
 
+  /* `.ds-btn-inverse` aliasé à `.ds-btn-white` (Welcome.tsx:601, compat) */
+  .ds-btn-white,
   .ds-btn-inverse {
-    background: var(--ds-color-text-inverse);
-    color: var(--ds-color-primary);
+    background: var(--surface-0);
+    color: var(--ds-color-text-primary);
   }
+  .ds-btn-white:hover,
   .ds-btn-inverse:hover {
-    background: rgba(255, 255, 255, 0.92);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
   }
 
   .ds-card {
