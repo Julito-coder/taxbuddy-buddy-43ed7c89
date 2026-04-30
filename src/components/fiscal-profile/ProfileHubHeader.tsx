@@ -8,6 +8,8 @@ interface Props {
   qualitativeLabel: string;
   remainingGain: number;
   hasNextModule: boolean;
+  nextModuleTitle?: string;
+  nextModuleGain?: number;
   onContinue: () => void;
 }
 
