@@ -60,6 +60,10 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
   const [expanded, setExpanded] = useState<string | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const pushedHistoryRef = useRef(false);
+  const closingViaPopRef = useRef(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   const close = () => onOpenChange(false);
 
@@ -69,36 +73,86 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  // Body scroll lock + back button support
+  // Body scroll lock + back button support + Escape
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
+    // Remember the element that opened the panel so we can restore focus on close.
+    previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
+
+    // Push a dummy history entry so the system back gesture / button closes
+    // the panel instead of leaving the page.
     const state = window.history.state;
     if (!state || !state.__elioTools) {
       window.history.pushState({ ...state, __elioTools: true }, '');
       pushedHistoryRef.current = true;
     }
     const onPop = () => {
+      // Browser already consumed our entry — don't push back() in cleanup.
       pushedHistoryRef.current = false;
+      closingViaPopRef.current = true;
       onOpenChange(false);
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onOpenChange(false);
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onOpenChange(false);
+        return;
+      }
+      // Simple focus trap: keep Tab inside the panel.
+      if (e.key === 'Tab' && panelRef.current) {
+        const focusables = panelRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+        if (e.shiftKey && active === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault();
+          first.focus();
+        } else if (active && !panelRef.current.contains(active)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener('popstate', onPop);
     window.addEventListener('keydown', onKey);
+
+    // Move focus into the panel after the open animation starts.
+    const focusTimer = window.setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 50);
+
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener('popstate', onPop);
       window.removeEventListener('keydown', onKey);
-      if (pushedHistoryRef.current) {
+      window.clearTimeout(focusTimer);
+
+      // Only unwind the dummy history entry if WE are closing the panel
+      // (X button, link, swipe, escape). If the close came from popstate
+      // itself, the entry is already gone.
+      if (pushedHistoryRef.current && !closingViaPopRef.current) {
         pushedHistoryRef.current = false;
         if (window.history.state?.__elioTools) {
           window.history.back();
         }
       }
+      closingViaPopRef.current = false;
+
+      // Restore focus to the trigger that opened the panel.
+      const prevFocus = previouslyFocusedRef.current;
+      if (prevFocus && document.contains(prevFocus)) {
+        prevFocus.focus();
+      }
+      previouslyFocusedRef.current = null;
     };
   }, [open, onOpenChange]);
 
@@ -131,23 +185,29 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
   return (
     <AnimatePresence>
       {open && (
-        <>
-          <motion.div
+        <div className="fixed inset-0 z-[60] lg:hidden">
+          {/* Tap-to-close backdrop. Sits behind the panel. */}
+          <motion.button
             key="overlay-bg"
-            className="fixed inset-0 z-[60] bg-foreground/40 backdrop-blur-[2px] lg:hidden"
+            type="button"
+            aria-label="Fermer le menu"
+            tabIndex={-1}
+            className="absolute inset-0 bg-foreground/40 backdrop-blur-[2px] cursor-pointer"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={close}
-            aria-hidden="true"
           />
+          {/* Slide-up panel. Leaves a small visible band at the top so the
+              backdrop tap target is always reachable. */}
           <motion.div
             key="overlay-panel"
+            ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label="Tous les outils"
-            className="fixed inset-0 z-[61] bg-background lg:hidden flex flex-col"
+            className="absolute inset-x-0 bottom-0 top-12 bg-background rounded-t-2xl shadow-2xl flex flex-col outline-none"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -155,6 +215,10 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
+            {/* Drag handle hint */}
+            <div className="pt-2 pb-1 flex justify-center" aria-hidden="true">
+              <span className="block h-1 w-10 rounded-full bg-muted-foreground/30" />
+            </div>
             {/* Header */}
             <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between">
               <div>
@@ -162,6 +226,7 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
                 <p className="text-[11px] text-muted-foreground">Navigation et simulations</p>
               </div>
               <button
+                ref={closeBtnRef}
                 onClick={close}
                 aria-label="Fermer"
                 className="h-11 w-11 inline-flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted active:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
