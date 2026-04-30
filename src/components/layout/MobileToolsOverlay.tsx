@@ -273,7 +273,8 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
               >
                 <X className="h-5 w-5" />
               </button>
-            </header>
+              </header>
+            </div>
 
             {/* Scroll body */}
             <div
