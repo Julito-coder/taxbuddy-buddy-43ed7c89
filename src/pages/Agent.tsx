@@ -1,409 +1,50 @@
-import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
-import {
-  Send,
-  ArrowLeft,
-  Calculator,
-  Search,
-  FileText,
-  GitCompare,
-  Building2,
-  Calendar,
-  Sparkles,
-  TrendingUp,
-  History,
-  Pin,
-  Trash2,
-  X,
-} from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { useElioAgent } from '@/hooks/useElioAgent';
-import { RichViewRenderer } from '@/components/elio-agent/RichViewRenderer';
-import {
-  listConversations,
-  loadConversation,
-  togglePin,
-  deleteConversation,
-  type ConversationSummary,
-} from '@/lib/agentConversationsService';
-import { CoachInlineBadge } from '@/components/coach/CoachInlineBadge';
+import { AgentHeader } from '@/components/agent/AgentHeader';
 
-interface Suggestion {
-  label: string;
-  prompt: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-const ElioSymbol = ({ size = 24 }: { size?: number }) => (
+const PlaceholderZone = ({ label, minHeight }: { label: string; minHeight: number }) => (
   <div
-    className="rounded-full bg-[#1B3A5C] flex items-center justify-center relative shrink-0"
-    style={{ width: size, height: size }}
+    className="rounded-2xl flex items-center justify-center text-sm font-medium"
+    style={{
+      minHeight,
+      border: '1.5px dashed var(--coral-500)',
+      color: 'var(--coral-500)',
+      background: 'var(--coral-50)',
+    }}
   >
-    <div
-      className="rounded-full bg-[#C8943E] absolute"
-      style={{ width: size * 0.22, height: size * 0.22, top: size * 0.22, right: size * 0.22 }}
-    />
+    {label}
   </div>
 );
 
-const getGreeting = (firstName: string, profile: any): { text: string; needsProfile: boolean } => {
-  const month = new Date().getMonth() + 1; // 1-12
-  const incomplete = !profile || (!profile.gross_monthly_salary && !profile.annual_revenue_ht && !profile.main_pension_annual);
-
-  if (incomplete) {
-    return {
-      text: 'Salut. Pour t\'aider au mieux, remplis d\'abord ton profil fiscal.',
-      needsProfile: true,
-    };
-  }
-
-  const name = firstName || 'toi';
-  if (month === 4 || month === 5) {
-    return { text: `Salut ${name}. Ta déclaration approche. Tu veux que je check ta situation ?`, needsProfile: false };
-  }
-  if (month === 7) {
-    return { text: `Salut ${name}. Ton avis d'imposition devrait arriver. Je peux le vérifier avec toi.`, needsProfile: false };
-  }
-  if (month === 9) {
-    return { text: `Salut ${name}. La taxe foncière arrive. On prépare ta trésorerie ?`, needsProfile: false };
-  }
-  return { text: `Salut ${name}. Qu'est-ce que je regarde pour toi aujourd'hui ?`, needsProfile: false };
-};
-
-const buildSuggestions = (profile: any): Suggestion[] => {
-  const month = new Date().getMonth() + 1;
-  const out: Suggestion[] = [];
-
-  const hasIncome = profile?.gross_monthly_salary > 0 || profile?.annual_revenue_ht > 0 || profile?.main_pension_annual > 0;
-  if (hasIncome) {
-    out.push({ label: 'Calcule mon impôt 2025', prompt: 'Calcule mon impôt sur le revenu 2025', icon: Calculator });
-  }
-
-  out.push({ label: 'Vérifie mes droits aux aides', prompt: 'Vérifie si j\'ai droit à des aides', icon: Search });
-
-  if (profile?.crypto_pnl_2025 || profile?.crypto_wallet_address) {
-    out.push({ label: 'Déclaration crypto 2086', prompt: 'Prépare ma déclaration crypto 2086', icon: FileText });
-  }
-
-  if (profile?.is_self_employed) {
-    out.push({ label: 'Compare micro vs SASU', prompt: 'Compare micro vs SASU pour moi', icon: GitCompare });
-  }
-
-  if ((month === 4 || month === 5) && out.length < 4) {
-    out.push({ label: 'Check ma déclaration', prompt: 'Check ma déclaration de cette année', icon: FileText });
-  }
-
-  if (profile?.has_rental_income && out.length < 4) {
-    out.push({ label: 'Simule un investissement locatif', prompt: 'Simule un investissement locatif pour moi', icon: Building2 });
-  }
-
-  // Fallbacks pour atteindre 4
-  const fallbacks: Suggestion[] = [
-    { label: 'Que puis-je optimiser ?', prompt: 'Que puis-je optimiser cette année ?', icon: Sparkles },
-    { label: 'Mes prochaines échéances', prompt: 'Quelles sont mes prochaines échéances fiscales ?', icon: Calendar },
-    { label: 'Ma tranche d\'imposition', prompt: 'Explique-moi ma tranche d\'imposition', icon: TrendingUp },
-    { label: 'Trouve des aides oubliées', prompt: 'Trouve-moi des aides que j\'oublie', icon: Search },
-  ];
-
-  for (const f of fallbacks) {
-    if (out.length >= 4) break;
-    if (!out.find((s) => s.label === f.label)) out.push(f);
-  }
-
-  return out.slice(0, 4);
-};
-
 const AgentPage = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [profile, setProfile] = useState<any>(null);
-  const [input, setInput] = useState('');
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const { messages, isLoading, remainingToday, sendMessage, startNewConversation, confirmProfileUpdates, loadExistingConversation } = useElioAgent();
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(false);
-
-  const refreshConversations = async () => {
-    if (!user) return;
-    setHistoryLoading(true);
-    const list = await listConversations(user.id);
-    setConversations(list);
-    setHistoryLoading(false);
-  };
-
-  const openHistory = async () => {
-    setHistoryOpen(true);
-    await refreshConversations();
-  };
-
-  const handleOpenConversation = async (id: string) => {
-    const detail = await loadConversation(id);
-    if (detail) {
-      loadExistingConversation(detail.id, detail.messages);
-      setHistoryOpen(false);
-    }
-  };
-
-  const handleTogglePin = async (id: string, currentlyPinned: boolean) => {
-    await togglePin(id, !currentlyPinned);
-    await refreshConversations();
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm('Supprimer cette conversation ?')) return;
-    await deleteConversation(id);
-    await refreshConversations();
-  };
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .maybeSingle()
-      .then(({ data }) => setProfile(data));
-  }, [user]);
-
-  // Auto-send prompt si arrivé via feed proactif
-  useEffect(() => {
-    const initial = (location.state as any)?.initialPrompt;
-    if (initial && messages.length === 0 && !isLoading) {
-      sendMessage(initial);
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.state]);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, isLoading]);
-
-  const firstName = (profile?.full_name || '').split(' ')[0] || '';
-  const { text: greeting, needsProfile } = getGreeting(firstName, profile);
-  const suggestions = buildSuggestions(profile);
-
-  const handleSend = () => {
-    if (!input.trim()) return;
-    const text = input;
-    setInput('');
-    sendMessage(text);
-  };
-
-  const handleSuggestion = (prompt: string) => {
-    sendMessage(prompt);
-  };
-
-  const isWelcome = messages.length === 0;
-
   return (
     <AppLayout>
-      <div className="max-w-[640px] mx-auto flex flex-col" style={{ fontFamily: 'Sora', minHeight: 'calc(100vh - 140px)' }}>
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6 px-1">
-          {!isWelcome ? (
-            <button
-              onClick={startNewConversation}
-              className="flex items-center gap-2 text-sm font-medium text-[#1B3A5C] hover:text-[#C8943E] transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Nouvelle conversation
-            </button>
-          ) : (
-            <>
-              <ElioSymbol size={32} />
-              <h1 className="text-xl font-semibold text-[#1B3A5C]">Élio Agent</h1>
-              <CoachInlineBadge className="ml-2" />
-              {typeof remainingToday === 'number' && (
-                <span className="ml-auto text-xs text-[#6B7A8D]">{remainingToday} restant·s aujourd'hui</span>
-              )}
-            </>
-          )}
-          <button
-            onClick={openHistory}
-            className={`${isWelcome ? '' : 'ml-auto'} flex items-center gap-1.5 text-sm font-medium text-[#1B3A5C] hover:text-[#C8943E] transition-colors`}
-            title="Historique des conversations"
-          >
-            <History className="w-4 h-4" />
-            <span className="hidden sm:inline">Historique</span>
-          </button>
+      <div
+        className="flex flex-col"
+        style={{
+          height: '100dvh',
+          background:
+            'radial-gradient(120% 60% at 50% 0%, rgba(240, 100, 73, 0.06) 0%, rgba(240, 100, 73, 0) 60%), hsl(var(--background))',
+        }}
+      >
+        <AgentHeader />
+
+        {/* Zone scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-[760px] px-4 py-4 space-y-4">
+            <PlaceholderZone label="Zone Hero (mascotte) — batch 2" minHeight={220} />
+            <PlaceholderZone label="Zone Suggestions — batch 3" minHeight={140} />
+            <PlaceholderZone label="Zone Chat — batch 4" minHeight={320} />
+          </div>
         </div>
 
-        {/* History drawer */}
-        {historyOpen && (
-          <>
-            <div
-              onClick={() => setHistoryOpen(false)}
-              className="fixed inset-0 bg-black/30 z-40"
-            />
-            <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[380px] bg-white z-50 shadow-xl flex flex-col" style={{ fontFamily: 'Sora' }}>
-              <div className="flex items-center justify-between px-4 py-4 border-b border-[#E5DED3]">
-                <h2 className="text-lg font-semibold text-[#1B3A5C]">Tes conversations</h2>
-                <button onClick={() => setHistoryOpen(false)} className="text-[#6B7A8D] hover:text-[#1B3A5C]">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto">
-                {historyLoading && (
-                  <p className="text-center text-sm text-[#6B7A8D] py-8">Chargement…</p>
-                )}
-                {!historyLoading && conversations.length === 0 && (
-                  <p className="text-center text-sm text-[#6B7A8D] py-8 px-4">
-                    Aucune conversation enregistrée pour l'instant. Tes échanges avec Élio seront sauvegardés automatiquement.
-                  </p>
-                )}
-                {!historyLoading && conversations.map((c) => (
-                  <div
-                    key={c.id}
-                    className="group border-b border-[#F0EBE2] hover:bg-[#FAF7F1] transition-colors"
-                  >
-                    <button
-                      onClick={() => handleOpenConversation(c.id)}
-                      className="w-full text-left px-4 py-3"
-                    >
-                      <div className="flex items-start gap-2">
-                        {c.is_pinned && <Pin className="w-3.5 h-3.5 text-[#C8943E] mt-1 shrink-0 fill-[#C8943E]" />}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#1F3347] line-clamp-2">
-                            {c.summary || c.topic || 'Conversation'}
-                          </p>
-                          <p className="text-xs text-[#6B7A8D] mt-1">
-                            {new Date(c.updated_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                    <div className="flex gap-2 px-4 pb-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => handleTogglePin(c.id, c.is_pinned)}
-                        className="text-xs text-[#6B7A8D] hover:text-[#C8943E] flex items-center gap-1"
-                      >
-                        <Pin className="w-3 h-3" />
-                        {c.is_pinned ? 'Désépingler' : 'Épingler'}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(c.id)}
-                        className="text-xs text-[#6B7A8D] hover:text-[#C9432E] flex items-center gap-1 ml-auto"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                        Supprimer
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="text-[10px] text-[#6B7A8D] text-center px-4 py-3 border-t border-[#E5DED3]">
-                Conversations conservées 30 jours. Épingle celles que tu veux garder.
-              </p>
-            </div>
-          </>
-        )}
-
-        {/* Welcome state */}
-        {isWelcome ? (
-          <div className="flex-1 flex flex-col">
-            <p className="text-2xl font-medium text-[#1B3A5C] leading-snug mb-2 px-1">{greeting}</p>
-
-            {needsProfile && (
-              <button
-                onClick={() => navigate('/profil/fiscal')}
-                className="self-start mt-2 mb-4 px-4 py-2 rounded-lg bg-[#1B3A5C] text-white text-sm font-medium hover:bg-[#152e4a] transition-colors"
-              >
-                Compléter mon profil
-              </button>
-            )}
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6 mb-6">
-              {suggestions.map((s) => {
-                const Icon = s.icon;
-                return (
-                  <button
-                    key={s.label}
-                    onClick={() => handleSuggestion(s.prompt)}
-                    disabled={isLoading}
-                    className="text-left p-4 rounded-xl bg-[#F8F5F0] border border-[#E5DED3] hover:border-[#C8943E] transition-colors disabled:opacity-50 flex flex-col gap-2"
-                  >
-                    <Icon className="w-5 h-5 text-[#C8943E]" />
-                    <span className="text-sm font-medium text-[#1B3A5C]">{s.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+        {/* Composer fixe en bas */}
+        <div
+          className="sticky bottom-0 border-t border-border bg-background"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          <div className="mx-auto w-full max-w-[760px] px-4 py-3">
+            <PlaceholderZone label="Composer — batch 4" minHeight={56} />
           </div>
-        ) : (
-          /* Conversation state */
-          <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 mb-4 px-1">
-            {messages.map((m, i) => {
-              if (m.role === 'user') {
-                return (
-                  <div key={i} className="flex justify-end">
-                    <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-[#1B3A5C] text-white px-4 py-3 text-sm">
-                      {m.content}
-                    </div>
-                  </div>
-                );
-              }
-              return (
-                <div key={i} className="flex gap-2">
-                  <ElioSymbol size={28} />
-                  <div className="flex-1 max-w-[calc(100%-40px)]">
-                    {m.content && (
-                      <div className="text-[#1F3347] text-sm whitespace-pre-wrap leading-relaxed">{m.content}</div>
-                    )}
-                    <RichViewRenderer rich_view={m.rich_view} onRunPrompt={sendMessage} onConfirmProfileUpdate={confirmProfileUpdates} />
-                  </div>
-                </div>
-              );
-            })}
-            {isLoading && (
-              <div className="flex gap-2 items-center">
-                <ElioSymbol size={28} />
-                <div className="flex gap-1.5 px-3 py-2">
-                  <span className="w-2 h-2 rounded-full bg-[#C8943E] animate-pulse" style={{ animationDelay: '0ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-[#C8943E] animate-pulse" style={{ animationDelay: '200ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-[#C8943E] animate-pulse" style={{ animationDelay: '400ms' }} />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Input bar */}
-        <div className="sticky bottom-0 bg-[#FAFAF7] pt-2 pb-2">
-          <div className="flex items-end gap-2 bg-white border border-[#E5DED3] rounded-2xl p-2">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder="Pose-moi ta question..."
-              rows={1}
-              disabled={isLoading}
-              className="flex-1 resize-none bg-transparent px-2 py-2 text-sm text-[#1F3347] placeholder:text-[#6B7A8D] focus:outline-none max-h-32"
-              style={{ fontFamily: 'Sora' }}
-            />
-            <button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="w-10 h-10 rounded-full bg-[#C8943E] text-white flex items-center justify-center hover:bg-[#b07f2f] transition-colors disabled:opacity-40 shrink-0"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
-          <p className="text-[10px] text-[#6B7A8D] text-center mt-2 px-2">
-            Élio fournit des estimations à titre indicatif. Pour toute décision fiscale, consulte un professionnel habilité.
-          </p>
         </div>
       </div>
     </AppLayout>

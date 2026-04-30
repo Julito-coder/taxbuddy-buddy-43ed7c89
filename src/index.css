@@ -104,8 +104,11 @@
     --shadow-glow-navy:  0 0 40px rgba(28, 59, 90, 0.20);
 
     /* Motion (v4) */
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-fast: 150ms;
     --duration: 300ms;
+    --duration-slow: 500ms;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
     /* Brand legacy --ds-* (rétrocompatibilité, redirigés vers tokens v4) */
     --ds-color-primary: var(--navy-800);
