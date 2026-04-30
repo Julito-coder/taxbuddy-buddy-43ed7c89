@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -17,10 +17,22 @@ export interface RichView {
   data: any;
 }
 
+export type AgentErrorKind = 'network' | 'quota' | 'profile_incomplete' | 'generic';
+
+export interface AgentErrorPayload {
+  kind: AgentErrorKind;
+  message: string;
+  meta?: { missingFields?: string[]; code?: string; rawMessage?: string };
+  /** Texte original que l'utilisateur a tenté d'envoyer, pour le retry */
+  retryText?: string;
+}
+
 export interface AgentMessage {
   role: 'user' | 'assistant';
   content: string;
   rich_view?: RichView | null;
+  /** Présent quand le message est une carte d'erreur affichée dans le thread */
+  error?: AgentErrorPayload | null;
 }
 
 export const useElioAgent = () => {
