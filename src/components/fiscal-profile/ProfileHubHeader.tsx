@@ -18,6 +18,8 @@ export const ProfileHubHeader = ({
   qualitativeLabel,
   remainingGain,
   hasNextModule,
+  nextModuleTitle,
+  nextModuleGain = 0,
   onContinue,
 }: Props) => {
   const circumference = 2 * Math.PI * 36;
