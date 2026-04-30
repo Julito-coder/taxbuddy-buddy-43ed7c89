@@ -378,7 +378,7 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
               </section>
             </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
