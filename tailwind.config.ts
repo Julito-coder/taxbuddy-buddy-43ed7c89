@@ -153,6 +153,13 @@ export default {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        "elio-float": {
+          "0%": { transform: "translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg)" },
+          "25%": { transform: "translate3d(0,-18px,0) rotateX(6deg) rotateY(-8deg) rotateZ(-2deg)" },
+          "50%": { transform: "translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg)" },
+          "75%": { transform: "translate3d(0,14px,0) rotateX(-6deg) rotateY(8deg) rotateZ(2deg)" },
+          "100%": { transform: "translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -161,6 +168,7 @@ export default {
         "slide-in-right": "slide-in-right 0.4s ease-out",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
         "number-count": "number-count 0.3s ease-out",
+        "elio-float": "elio-float 5.5s ease-in-out infinite",
       },
     },
   },
