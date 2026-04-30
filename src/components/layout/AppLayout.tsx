@@ -30,22 +30,12 @@ export const AppLayout = ({ children, variant = 'default' }: AppLayoutProps) => 
         // viewport height, leaves room for the mobile bottom nav, and gives
         // its child a flex column to occupy precisely.
         <main
-          className="lg:ml-64 flex flex-col overflow-hidden"
-          style={{
-            height: '100dvh',
-            // Reserve space for the mobile BottomNav (68px). Disabled on desktop
-            // where the sidebar is lateral.
-            paddingBottom: 'var(--bottom-nav-h, 68px)',
-          }}
+          className="lg:ml-64 flex flex-col overflow-hidden pb-[68px] lg:pb-0"
+          style={{ height: '100dvh' }}
         >
-          <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden lg:!pb-0">
+          <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden">
             {children}
           </div>
-          <style>{`
-            @media (min-width: 1024px) {
-              main { padding-bottom: 0 !important; }
-            }
-          `}</style>
         </main>
       ) : (
         <main className="lg:ml-64 min-h-screen pb-20 lg:pb-0 overflow-x-hidden">
