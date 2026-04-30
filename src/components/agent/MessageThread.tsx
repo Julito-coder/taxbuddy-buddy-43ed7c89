@@ -25,9 +25,9 @@ export const MessageThread = ({
   isStreaming,
   onRunPrompt,
   onConfirmProfileUpdate,
+  onRetry,
 }: Props) => {
   const reduce = useReducedMotion();
-  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [stickToBottom, setStickToBottom] = useState(true);
