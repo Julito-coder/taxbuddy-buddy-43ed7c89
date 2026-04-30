@@ -19,6 +19,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { LandingHeader } from '@/components/landing/Header';
 import { LandingHero } from '@/components/landing/Hero';
 import { LandingStats } from '@/components/landing/Stats';
+import { LandingSteps } from '@/components/landing/Steps';
 import { Loader2 } from 'lucide-react';
 
 const SIGNUP_HREF = '/quiz';
@@ -30,38 +31,6 @@ const fadeUp = {
   viewport: { once: true, margin: '-80px' },
   transition: { duration: 0.4, ease: 'easeOut' as const },
 } as const;
-
-// ─────────────────────────────────────── How it works
-function HowItWorks() {
-  const steps = [
-    { n: 1, title: 'Réponds au quiz', desc: '5 à 7 questions, en swipe. Pas de formulaire interminable.' },
-    { n: 2, title: 'Reçois ton Score Élio', desc: 'Un score de 0 à 100, ton montant récupérable et le top 3 des actions.' },
-    { n: 3, title: 'Agis chaque matin', desc: 'Ton bulletin quotidien : une action concrète, en 60 secondes.' },
-  ];
-  return (
-    <section id="how" className="mx-auto max-w-7xl px-ds-4 py-ds-24 sm:px-ds-6">
-      <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
-        <h2 className="text-ds-3xl font-bold text-ds-text-primary">Comment ça marche</h2>
-        <p className="mt-ds-4 text-ds-base text-ds-text-secondary">
-          Trois étapes pour transformer l'admin en habitude qui rapporte.
-        </p>
-      </motion.div>
-      <div className="mt-ds-12 grid gap-ds-6 md:grid-cols-3">
-        {steps.map((s, i) => (
-          <motion.div key={s.n} {...fadeUp} transition={{ ...fadeUp.transition, delay: i * 0.1 }}>
-            <div className="ds-card h-full">
-              <div className="flex h-10 w-10 items-center justify-center rounded-ds-pill bg-ds-primary text-ds-text-inverse font-bold">
-                {s.n}
-              </div>
-              <h3 className="mt-ds-4 text-ds-2xl font-semibold text-ds-text-primary">{s.title}</h3>
-              <p className="mt-ds-2 text-ds-base text-ds-text-secondary">{s.desc}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────── Features (alternating image/text)
 const featureBlocks = [
@@ -523,7 +492,7 @@ const Welcome = () => {
       <main id="main-content">
         <LandingHero />
         <LandingStats />
-        <HowItWorks />
+        <LandingSteps />
         <FeaturesGrid />
         <Pricing />
         <Testimonials />

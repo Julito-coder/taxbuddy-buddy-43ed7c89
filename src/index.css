@@ -977,4 +977,119 @@
     margin-left: auto;
     margin-right: auto;
   }
+
+  /* ─────────────────────── Landing : Steps "Comment ça marche" (Batch 6) */
+
+  .lp-steps {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--s24) var(--s4);
+  }
+  @media (min-width: 640px) {
+    .lp-steps { padding-left: var(--s6); padding-right: var(--s6); }
+  }
+
+  .lp-steps-header {
+    max-width: 640px;
+    margin: 0 auto var(--s16);
+    text-align: center;
+  }
+
+  .lp-steps-label {
+    margin: 0 0 var(--s4);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--coral-500);
+  }
+
+  .lp-steps-h2 {
+    margin: 0 0 var(--s5);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--ds-color-text-primary);
+    text-wrap: balance;
+  }
+
+  .lp-steps-subtitle {
+    max-width: 520px;
+    margin: 0 auto;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ds-color-text-tertiary);
+  }
+
+  .lp-steps-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s6);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  @media (min-width: 768px) {
+    .lp-steps-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--s8);
+    }
+  }
+
+  .lp-step-item {
+    display: flex;
+  }
+
+  .lp-step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4);
+    width: 100%;
+    padding: var(--s10);
+    background: var(--surface-0);
+    border: 1px solid var(--border-light);
+    border-radius: var(--r-2xl);
+    box-shadow: var(--shadow-xs);
+    transition:
+      border-color var(--duration) var(--ease),
+      box-shadow var(--duration) var(--ease),
+      transform var(--duration) var(--ease);
+  }
+  .lp-step:hover {
+    border-color: var(--coral-300);
+    box-shadow: var(--shadow-md), 0 0 32px rgba(240, 100, 73, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .lp-step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-md);
+    background: linear-gradient(135deg, var(--coral-500) 0%, var(--coral-400) 100%);
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    box-shadow: var(--shadow-sm), 0 4px 16px rgba(240, 100, 73, 0.28);
+  }
+
+  .lp-step-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    color: var(--ds-color-text-primary);
+  }
+
+  .lp-step-desc {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ds-color-text-tertiary);
+  }
 }
