@@ -5,9 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import {
   loadFiscalProfile,
-  saveFiscalProfile,
   FiscalProfileData,
 } from '@/lib/fiscalProfileService';
+import { useFiscalProfileAutosave } from '@/hooks/useFiscalProfileAutosave';
 import {
   MODULES,
   ModuleId,
@@ -33,7 +33,10 @@ export const ProfileHub = () => {
   const [loading, setLoading] = useState(true);
   const [activeModuleId, setActiveModuleId] = useState<ModuleId | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
+
+  const { status, lastError, queueUpdate, flushNow } = useFiscalProfileAutosave({
+    userId: user?.id,
+  });
 
   useEffect(() => {
     if (!user) return;
@@ -43,9 +46,13 @@ export const ProfileHub = () => {
     });
   }, [user]);
 
-  const handleChange = useCallback((updates: Partial<FiscalProfileData>) => {
-    setData((prev) => (prev ? { ...prev, ...updates } : prev));
-  }, []);
+  const handleChange = useCallback(
+    (updates: Partial<FiscalProfileData>) => {
+      setData((prev) => (prev ? { ...prev, ...updates } : prev));
+      queueUpdate(updates);
+    },
+    [queueUpdate]
+  );
 
   const overall = useMemo(
     () =>
@@ -70,24 +77,21 @@ export const ProfileHub = () => {
     setDrawerOpen(true);
   };
 
-  const handleSave = async () => {
-    if (!user || !data) return;
-    setSaving(true);
-    const result = await saveFiscalProfile(user.id, data);
-    setSaving(false);
-    if (result.success) {
-      toast({ title: 'Profil mis à jour', description: 'Tes informations sont enregistrées.' });
-      window.dispatchEvent(
-        new CustomEvent('elio:profile-updated', { detail: { source: 'profile_hub' } })
-      );
-      setDrawerOpen(false);
-    } else {
+  // Notify error once per occurrence
+  useEffect(() => {
+    if (status === 'error' && lastError) {
       toast({
-        title: 'Impossible d’enregistrer',
-        description: result.error || 'Réessaie dans un instant.',
+        title: 'Sauvegarde impossible',
+        description: lastError,
         variant: 'destructive',
       });
     }
+  }, [status, lastError, toast]);
+
+  const handleCloseDrawer = async () => {
+    // Flush any pending changes before closing
+    await flushNow();
+    setDrawerOpen(false);
   };
 
   if (loading || !data) {
@@ -172,11 +176,19 @@ export const ProfileHub = () => {
         module={activeModule}
         open={drawerOpen}
         onOpenChange={(open) => {
-          setDrawerOpen(open);
-          if (!open) setActiveModuleId(null);
+          if (!open) {
+            // Flush pending edits before unmounting the section
+            void flushNow().finally(() => {
+              setDrawerOpen(false);
+              setActiveModuleId(null);
+            });
+          } else {
+            setDrawerOpen(true);
+          }
         }}
-        onSave={handleSave}
-        saving={saving}
+        onSave={handleCloseDrawer}
+        saving={status === 'saving'}
+        saveStatus={status}
       >
         {renderModuleContent()}
       </ProfileModuleDrawer>
