@@ -139,6 +139,8 @@ export const ProfileHub = () => {
         qualitativeLabel={overall.qualitativeLabel}
         remainingGain={overall.remainingGain}
         hasNextModule={!!overall.nextModuleId}
+        nextModuleTitle={overall.nextModuleTitle}
+        nextModuleGain={overall.nextModuleGain}
         onContinue={() => overall.nextModuleId && openModule(overall.nextModuleId)}
       />
 
