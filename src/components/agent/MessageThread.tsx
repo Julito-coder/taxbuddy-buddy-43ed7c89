@@ -30,8 +30,11 @@ export const MessageThread = ({
   const reduce = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [stickToBottom, setStickToBottom] = useState(true);
+  const stickToBottomRef = useRef(true);
   const [isNarrow, setIsNarrow] = useState(false);
+  // Marqueur pour ignorer les changements de visibilité dus à un resize
+  // (clavier mobile) plutôt qu'à un vrai scroll utilisateur.
+  const ignoreVisibilityUntilRef = useRef(0);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 379px)');
@@ -41,23 +44,62 @@ export const MessageThread = ({
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  // Track manual scroll
+  // IntersectionObserver sur la sentinelle de fin :
+  // - source de vérité pour "l'utilisateur est-il en bas ?"
+  // - immunisée aux changements de scrollTop induits par le resize clavier,
+  //   parce qu'elle observe la position relative de la sentinelle dans le viewport
+  //   du conteneur, pas la valeur scrollTop.
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-      setStickToBottom(distanceFromBottom < 80);
-    };
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => el.removeEventListener('scroll', onScroll);
+    const root = containerRef.current;
+    const target = bottomRef.current;
+    if (!root || !target || typeof IntersectionObserver === 'undefined') return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        // Si on vient de resize (clavier), on ignore une éventuelle entrée
+        // pour ne pas marquer "stick" alors que l'utilisateur ne l'a pas demandé.
+        if (Date.now() < ignoreVisibilityUntilRef.current) return;
+        const entry = entries[0];
+        if (!entry) return;
+        stickToBottomRef.current = entry.isIntersecting;
+      },
+      {
+        root,
+        // ~ "presque en bas" = encore considéré comme stick
+        rootMargin: '0px 0px 120px 0px',
+        threshold: 0,
+      },
+    );
+    io.observe(target);
+    return () => io.disconnect();
   }, []);
 
-  // Auto-scroll
+  // Pause la mise à jour du flag pendant les resize de visualViewport
+  // (apparition/disparition du clavier mobile).
   useEffect(() => {
-    if (!stickToBottom) return;
+    const vv = (window as any).visualViewport as VisualViewport | undefined;
+    if (!vv) return;
+    const onResize = () => {
+      ignoreVisibilityUntilRef.current = Date.now() + 350;
+      // Si on était "collé" en bas, on y reste après le resize.
+      if (stickToBottomRef.current) {
+        // Double rAF pour laisser le layout se stabiliser après le resize.
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            bottomRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+          });
+        });
+      }
+    };
+    vv.addEventListener('resize', onResize);
+    return () => vv.removeEventListener('resize', onResize);
+  }, []);
+
+  // Auto-scroll sur nouveaux messages : uniquement si l'utilisateur est en bas.
+  useEffect(() => {
+    if (!stickToBottomRef.current) return;
     bottomRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'end' });
-  }, [messages, isStreaming, stickToBottom, reduce]);
+  }, [messages, isStreaming, reduce]);
 
   const mascotSize = isNarrow ? 36 : 40;
 
