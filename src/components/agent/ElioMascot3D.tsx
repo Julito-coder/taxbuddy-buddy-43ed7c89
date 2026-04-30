@@ -22,13 +22,13 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
 
   const renderSize = size ?? (isMobile ? 160 : 200);
 
-  // Float animation (vertical)
+  // Float animation (vertical) — amplitude plus marquée pour un effet flottant visible
   const floatAnim = reduce
     ? {}
-    : { y: [0, -8, 0, 8, 0] };
+    : { y: [0, -16, 0, 14, 0], rotate: [0, -1.5, 0, 1.5, 0] };
 
   const floatTransition = {
-    duration: 4,
+    duration: 5,
     repeat: Infinity,
     ease: 'easeInOut' as const,
   };
