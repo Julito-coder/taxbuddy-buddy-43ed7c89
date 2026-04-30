@@ -91,12 +91,12 @@ export const ContextualChips = ({ onSelect }: Props) => {
 
   return (
     <div
-      className="-mx-3 overflow-x-auto px-3 sm:-mx-4 sm:px-4"
+      className="overflow-x-auto overflow-y-hidden w-full"
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
         WebkitOverflowScrolling: 'touch',
-        maxWidth: '100vw',
+        overscrollBehaviorX: 'contain',
       }}
     >
       <style>{`
