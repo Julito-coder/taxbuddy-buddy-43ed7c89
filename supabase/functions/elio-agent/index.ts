@@ -25,6 +25,11 @@ import {
   type RawProfile,
   type DerivedValues,
 } from './profileDeriver.ts';
+import {
+  loadPatrimonySnapshot,
+  buildPatrimonyBlock,
+  type PatrimonySnapshot,
+} from './patrimonySnapshot.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
