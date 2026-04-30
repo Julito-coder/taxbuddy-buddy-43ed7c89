@@ -91,18 +91,19 @@ export const ContextualChips = ({ onSelect }: Props) => {
 
   return (
     <div
-      className="overflow-x-auto overflow-y-hidden w-full"
+      className="elio-chips-strip overflow-x-auto overflow-y-hidden w-full max-w-full"
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
         WebkitOverflowScrolling: 'touch',
         overscrollBehaviorX: 'contain',
+        touchAction: 'pan-x',
       }}
     >
       <style>{`
         .elio-chips-strip::-webkit-scrollbar { display: none; }
       `}</style>
-      <div className="elio-chips-strip flex gap-2 pb-1">
+      <div className="flex gap-2 pb-1 w-max">
         {chips.map((chip, idx) => (
           <motion.button
             key={chip.id}
