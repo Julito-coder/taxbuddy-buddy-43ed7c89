@@ -116,25 +116,25 @@ export const ProfileModuleDrawer = ({
 
         <div className="flex-1 overflow-y-auto px-6 py-6">{children}</div>
 
-        <footer className="px-6 py-4 border-t border-border flex items-center justify-between gap-3 bg-card">
-          <Button
-            variant="ghost"
-            onClick={() => onOpenChange(false)}
-            disabled={saving}
-            className="text-muted-foreground"
-          >
-            Fermer
-          </Button>
-          <Button onClick={onSave} disabled={saving} className="min-w-[140px]">
-            {saving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Enregistrement
-              </>
-            ) : (
-              'Enregistrer'
-            )}
-          </Button>
+        <footer className="px-6 py-3 border-t border-border bg-card">
+          <div className="flex items-center justify-between gap-3 mb-2 min-h-[20px]">
+            {renderStatus()}
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-muted-foreground hidden sm:block">
+              Tes modifications sont enregistrées automatiquement.
+            </p>
+            <Button onClick={onSave} disabled={saving} className="min-w-[120px] ml-auto">
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Enregistrement
+                </>
+              ) : (
+                'Terminer'
+              )}
+            </Button>
+          </div>
         </footer>
       </SheetContent>
     </Sheet>
