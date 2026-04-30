@@ -58,7 +58,12 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
   const location = useLocation();
   const { signOut } = useAuth();
   const [expanded, setExpanded] = useState<string | null>(null);
-  const touchStartYRef = useRef<number | null>(null);
+  const dragStateRef = useRef<{
+    x: number;
+    y: number;
+    t: number;
+    active: boolean;
+  } | null>(null);
   const pushedHistoryRef = useRef(false);
   const closingViaPopRef = useRef(false);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -156,15 +161,38 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
     };
   }, [open, onOpenChange]);
 
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartYRef.current = e.touches[0].clientY;
+  // Swipe-down to close — only when the gesture STARTS on the header/handle
+  // area, not in the scrollable body. This keeps natural scroll inside the
+  // panel and prevents accidental closes while the user reads the list.
+  const onHeaderTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    dragStateRef.current = {
+      x: t.clientX,
+      y: t.clientY,
+      t: performance.now(),
+      active: true,
+    };
   };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const startY = touchStartYRef.current;
-    touchStartYRef.current = null;
-    if (startY == null) return;
-    const dy = e.changedTouches[0].clientY - startY;
-    if (dy > 80) close();
+  const onHeaderTouchEnd = (e: React.TouchEvent) => {
+    const s = dragStateRef.current;
+    dragStateRef.current = null;
+    if (!s || !s.active) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - s.x;
+    const dy = t.clientY - s.y;
+    const dt = Math.max(1, performance.now() - s.t);
+    const velocity = dy / dt; // px / ms
+
+    // Dynamic threshold: harder to dismiss on tall screens.
+    const distanceThreshold = Math.max(80, window.innerHeight * 0.18);
+    // Must be a downward, clearly vertical gesture.
+    const isVertical = Math.abs(dy) > Math.abs(dx) * 2;
+    const farEnough = dy > distanceThreshold;
+    const flickedDown = dy > 40 && velocity > 0.6;
+
+    if (isVertical && (farEnough || flickedDown)) {
+      close();
+    }
   };
 
   const handleSubItem = (item: SubItem) => {
@@ -219,15 +247,20 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
             animate={{ clipPath: `circle(${revealMaxRadius} at ${revealOrigin})` }}
             exit={{ clipPath: `circle(0px at ${revealOrigin})` }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
           >
-            {/* Drag handle hint */}
-            <div className="pt-2 pb-1 flex justify-center" aria-hidden="true">
-              <span className="block h-1 w-10 rounded-full bg-muted-foreground/30" />
-            </div>
-            {/* Header */}
-            <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between">
+            {/* Drag-to-close zone: handle + sticky header. Touch handlers
+                live HERE, not on the panel, so the scrollable body keeps
+                a fully natural scroll. */}
+            <div
+              onTouchStart={onHeaderTouchStart}
+              onTouchEnd={onHeaderTouchEnd}
+              className="touch-pan-y"
+            >
+              <div className="pt-2 pb-1 flex justify-center cursor-grab active:cursor-grabbing" aria-hidden="true">
+                <span className="block h-1 w-10 rounded-full bg-muted-foreground/30" />
+              </div>
+              {/* Header */}
+              <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between">
               <div>
                 <h2 className="text-base font-bold text-foreground">Tous les outils</h2>
                 <p className="text-[11px] text-muted-foreground">Navigation et simulations</p>
@@ -240,7 +273,8 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
               >
                 <X className="h-5 w-5" />
               </button>
-            </header>
+              </header>
+            </div>
 
             {/* Scroll body */}
             <div
