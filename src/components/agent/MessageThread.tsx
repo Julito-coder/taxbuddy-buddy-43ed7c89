@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { AlertCircle } from 'lucide-react';
 import { ElioMascot3D } from './ElioMascot3D';
+import { ErrorCard } from './ErrorCard';
 import { RichViewRenderer } from '@/components/elio-agent/RichViewRenderer';
-import type { AgentMessage } from '@/hooks/useElioAgent';
+import type { AgentMessage, AgentErrorPayload } from '@/hooks/useElioAgent';
 
 export interface UIMessage extends AgentMessage {
   id: string;
   status?: 'ok' | 'error';
-  errorKind?: 'network' | 'limit';
+  /** Détails d'erreur structurés (network / quota / profile_incomplete / generic) */
+  error?: AgentErrorPayload | null;
 }
 
 interface Props {
@@ -17,6 +17,7 @@ interface Props {
   isStreaming: boolean;
   onRunPrompt?: (prompt: string) => void;
   onConfirmProfileUpdate?: (updates: Array<{ field: string; value: any }>) => void;
+  onRetry?: () => void;
 }
 
 export const MessageThread = ({
