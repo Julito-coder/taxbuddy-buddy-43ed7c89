@@ -260,6 +260,8 @@ export const computeOverallProgress = (data: FiscalProfileData) => {
     qualitativeLabel,
     remainingGain,
     nextModuleId: nextModule?.id,
+    nextModuleTitle: nextModuleMeta?.title,
+    nextModuleGain: nextModuleMeta?.estimatedAnnualGain ?? 0,
     progresses,
   };
 };
