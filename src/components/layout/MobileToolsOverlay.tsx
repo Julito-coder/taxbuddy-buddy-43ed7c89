@@ -182,6 +182,13 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
     navigate(to);
   };
 
+  // Origin of the circular reveal: roughly the "Outils" button (bottom-right of the bottom nav).
+  // BottomNav has 6 evenly-spaced cells over the viewport width, height 68px;
+  // the Outils cell center is at ~ (11/12) of width, ~34px from the bottom.
+  const revealOrigin = 'calc(100% - 8.33vw) calc(100% - 34px)';
+  // Maximum radius needed to cover the whole viewport from that origin.
+  const revealMaxRadius = '160vmax';
+
   return (
     <AnimatePresence>
       {open && (
@@ -196,22 +203,22 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.25 }}
             onClick={close}
           />
-          {/* Slide-up panel. Leaves a small visible band at the top so the
-              backdrop tap target is always reachable. */}
+          {/* Full-screen panel revealed via a circular clip-path expanding
+              from the bottom-right (Outils button origin). */}
           <motion.div
             key="overlay-panel"
             ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label="Tous les outils"
-            className="absolute inset-x-0 bottom-0 top-12 bg-background rounded-t-2xl shadow-2xl flex flex-col outline-none"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'tween', duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0 bg-background shadow-2xl flex flex-col outline-none"
+            initial={{ clipPath: `circle(0px at ${revealOrigin})` }}
+            animate={{ clipPath: `circle(${revealMaxRadius} at ${revealOrigin})` }}
+            exit={{ clipPath: `circle(0px at ${revealOrigin})` }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
