@@ -74,10 +74,8 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
         }}
       />
 
-      <motion.div
-        animate={floatAnim}
-        transition={floatTransition}
-        {...hoverProps}
+      <div
+        className={reduce ? '' : 'animate-elio-float'}
         style={{
           width: '100%',
           height: '100%',
