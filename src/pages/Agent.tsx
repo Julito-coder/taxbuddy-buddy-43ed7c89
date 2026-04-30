@@ -1,5 +1,6 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AgentHeader } from '@/components/agent/AgentHeader';
+import { AgentHero } from '@/components/agent/AgentHero';
 
 const PlaceholderZone = ({ label, minHeight }: { label: string; minHeight: number }) => (
   <div
@@ -31,7 +32,7 @@ const AgentPage = () => {
         {/* Zone scrollable */}
         <div className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-[760px] px-4 py-4 space-y-4">
-            <PlaceholderZone label="Zone Hero (mascotte) — batch 2" minHeight={220} />
+            <AgentHero />
             <PlaceholderZone label="Zone Suggestions — batch 3" minHeight={140} />
             <PlaceholderZone label="Zone Chat — batch 4" minHeight={320} />
           </div>
