@@ -1,6 +1,8 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AgentHeader } from '@/components/agent/AgentHeader';
 import { AgentHero } from '@/components/agent/AgentHero';
+import { ContextualChips } from '@/components/agent/ContextualChips';
+import { QuickActionsGrid } from '@/components/agent/QuickActionsGrid';
 
 const PlaceholderZone = ({ label, minHeight }: { label: string; minHeight: number }) => (
   <div
@@ -17,6 +19,12 @@ const PlaceholderZone = ({ label, minHeight }: { label: string; minHeight: numbe
 );
 
 const AgentPage = () => {
+  // TODO Batch 4 : câbler onSelect au composer
+  const handlePromptSelect = (prompt: string) => {
+    // eslint-disable-next-line no-console
+    console.debug('[Agent] prompt selected:', prompt);
+  };
+
   return (
     <AppLayout>
       <div
@@ -31,9 +39,14 @@ const AgentPage = () => {
 
         {/* Zone scrollable */}
         <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-[760px] px-4 py-4 space-y-4">
+          <div className="mx-auto w-full max-w-[760px] px-4 py-4">
             <AgentHero />
-            <PlaceholderZone label="Zone Suggestions — batch 3" minHeight={140} />
+            <div className="mt-4 mb-6">
+              <ContextualChips onSelect={handlePromptSelect} />
+            </div>
+            <div className="mb-8">
+              <QuickActionsGrid onSelect={handlePromptSelect} />
+            </div>
             <PlaceholderZone label="Zone Chat — batch 4" minHeight={320} />
           </div>
         </div>
