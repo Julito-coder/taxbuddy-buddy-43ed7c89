@@ -4,11 +4,13 @@ import {
   Calculator, Settings, LogOut, Compass, Building2, PiggyBank,
   Heart, Briefcase, ScanSearch, FolderLock, ChevronDown,
 } from 'lucide-react';
-import { useState } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useEffect, useRef, useState } from 'react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetOverlay, SheetPortal } from '@/components/ui/sheet';
+import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAuth } from '@/contexts/AuthContext';
 import { ElioLogo } from './ElioLogo';
+import { cn } from '@/lib/utils';
 
 interface NavItem {
   path: string;
