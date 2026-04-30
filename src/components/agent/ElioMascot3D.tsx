@@ -74,7 +74,8 @@ export const ElioMascot3D = ({ state = 'idle', size }: Props) => {
       style={{
         width: renderSize,
         height: renderSize,
-        perspective: 1000,
+        perspective: 800,
+        perspectiveOrigin: '50% 50%',
       }}
       role="img"
       aria-label="Élio, ton agent fiscal"
