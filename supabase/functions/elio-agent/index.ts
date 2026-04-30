@@ -292,11 +292,21 @@ function buildMissingBlock(p: RawProfile, d: DerivedValues): string {
   return missing.map((m) => `- ${m}`).join('\n');
 }
 
-function buildSystemPrompt(p: RawProfile, d: DerivedValues, profileChangedSinceLastTurn: boolean): string {
+function buildSystemPrompt(
+  p: RawProfile,
+  d: DerivedValues,
+  profileChangedSinceLastTurn: boolean,
+  patrimony: PatrimonySnapshot,
+): string {
   const today = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   const freshnessNotice = profileChangedSinceLastTurn
     ? "\n\n⚠️ L'utilisateur a mis à jour son profil depuis ton dernier message. Reprends en compte les nouvelles valeurs ci-dessous."
     : '';
+
+  const patrimonyBlock = buildPatrimonyBlock(patrimony, {
+    crypto_pnl_2025: p.crypto_pnl_2025,
+    crypto_wallet_address: p.crypto_wallet_address,
+  });
 
   return `Tu es Élio, l'agent IA fiscal et administratif de l'app Élio. Tu aides les particuliers français à comprendre, anticiper et optimiser leur situation fiscale.
 
@@ -321,6 +331,9 @@ ${buildEssentialBlock(p)}
 
 PROFIL CHIFFRÉ
 ${buildNumericBlock(p, d)}
+
+PATRIMOINE DÉTAILLÉ (lu en direct depuis les tables dédiées — source de vérité)
+${patrimonyBlock}
 
 CHAMPS MANQUANTS
 ${buildMissingBlock(p, d)}
