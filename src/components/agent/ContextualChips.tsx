@@ -90,51 +90,58 @@ export const ContextualChips = ({ onSelect }: Props) => {
   }, [user]);
 
   return (
-    <div
-      className="elio-chips-strip overflow-x-auto overflow-y-hidden w-full max-w-full"
-      style={{
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-        WebkitOverflowScrolling: 'touch',
-        overscrollBehaviorX: 'contain',
-        touchAction: 'pan-x',
-      }}
-    >
-      <style>{`
-        .elio-chips-strip::-webkit-scrollbar { display: none; }
-      `}</style>
-      <div className="flex gap-2 pb-1 w-max">
-        {chips.map((chip, idx) => (
-          <motion.button
-            key={chip.id}
-            type="button"
-            onClick={() => onSelect?.(chip.prompt)}
-            initial={reduce ? false : { opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.25,
-              ease: [0.22, 1, 0.36, 1],
-              delay: 0.4 + idx * 0.03,
-            }}
-            className="shrink-0 rounded-full border bg-muted text-foreground transition-colors duration-200 hover:text-primary"
-            style={{
-              height: 36,
-              padding: '0 14px',
-              fontSize: '13px',
-              fontWeight: 500,
-              borderColor: 'hsl(var(--border) / 0.5)',
-              backgroundColor: 'hsl(var(--muted))',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--coral-100)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'hsl(var(--muted))';
-            }}
-          >
-            {chip.label}
-          </motion.button>
-        ))}
+    <div className="relative w-full max-w-full min-w-0 overflow-hidden">
+      <div
+        className="elio-chips-strip overflow-x-auto overflow-y-hidden w-full"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehaviorX: 'contain',
+          touchAction: 'pan-x',
+          // Subtle right-edge fade to hint there is more content to swipe.
+          WebkitMaskImage:
+            'linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%)',
+          maskImage:
+            'linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%)',
+        }}
+      >
+        <style>{`
+          .elio-chips-strip::-webkit-scrollbar { display: none; }
+        `}</style>
+        <div className="flex gap-2 pb-1 pr-6 w-max">
+          {chips.map((chip, idx) => (
+            <motion.button
+              key={chip.id}
+              type="button"
+              onClick={() => onSelect?.(chip.prompt)}
+              initial={reduce ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.25,
+                ease: [0.22, 1, 0.36, 1],
+                delay: 0.4 + idx * 0.03,
+              }}
+              className="shrink-0 rounded-full border bg-muted text-foreground transition-colors duration-200 hover:text-primary text-[12px] sm:text-[13px]"
+              style={{
+                padding: '0 12px',
+                fontWeight: 500,
+                borderColor: 'hsl(var(--border) / 0.5)',
+                backgroundColor: 'hsl(var(--muted))',
+                lineHeight: '32px',
+                height: 32,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--coral-100)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'hsl(var(--muted))';
+              }}
+            >
+              {chip.label}
+            </motion.button>
+          ))}
+        </div>
       </div>
     </div>
   );

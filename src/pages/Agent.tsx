@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AgentHeader } from '@/components/agent/AgentHeader';
@@ -51,79 +51,67 @@ const AgentPage = () => {
     handleSend(prompt);
   };
 
-  // Adjust scroll on viewport changes (mobile keyboard)
-  useEffect(() => {
-    const vv = (window as any).visualViewport as VisualViewport | undefined;
-    if (!vv) return;
-    const onResize = () => {
-      // Trigger reflow so sticky composer stays above keyboard
-      document.documentElement.style.setProperty('--vv-height', `${vv.height}px`);
-    };
-    vv.addEventListener('resize', onResize);
-    onResize();
-    return () => vv.removeEventListener('resize', onResize);
-  }, []);
-
   const fadeDuration = reduce ? 0.001 : 0.25;
   const enterDelay = reduce ? 0 : 0.2;
 
   return (
-    <AppLayout>
+    <AppLayout variant="chat">
       <div
-        className="flex flex-col overflow-x-hidden"
+        className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden"
         style={{
-          height: '100dvh',
-          width: '100%',
-          maxWidth: '100vw',
           background:
             'radial-gradient(120% 60% at 50% 0%, rgba(240, 100, 73, 0.06) 0%, rgba(240, 100, 73, 0) 60%), hsl(var(--background))',
         }}
       >
+        {/* Header — flex child, not sticky. */}
         <AgentHeader />
 
-        {/* Welcome zone (hero + chips + grid) — visible when no messages */}
-        <AnimatePresence mode="wait">
-          {!hasMessages ? (
-            <motion.div
-              key="welcome"
-              initial={false}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -16 }}
-              transition={{ duration: fadeDuration, ease: [0.22, 1, 0.36, 1] }}
-              className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden"
-            >
-              <div className="mx-auto w-full max-w-[760px] px-3 py-4 sm:px-4">
-                <AgentHero />
-                <div className="mt-4 mb-6">
-                  <ContextualChips onSelect={handlePromptSelect} />
+        {/* Center zone — single scrollable area, occupies remaining space. */}
+        <div className="relative flex-1 min-h-0 min-w-0 overflow-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            {!hasMessages ? (
+              <motion.div
+                key="welcome"
+                initial={false}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, y: -16 }}
+                transition={{ duration: fadeDuration, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0 overflow-y-auto overflow-x-hidden"
+              >
+                <div className="mx-auto w-full max-w-[760px] min-w-0 px-3 py-4 sm:px-4">
+                  <AgentHero />
+                  <div className="mt-4 mb-6">
+                    <ContextualChips onSelect={handlePromptSelect} />
+                  </div>
+                  <div className="mb-8">
+                    <QuickActionsGrid onSelect={handlePromptSelect} />
+                  </div>
                 </div>
-                <div className="mb-8">
-                  <QuickActionsGrid onSelect={handlePromptSelect} />
-                </div>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="thread"
-              initial={reduce ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: reduce ? 0.001 : 0.3,
-                ease: [0.22, 1, 0.36, 1],
-                delay: enterDelay,
-              }}
-              className="flex flex-1 min-h-0 min-w-0 flex-col overflow-x-hidden"
-            >
-              <MessageThread
-                messages={uiMessages}
-                isStreaming={isLoading}
-                onRunPrompt={handlePromptSelect}
-                onConfirmProfileUpdate={confirmProfileUpdates}
-                onRetry={retryLastMessage}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="thread"
+                initial={reduce ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: reduce ? 0.001 : 0.3,
+                  ease: [0.22, 1, 0.36, 1],
+                  delay: enterDelay,
+                }}
+                className="absolute inset-0 flex min-h-0 min-w-0 flex-col overflow-hidden"
+              >
+                <MessageThread
+                  messages={uiMessages}
+                  isStreaming={isLoading}
+                  onRunPrompt={handlePromptSelect}
+                  onConfirmProfileUpdate={confirmProfileUpdates}
+                  onRetry={retryLastMessage}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
+        {/* Composer — flex child at the very bottom, no longer sticky. */}
         <AgentComposer
           value={input}
           onChange={setInput}
