@@ -561,14 +561,24 @@ serve(async (req) => {
       .maybeSingle();
     const currentCount = usageRow?.messages_count || 0;
 
-    // --- Load profile (frais) ---
-    const { data: profile } = await adminClient
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
+    // --- Load profile + patrimony snapshot in parallel ---
+    const [profileRes, patrimony] = await Promise.all([
+      adminClient
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle(),
+      loadPatrimonySnapshot(adminClient, userId),
+    ]);
+    const profile = profileRes.data;
 
     const derivedCtx = deriveProfile(profile);
+    console.log('[elio-agent] patrimony snapshot loaded', {
+      crypto_accounts: patrimony.crypto.accounts_count,
+      crypto_tx: patrimony.crypto.transactions_count,
+      has_computation: !!patrimony.crypto.computation,
+      re_projects: patrimony.real_estate.projects_count,
+    });
 
     // --- Load conversation history ---
     let conversation: any = null;
@@ -589,7 +599,12 @@ serve(async (req) => {
       : 0;
     const profileChangedSinceLastTurn = !!(conversation && profileUpdatedAt > lastSnapshot);
 
-    const systemPrompt = buildSystemPrompt(derivedCtx.raw, derivedCtx.derived, profileChangedSinceLastTurn);
+    const systemPrompt = buildSystemPrompt(
+      derivedCtx.raw,
+      derivedCtx.derived,
+      profileChangedSinceLastTurn,
+      patrimony,
+    );
 
     const previousMessages: any[] = Array.isArray(conversation?.messages) ? conversation.messages : [];
     const recentHistory = previousMessages
