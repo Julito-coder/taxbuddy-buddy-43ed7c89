@@ -116,9 +116,12 @@ Contraintes absolues :
 Retourne UNIQUEMENT du JSON valide :
 { "context": "...", "title": "...", "body": "..." }`;
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
   try {
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
+      signal: controller.signal,
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
@@ -181,6 +184,8 @@ Retourne UNIQUEMENT du JSON valide :
   } catch (err) {
     console.error('News generation failed:', err);
     return null;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
