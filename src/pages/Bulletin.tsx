@@ -43,7 +43,7 @@ const Bulletin = () => {
     );
   }
 
-  const showEmptyState = !data || data.profileCompletionPct < 30;
+  const showEmptyState = !data || data.profileCompletionPct < 50;
 
   return (
     <AppLayout>
