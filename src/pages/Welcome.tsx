@@ -2,12 +2,6 @@ import { useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
 import { useAuth } from '@/contexts/AuthContext';
 import { LandingHeader } from '@/components/landing/Header';
 import { LandingHero } from '@/components/landing/Hero';
@@ -16,6 +10,7 @@ import { LandingSteps } from '@/components/landing/Steps';
 import { LandingFeatures } from '@/components/landing/Features';
 import { LandingPricing } from '@/components/landing/Pricing';
 import { LandingTrust } from '@/components/landing/Trust';
+import { LandingFAQ } from '@/components/landing/FAQ';
 import { Loader2 } from 'lucide-react';
 
 const SIGNUP_HREF = '/quiz';
@@ -28,38 +23,6 @@ const fadeUp = {
   transition: { duration: 0.4, ease: 'easeOut' as const },
 } as const;
 
-
-// ─────────────────────────────────────── FAQ
-function FAQ() {
-  const items = [
-    { q: 'Est-ce que c\'est vraiment gratuit ?', a: "Oui. Le diagnostic, le Score Élio et les actions essentielles sont gratuits, sans carte bancaire. Le plan Premium est optionnel pour débloquer les fonctionnalités avancées." },
-    { q: 'Élio remplace-t-il mon comptable ?', a: "Non. Élio fournit des estimations à titre indicatif et te guide vers les bonnes démarches. Pour toute décision fiscale importante, consulte un professionnel habilité." },
-    { q: 'Mes données sont-elles en sécurité ?', a: "Tes données sont chiffrées et hébergées en Europe. Tu peux exporter ou supprimer ton compte à tout moment depuis ton profil." },
-    { q: 'Puis-je l\'utiliser sur mobile ?', a: "Oui. Élio est une application web installable (PWA) optimisée mobile. Tu peux l'ajouter à ton écran d'accueil iPhone ou Android en un clic." },
-    { q: 'Quand passer en Premium ?', a: "Quand Élio t'a déjà fait gagner plus que le prix de l'abonnement. La plupart des utilisateurs récupèrent 10 à 20× le coût annuel." },
-  ];
-  return (
-    <section id="faq" className="mx-auto max-w-3xl px-ds-4 py-ds-24 sm:px-ds-6">
-      <motion.div {...fadeUp} className="text-center">
-        <h2 className="text-ds-3xl font-bold text-ds-text-primary">Questions fréquentes</h2>
-      </motion.div>
-      <motion.div {...fadeUp} className="mt-ds-10">
-        <Accordion type="single" collapsible className="space-y-ds-2">
-          {items.map((item, i) => (
-            <AccordionItem key={i} value={`item-${i}`} className="rounded-ds-md border border-ds-border-light bg-ds-bg-tertiary px-ds-4">
-              <AccordionTrigger className="text-left text-ds-base font-semibold text-ds-text-primary hover:no-underline">
-                {item.q}
-              </AccordionTrigger>
-              <AccordionContent className="text-ds-base text-ds-text-secondary">
-                {item.a}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </motion.div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────── Final CTA
 function FinalCTA() {
@@ -193,7 +156,7 @@ const Welcome = () => {
         <LandingFeatures />
         <LandingPricing />
         <LandingTrust />
-        <FAQ />
+        <LandingFAQ />
         <FinalCTA />
       </main>
       <LandingFooter />
