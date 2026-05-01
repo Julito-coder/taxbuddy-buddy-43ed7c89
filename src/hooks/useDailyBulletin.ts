@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { loadUserProfile, UserProfile } from '@/lib/dashboardService';
+import { loadFiscalProfile, calculateProfileCompletion } from '@/lib/fiscalProfileService';
 import { selectActionOfTheDay, getNextDeadline, computeCumulativeGain, BulletinAction, BulletinDeadline } from '@/lib/bulletinEngine';
 import {
   getTodayBulletin,
