@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LandingHeader } from '@/components/landing/Header';
@@ -11,47 +10,11 @@ import { LandingFeatures } from '@/components/landing/Features';
 import { LandingPricing } from '@/components/landing/Pricing';
 import { LandingTrust } from '@/components/landing/Trust';
 import { LandingFAQ } from '@/components/landing/FAQ';
+import { LandingFinalCTA } from '@/components/landing/FinalCTA';
 import { Loader2 } from 'lucide-react';
 
 const SIGNUP_HREF = '/quiz';
 const LOGIN_HREF = '/auth?mode=login&from=welcome';
-
-const fadeUp = {
-  initial: { opacity: 0, y: 16 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-80px' },
-  transition: { duration: 0.4, ease: 'easeOut' as const },
-} as const;
-
-
-// ─────────────────────────────────────── Final CTA
-function FinalCTA() {
-  return (
-    <section className="px-ds-4 pb-ds-24 sm:px-ds-6">
-      <motion.div
-        {...fadeUp}
-        className="relative mx-auto max-w-6xl overflow-hidden rounded-ds-xl px-ds-8 py-ds-16 text-center sm:px-ds-16 sm:py-ds-20"
-        style={{
-          background: 'linear-gradient(135deg, var(--ds-color-primary) 0%, #1F4366 60%, var(--ds-color-accent-light) 130%)',
-        }}
-      >
-        <div aria-hidden="true" className="absolute inset-0 opacity-20" style={{ background: 'radial-gradient(60% 60% at 50% 0%, white, transparent)' }} />
-        <div className="relative">
-          <h2 className="text-ds-3xl font-bold text-ds-text-inverse">
-            Commence à récupérer ton argent dès aujourd'hui.
-          </h2>
-          <p className="mx-auto mt-ds-4 max-w-xl text-ds-base text-ds-text-inverse/85">
-            Diagnostic gratuit en 90 secondes. Sans carte bancaire.
-          </p>
-          <Link to={SIGNUP_HREF} className="ds-btn ds-btn-inverse mt-ds-8">
-            Créer mon compte gratuit
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </motion.div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────── Footer
 function LandingFooter() {
@@ -157,7 +120,7 @@ const Welcome = () => {
         <LandingPricing />
         <LandingTrust />
         <LandingFAQ />
-        <FinalCTA />
+        <LandingFinalCTA />
       </main>
       <LandingFooter />
     </div>

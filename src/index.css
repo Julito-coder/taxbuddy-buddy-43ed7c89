@@ -1831,4 +1831,152 @@
       transition: none;
     }
   }
+
+  /* ─────────────────────── Landing : Final CTA (Batch 11) */
+
+  .lp-final-cta {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%);
+    padding: var(--s24) var(--s4);
+  }
+  @media (min-width: 640px) {
+    .lp-final-cta { padding: var(--s32) var(--s6); }
+  }
+
+  /* Glow ambient coral — centré mobile, asymétrique desktop */
+  .lp-final-cta::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(240, 100, 73, 0.22) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  @media (min-width: 1024px) {
+    .lp-final-cta::before {
+      top: 50%;
+      left: auto;
+      right: -10%;
+      transform: translateY(-50%);
+      width: 600px;
+      height: 600px;
+    }
+  }
+
+  .lp-final-cta-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s10);
+    text-align: center;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .lp-final-cta-inner {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s16);
+      text-align: left;
+    }
+  }
+
+  .lp-final-cta-text {
+    max-width: 640px;
+  }
+  .lp-final-cta-h2 {
+    margin: 0 0 var(--s5);
+    font-size: clamp(32px, 4.5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--ds-color-text-inverse);
+    text-wrap: balance;
+  }
+  .lp-final-cta-paragraph {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.72);
+    max-width: 540px;
+    text-wrap: pretty;
+  }
+
+  /* Actions: column mobile (stack full-width) → row tablet (côte à côte) → column desktop (vertical) */
+  .lp-final-cta-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+    width: 100%;
+    max-width: 320px;
+  }
+  @media (min-width: 640px) {
+    .lp-final-cta-actions {
+      flex-direction: row;
+      max-width: none;
+      width: auto;
+      justify-content: center;
+    }
+  }
+  @media (min-width: 1024px) {
+    .lp-final-cta-actions {
+      flex-direction: column;
+      width: auto;
+      flex-shrink: 0;
+      gap: var(--s3);
+    }
+  }
+
+  /* Primary CTA avec icône inline */
+  .lp-final-cta-primary {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s2);
+  }
+  @media (min-width: 640px) {
+    .lp-final-cta-primary {
+      width: auto;
+    }
+  }
+  .lp-final-cta-primary-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    transition: transform var(--duration) var(--ease);
+  }
+  .lp-final-cta-primary:hover .lp-final-cta-primary-icon {
+    transform: translateX(2px);
+  }
+
+  /* Ghost variant pour fond dark */
+  .lp-final-cta-ghost {
+    background: transparent;
+    color: var(--ds-color-text-inverse);
+    border: 1.5px solid rgba(255, 255, 255, 0.24);
+    width: 100%;
+    transition:
+      background var(--duration) var(--ease),
+      border-color var(--duration) var(--ease),
+      transform var(--duration) var(--ease);
+  }
+  .lp-final-cta-ghost:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.40);
+    transform: translateY(-2px);
+  }
+  @media (min-width: 640px) {
+    .lp-final-cta-ghost {
+      width: auto;
+    }
+  }
 }
