@@ -54,14 +54,21 @@ export function useDailyBulletin() {
 
       const firstName = profile.fullName?.split(' ')[0] || '';
 
-      // Score de complétion simplifié
-      const filledFields = [
-        profile.isEmployee, profile.isSelfEmployed, profile.isRetired, profile.isInvestor,
-        profile.grossMonthlySalary > 0, profile.netMonthlySalary > 0,
-        profile.childrenCount > 0, profile.familyStatus !== 'single',
-        profile.isHomeowner, profile.onboardingCompleted,
-      ].filter(Boolean).length;
-      const profileCompletionPct = Math.round((filledFields / 10) * 100);
+      // Score de complétion basé sur le profil fiscal détaillé (cohérent avec /profil/fiscal)
+      let profileCompletionPct = 0;
+      try {
+        const fiscalProfile = await loadFiscalProfile(user.id);
+        profileCompletionPct = calculateProfileCompletion(fiscalProfile);
+      } catch {
+        // Fallback : heuristique simple sur le profil dashboard
+        const filledFields = [
+          profile.isEmployee, profile.isSelfEmployed, profile.isRetired, profile.isInvestor,
+          profile.grossMonthlySalary > 0, profile.netMonthlySalary > 0,
+          profile.childrenCount > 0, profile.familyStatus !== 'single',
+          profile.isHomeowner, profile.onboardingCompleted,
+        ].filter(Boolean).length;
+        profileCompletionPct = Math.round((filledFields / 10) * 100);
+      }
 
       // Streak
       const streak = await updateStreak(user.id);
