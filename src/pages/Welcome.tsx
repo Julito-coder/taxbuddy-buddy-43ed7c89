@@ -15,6 +15,7 @@ import { LandingStats } from '@/components/landing/Stats';
 import { LandingSteps } from '@/components/landing/Steps';
 import { LandingFeatures } from '@/components/landing/Features';
 import { LandingPricing } from '@/components/landing/Pricing';
+import { LandingTrust } from '@/components/landing/Trust';
 import { Loader2 } from 'lucide-react';
 
 const SIGNUP_HREF = '/quiz';
@@ -27,51 +28,6 @@ const fadeUp = {
   transition: { duration: 0.4, ease: 'easeOut' as const },
 } as const;
 
-
-// ─────────────────────────────────────── Testimonials
-function Testimonials() {
-  const items = [
-    { name: 'Léa, 22 ans', role: 'Étudiante', quote: "J'ai découvert que j'avais droit à 220 €/mois d'APL et à la prime d'activité. En 5 minutes.", initials: 'LM', avatarBg: 'var(--ds-color-primary)' },
-    { name: 'Thomas, 29 ans', role: 'Développeur CDI', quote: "Élio m'a fait gagner 680 € sur ma déclaration grâce aux frais réels télétravail.", initials: 'TR', avatarBg: 'var(--ds-color-accent)' },
-    { name: 'Sarah & Karim', role: 'Couple, 2 enfants', quote: "On a enfin compris notre quotient familial et optimisé la CMG. 1 200 €/an récupérés.", initials: 'SK', avatarBg: '#4B8264' },
-  ];
-  return (
-    <section className="bg-ds-bg-secondary/40 py-ds-24">
-      <div className="mx-auto max-w-7xl px-ds-4 sm:px-ds-6">
-        <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
-          <h2 className="text-ds-3xl font-bold text-ds-text-primary">Ils ont récupéré leur argent</h2>
-        </motion.div>
-        <div className="mt-ds-12 grid gap-ds-6 md:grid-cols-3">
-          {items.map((t, i) => (
-            <motion.div key={t.name} {...fadeUp} transition={{ ...fadeUp.transition, delay: i * 0.1 }}>
-              <div className="ds-card h-full">
-                <div className="flex items-center gap-ds-3">
-                  <div
-                    className="flex h-12 w-12 items-center justify-center rounded-ds-pill text-ds-base font-bold text-ds-text-inverse"
-                    style={{ background: t.avatarBg }}
-                    aria-hidden="true"
-                  >
-                    {t.initials}
-                  </div>
-                  <div>
-                    <p className="text-ds-base font-semibold text-ds-text-primary">{t.name}</p>
-                    <p className="text-ds-xs text-ds-text-tertiary">{t.role}</p>
-                  </div>
-                </div>
-                <p className="mt-ds-4 text-ds-base text-ds-text-secondary" style={{ lineHeight: 'var(--ds-lh-relaxed)' }}>
-                  « {t.quote} »
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        <p className="mt-ds-6 text-center text-ds-xs text-ds-text-tertiary">
-          Résultats basés sur des profils types représentatifs.
-        </p>
-      </div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────── FAQ
 function FAQ() {
@@ -236,7 +192,7 @@ const Welcome = () => {
         <LandingSteps />
         <LandingFeatures />
         <LandingPricing />
-        <Testimonials />
+        <LandingTrust />
         <FAQ />
         <FinalCTA />
       </main>

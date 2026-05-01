@@ -1561,4 +1561,125 @@
     width: 100%;
     margin-top: var(--s4);
   }
+
+  /* ─────────────────────── Landing : Trust (Batch 9) */
+
+  .lp-trust {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%);
+    padding: var(--s24) var(--s4) var(--s32);
+  }
+  @media (min-width: 640px) {
+    .lp-trust { padding-left: var(--s6); padding-right: var(--s6); }
+  }
+
+  /* Glow ambient coral en haut-droit */
+  .lp-trust::before {
+    content: "";
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(240, 100, 73, 0.18) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Fade gradient en bas pour transition smooth dark→light */
+  .lp-trust::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(180deg, transparent 0%, var(--surface-1) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .lp-trust-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .lp-trust-header {
+    max-width: 720px;
+    margin: 0 auto var(--s12);
+    text-align: center;
+  }
+  .lp-trust-label {
+    margin: 0 0 var(--s4);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--coral-500);
+  }
+  .lp-trust-h2 {
+    margin: 0 0 var(--s5);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--ds-color-text-inverse);
+    text-wrap: balance;
+  }
+  .lp-trust-manifesto {
+    max-width: 720px;
+    margin: 0 auto;
+    font-size: 17px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.72);
+    text-wrap: pretty;
+  }
+
+  /* Grille logos */
+  .lp-trust-logos {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s6) var(--s4);
+    align-items: center;
+    justify-items: center;
+  }
+  @media (min-width: 640px) {
+    .lp-trust-logos {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--s8) var(--s6);
+    }
+  }
+  @media (min-width: 1024px) {
+    .lp-trust-logos {
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--s4);
+    }
+  }
+
+  .lp-trust-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    color: rgba(255, 255, 255, 0.6);
+    transition:
+      color var(--duration) var(--ease),
+      transform var(--duration) var(--ease);
+  }
+  .lp-trust-logo:hover {
+    color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+  }
+  .lp-trust-logo svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    display: block;
+  }
 }
