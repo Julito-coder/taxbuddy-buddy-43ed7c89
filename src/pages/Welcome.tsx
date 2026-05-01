@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Check, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -14,6 +14,7 @@ import { LandingHero } from '@/components/landing/Hero';
 import { LandingStats } from '@/components/landing/Stats';
 import { LandingSteps } from '@/components/landing/Steps';
 import { LandingFeatures } from '@/components/landing/Features';
+import { LandingPricing } from '@/components/landing/Pricing';
 import { Loader2 } from 'lucide-react';
 
 const SIGNUP_HREF = '/quiz';
@@ -26,85 +27,6 @@ const fadeUp = {
   transition: { duration: 0.4, ease: 'easeOut' as const },
 } as const;
 
-
-// ─────────────────────────────────────── Pricing
-function Pricing() {
-  const free = [
-    'Diagnostic complet + Score Élio',
-    'Top 3 actions personnalisées',
-    'Calendrier sans montants',
-    '1 scan fiscal par mois',
-    'Agent IA limité (5 requêtes/jour)',
-  ];
-  const premium = [
-    'Tout le plan Gratuit',
-    'Calendrier avec montants + trésorerie',
-    'Scans fiscaux illimités',
-    'Agent IA illimité + actions + exports',
-    'Simulateurs complets + PDF',
-    'Coffre-fort 5 Go',
-    'Coach fiscal proactif',
-  ];
-  return (
-    <section id="pricing" className="mx-auto max-w-7xl px-ds-4 py-ds-24 sm:px-ds-6">
-      <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
-        <h2 className="text-ds-3xl font-bold text-ds-text-primary">Des tarifs simples</h2>
-        <p className="mt-ds-4 text-ds-base text-ds-text-secondary">
-          Commence gratuitement. Passe en Premium quand Élio te rapporte.
-        </p>
-      </motion.div>
-      <div className="mx-auto mt-ds-12 grid max-w-4xl items-stretch gap-ds-6 md:grid-cols-2">
-        <motion.div {...fadeUp}>
-          <div className="ds-card flex h-full flex-col p-ds-8">
-            <h3 className="text-ds-xl font-semibold text-ds-text-primary">Gratuit</h3>
-            <p className="mt-ds-1 text-ds-sm text-ds-text-secondary">Pour découvrir Élio</p>
-            <p className="mt-ds-6 text-ds-4xl font-bold text-ds-text-primary">
-              0 €<span className="text-ds-base font-normal text-ds-text-tertiary">/mois</span>
-            </p>
-            <ul className="mt-ds-6 flex-1 space-y-ds-3">
-              {free.map((f) => (
-                <li key={f} className="flex items-start gap-ds-2 text-ds-base text-ds-text-primary">
-                  <Check className="mt-1 h-4 w-4 shrink-0 text-ds-success" aria-hidden="true" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link to={SIGNUP_HREF} className="ds-btn ds-btn-secondary w-full mt-ds-8">
-              Commencer gratuitement
-            </Link>
-          </div>
-        </motion.div>
-        <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.1 }}>
-          <div className="ds-card-elevated relative flex h-full flex-col">
-            <div
-              className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-ds-pill px-ds-3 py-ds-1 text-ds-xs font-semibold uppercase tracking-wider"
-              style={{ background: 'var(--ds-color-accent)', color: 'var(--ds-color-text-inverse)' }}
-            >
-              Le plus populaire
-            </div>
-            <h3 className="text-ds-xl font-semibold text-ds-text-primary">Premium</h3>
-            <p className="mt-ds-1 text-ds-sm text-ds-text-secondary">Pour récupérer chaque euro</p>
-            <p className="mt-ds-6 text-ds-4xl font-bold text-ds-text-primary">
-              9,99 €<span className="text-ds-base font-normal text-ds-text-tertiary">/mois</span>
-            </p>
-            <p className="text-ds-xs text-ds-text-tertiary">ou 99 €/an (2 mois offerts)</p>
-            <ul className="mt-ds-6 flex-1 space-y-ds-3">
-              {premium.map((f) => (
-                <li key={f} className="flex items-start gap-ds-2 text-ds-base text-ds-text-primary">
-                  <Check className="mt-1 h-4 w-4 shrink-0 text-ds-success" aria-hidden="true" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link to={SIGNUP_HREF} className="ds-btn ds-btn-primary w-full mt-ds-8">
-              Commencer gratuitement
-            </Link>
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────── Testimonials
 function Testimonials() {
@@ -313,7 +235,7 @@ const Welcome = () => {
         <LandingStats />
         <LandingSteps />
         <LandingFeatures />
-        <Pricing />
+        <LandingPricing />
         <Testimonials />
         <FAQ />
         <FinalCTA />
