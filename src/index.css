@@ -633,15 +633,17 @@
   .lp-hero-badge {
     display: inline-flex;
     align-items: center;
-    gap: var(--s2);
-    padding: 8px var(--s3);
+    padding: 8px 16px;
     background: var(--coral-50);
     color: var(--coral-500);
-    border: 1px solid rgba(240, 100, 73, 0.15);
+    border: 1px solid var(--coral-100);
     border-radius: var(--r-pill);
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
+    line-height: 1.4;
+    text-wrap: balance;
+    max-width: 100%;
   }
 
   .lp-hero-h1 {
@@ -1181,7 +1183,7 @@
     padding: var(--s10);
     background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 100%);
     border-color: transparent;
-    color: var(--text-inverse);
+    color: var(--ds-color-text-inverse);
     box-shadow: var(--shadow-md);
   }
   .lp-bento-card-featured:hover {
@@ -1189,7 +1191,7 @@
     box-shadow: var(--shadow-lg), 0 0 48px rgba(240, 100, 73, 0.20);
     transform: translateY(-2px);
   }
-  .lp-bento-card-featured .lp-bento-title { color: var(--text-inverse); }
+  .lp-bento-card-featured .lp-bento-title { color: var(--ds-color-text-inverse); }
   .lp-bento-card-featured .lp-bento-desc  { color: rgba(255, 255, 255, 0.78); }
 
   /* Wide card (Agent IA Élio) — flex-row sur ≥1024px */
@@ -1291,7 +1293,7 @@
     text-align: right;
   }
   .lp-bento-card-featured .lp-bento-preview-value {
-    color: var(--text-inverse);
+    color: var(--ds-color-text-inverse);
   }
 
   .lp-bento-preview-qa {
@@ -1582,7 +1584,7 @@
     right: -200px;
     width: 480px;
     height: 480px;
-    background: radial-gradient(circle, rgba(240, 100, 73, 0.18) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(240, 100, 73, 0.30) 0%, transparent 60%);
     pointer-events: none;
     z-index: 0;
   }
@@ -1594,7 +1596,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 120px;
+    height: 80px;
     background: linear-gradient(180deg, transparent 0%, var(--surface-1) 100%);
     pointer-events: none;
     z-index: 0;

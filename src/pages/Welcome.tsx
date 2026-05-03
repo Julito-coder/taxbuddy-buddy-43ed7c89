@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { LandingHeader } from '@/components/landing/Header';
 import { LandingHero } from '@/components/landing/Hero';
@@ -12,9 +12,6 @@ import { LandingFAQ } from '@/components/landing/FAQ';
 import { LandingFinalCTA } from '@/components/landing/FinalCTA';
 import { LandingFooter } from '@/components/landing/Footer';
 import { Loader2 } from 'lucide-react';
-
-const SIGNUP_HREF = '/quiz';
-const LOGIN_HREF = '/auth?mode=login&from=welcome';
 
 // ─────────────────────────────────────── Page
 const Welcome = () => {

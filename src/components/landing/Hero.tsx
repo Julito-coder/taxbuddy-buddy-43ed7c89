@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Zap } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { usePhoneTilt } from './hooks/usePhoneTilt';
 
 const SIGNUP_HREF = '/quiz';
@@ -11,8 +11,7 @@ export function LandingHero() {
       <div className="lp-hero-inner">
         <div className="lp-hero-content">
           <span className="lp-hero-badge">
-            <Zap className="h-3.5 w-3.5" aria-hidden="true" />
-            Diagnostic en 90 secondes
+            Le pro que tu n'avais pas les moyens de payer.
           </span>
 
           <h1 className="lp-hero-h1">
@@ -20,8 +19,9 @@ export function LandingHero() {
           </h1>
 
           <p className="lp-hero-description">
-            Élio scanne tes impôts, tes aides oubliées et tes contrats pour te montrer{' '}
-            <strong>combien tu peux récupérer</strong>. Sans expertise comptable, sans paperasse.
+            Élio détecte ce que tu peux récupérer en 90 secondes. Aides oubliées,
+            optimisations fiscales, contrats sous-optimisés — <strong>tout, sans
+            expert-comptable.</strong>
           </p>
 
           <div className="lp-hero-actions">
