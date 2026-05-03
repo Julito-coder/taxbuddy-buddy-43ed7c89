@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LandingHeader } from '@/components/landing/Header';
 import { LandingHero } from '@/components/landing/Hero';
@@ -11,68 +10,11 @@ import { LandingPricing } from '@/components/landing/Pricing';
 import { LandingTrust } from '@/components/landing/Trust';
 import { LandingFAQ } from '@/components/landing/FAQ';
 import { LandingFinalCTA } from '@/components/landing/FinalCTA';
+import { LandingFooter } from '@/components/landing/Footer';
 import { Loader2 } from 'lucide-react';
 
 const SIGNUP_HREF = '/quiz';
 const LOGIN_HREF = '/auth?mode=login&from=welcome';
-
-// ─────────────────────────────────────── Footer
-function LandingFooter() {
-  const linkClass =
-    'inline-flex items-center min-h-[44px] text-ds-base text-ds-text-secondary hover:text-ds-primary transition-colors';
-  return (
-    <footer className="border-t border-ds-border-light bg-ds-bg-secondary/40">
-      <div className="mx-auto max-w-7xl px-ds-4 py-ds-16 sm:px-ds-6">
-        <div className="grid gap-ds-10 sm:grid-cols-2 md:grid-cols-4">
-          <div>
-            <div className="flex items-center gap-ds-2">
-              <div
-                className="flex h-9 w-9 items-center justify-center rounded-ds-md font-bold"
-                style={{ background: 'var(--ds-color-primary)', color: 'var(--ds-color-text-inverse)' }}
-              >
-                É
-              </div>
-              <span className="text-ds-base font-bold text-ds-text-primary">Élio</span>
-            </div>
-            <p className="mt-ds-3 text-ds-sm text-ds-text-secondary">
-              Le copilote administratif et financier des Français.
-            </p>
-          </div>
-          <div>
-            <p className="text-ds-xs font-semibold uppercase tracking-wider text-ds-text-primary">Produit</p>
-            <ul className="mt-ds-3 space-y-ds-1">
-              <li><a href="#features" className={linkClass}>Fonctionnalités</a></li>
-              <li><a href="#pricing" className={linkClass}>Tarifs</a></li>
-              <li><Link to="/auth" className={linkClass}>Se connecter</Link></li>
-            </ul>
-          </div>
-          <div>
-            <p className="text-ds-xs font-semibold uppercase tracking-wider text-ds-text-primary">Ressources</p>
-            <ul className="mt-ds-3 space-y-ds-1">
-              <li><a href="#faq" className={linkClass}>FAQ</a></li>
-              <li><a href="mailto:contact@eliotax.fr" className={linkClass}>Contact</a></li>
-            </ul>
-          </div>
-          <div>
-            <p className="text-ds-xs font-semibold uppercase tracking-wider text-ds-text-primary">Légal</p>
-            <ul className="mt-ds-3 space-y-ds-1">
-              <li><Link to="/legal/mentions-legales" className={linkClass}>Mentions légales</Link></li>
-              <li><Link to="/legal/confidentialite" className={linkClass}>Confidentialité</Link></li>
-              <li><Link to="/legal/cgu" className={linkClass}>CGU</Link></li>
-            </ul>
-          </div>
-        </div>
-        <div className="mt-ds-12 flex flex-col gap-ds-4 border-t border-ds-border-light pt-ds-6 text-ds-xs text-ds-text-tertiary sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Élio. Tous droits réservés.</p>
-          <p className="flex items-center gap-ds-2">
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            Élio fournit des estimations à titre indicatif. Pour toute décision fiscale, consulte un professionnel habilité.
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 // ─────────────────────────────────────── Page
 const Welcome = () => {

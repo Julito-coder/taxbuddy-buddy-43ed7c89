@@ -61,7 +61,7 @@ const LOGOS: TrustLogo[] = [
 
 function LandingTrustBase() {
   return (
-    <section className="lp-trust">
+    <section className="lp-trust" id="trust">
       <div className="lp-trust-inner">
         <div className="lp-trust-header">
           <p className="lp-trust-label">Sources officielles</p>
