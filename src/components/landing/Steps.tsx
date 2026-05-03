@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useScrollReveal } from './hooks/useScrollReveal';
 
 const STEPS = [
   {
@@ -19,8 +20,9 @@ const STEPS = [
 ];
 
 function LandingStepsBase() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
   return (
-    <section className="lp-steps" id="how" aria-labelledby="lp-steps-title">
+    <section ref={ref} className="lp-steps" id="how" aria-labelledby="lp-steps-title">
       <div className="lp-steps-header">
         <p className="lp-steps-label">Comment ça marche</p>
         <h2 id="lp-steps-title" className="lp-steps-h2">
@@ -31,8 +33,13 @@ function LandingStepsBase() {
         </p>
       </div>
       <ol className="lp-steps-grid">
-        {STEPS.map((s) => (
-          <li key={s.n} className="lp-step-item">
+        {STEPS.map((s, i) => (
+          <li
+            key={s.n}
+            className="lp-step-item lp-reveal"
+            data-cascade={i + 1}
+            data-revealed={isVisible || undefined}
+          >
             <article className="lp-step">
               <span className="lp-step-number" aria-hidden="true">{s.n}</span>
               <h3 className="lp-step-title">{s.title}</h3>

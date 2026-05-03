@@ -1,5 +1,6 @@
 import { useState, useId, type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useScrollReveal } from './hooks/useScrollReveal';
 
 type FAQItem = { q: string; a: ReactNode };
 
@@ -34,11 +35,15 @@ const ITEMS: FAQItem[] = [
 export function LandingFAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const baseId = useId();
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
 
   return (
-    <section className="lp-faq" id="faq">
+    <section ref={ref} className="lp-faq" id="faq">
       <div className="lp-faq-inner">
-        <div className="lp-faq-header">
+        <div
+          className="lp-faq-header lp-reveal"
+          data-revealed={isVisible || undefined}
+        >
           <p className="lp-faq-label">Questions</p>
           <h2 className="lp-faq-h2">Tout ce que tu te demandes avant de te lancer.</h2>
           <p className="lp-faq-subtitle">
@@ -51,7 +56,12 @@ export function LandingFAQ() {
             const triggerId = `${baseId}-trigger-${i}`;
             const contentId = `${baseId}-content-${i}`;
             return (
-              <li key={item.q} className="lp-faq-item">
+              <li
+                key={item.q}
+                className="lp-faq-item lp-reveal"
+                data-cascade={i + 1}
+                data-revealed={isVisible || undefined}
+              >
                 <h3 className="lp-faq-heading">
                   <button
                     type="button"

@@ -1,5 +1,6 @@
 import { memo, type ComponentType, type SVGProps } from 'react';
 import { ScanLine, HandCoins, CalendarClock } from 'lucide-react';
+import { useScrollReveal } from './hooks/useScrollReveal';
 
 type LucideIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -82,9 +83,13 @@ function AgentPreview() {
   );
 }
 
-function FeaturedCardEl({ card }: { card: FeaturedCard }) {
+function FeaturedCardEl({ card, index, start }: { card: FeaturedCard; index: number; start: boolean }) {
   return (
-    <article className="lp-bento-card lp-bento-card-featured">
+    <article
+      className="lp-bento-card lp-bento-card-featured lp-reveal-scale"
+      data-cascade={index + 1}
+      data-revealed={start || undefined}
+    >
       <h3 className="lp-bento-title">{card.title}</h3>
       <p className="lp-bento-desc">{card.desc}</p>
       <BulletinPreview />
@@ -92,10 +97,14 @@ function FeaturedCardEl({ card }: { card: FeaturedCard }) {
   );
 }
 
-function IconCardEl({ card }: { card: IconCard }) {
+function IconCardEl({ card, index, start }: { card: IconCard; index: number; start: boolean }) {
   const Icon = card.icon;
   return (
-    <article className="lp-bento-card lp-bento-card-single">
+    <article
+      className="lp-bento-card lp-bento-card-single lp-reveal-scale"
+      data-cascade={index + 1}
+      data-revealed={start || undefined}
+    >
       <div className={`lp-bento-icon lp-bento-icon-${card.iconBg}`} aria-hidden="true">
         <Icon className="lp-bento-icon-svg" />
       </div>
@@ -105,9 +114,13 @@ function IconCardEl({ card }: { card: IconCard }) {
   );
 }
 
-function WideCardEl({ card }: { card: WideCard }) {
+function WideCardEl({ card, index, start }: { card: WideCard; index: number; start: boolean }) {
   return (
-    <article className="lp-bento-card lp-bento-card-wide">
+    <article
+      className="lp-bento-card lp-bento-card-wide lp-reveal-scale"
+      data-cascade={index + 1}
+      data-revealed={start || undefined}
+    >
       <div className="lp-bento-card-wide-text">
         <h3 className="lp-bento-title">{card.title}</h3>
         <p className="lp-bento-desc">{card.desc}</p>
@@ -118,9 +131,13 @@ function WideCardEl({ card }: { card: WideCard }) {
 }
 
 function LandingFeaturesBase() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
   return (
-    <section className="lp-features" id="features" aria-labelledby="lp-features-title">
-      <div className="lp-features-header">
+    <section ref={ref} className="lp-features" id="features" aria-labelledby="lp-features-title">
+      <div
+        className="lp-features-header lp-reveal"
+        data-revealed={isVisible || undefined}
+      >
         <p className="lp-features-label">Fonctionnalités</p>
         <h2 id="lp-features-title" className="lp-features-h2">
           Tout ce qu'il faut pour ne plus rien laisser passer.
@@ -130,11 +147,11 @@ function LandingFeaturesBase() {
         </p>
       </div>
       <div className="lp-bento">
-        <FeaturedCardEl card={CARDS.bulletin} />
-        <IconCardEl     card={CARDS.scanner} />
-        <IconCardEl     card={CARDS.aides} />
-        <IconCardEl     card={CARDS.calendrier} />
-        <WideCardEl     card={CARDS.agent} />
+        <FeaturedCardEl card={CARDS.bulletin}   index={0} start={isVisible} />
+        <IconCardEl     card={CARDS.scanner}    index={1} start={isVisible} />
+        <IconCardEl     card={CARDS.aides}      index={2} start={isVisible} />
+        <IconCardEl     card={CARDS.calendrier} index={3} start={isVisible} />
+        <WideCardEl     card={CARDS.agent}      index={4} start={isVisible} />
       </div>
     </section>
   );

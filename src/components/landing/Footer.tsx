@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Linkedin } from 'lucide-react';
 import { LandingLogo } from './Logo';
+import { useScrollReveal } from './hooks/useScrollReveal';
 
 const PRODUIT_LINKS = [
   { label: 'Comment ça marche', href: '#how' },
@@ -28,12 +29,19 @@ const LINKEDIN_URL = 'https://www.linkedin.com/in/jules-peron-08b3b8255';
 
 export function LandingFooter() {
   const year = new Date().getFullYear();
+  const { ref, isVisible } = useScrollReveal<HTMLElement>({
+    rootMargin: '0px 0px 0px 0px',
+  });
   return (
-    <footer className="lp-footer">
+    <footer ref={ref} className="lp-footer">
       <div className="lp-footer-inner">
         <div className="lp-footer-grid">
           {/* Col 1 — Brand */}
-          <div className="lp-footer-brand">
+          <div
+            className="lp-footer-brand lp-reveal"
+            data-cascade="1"
+            data-revealed={isVisible || undefined}
+          >
             <div className="lp-footer-brand-logo">
               <LandingLogo to="/" />
             </div>
@@ -43,7 +51,12 @@ export function LandingFooter() {
           </div>
 
           {/* Col 2 — Produit */}
-          <nav aria-label="Produit">
+          <nav
+            aria-label="Produit"
+            className="lp-reveal"
+            data-cascade="2"
+            data-revealed={isVisible || undefined}
+          >
             <p className="lp-footer-col-title">Produit</p>
             <ul className="lp-footer-col-list">
               {PRODUIT_LINKS.map((l) => (
@@ -55,7 +68,12 @@ export function LandingFooter() {
           </nav>
 
           {/* Col 3 — Ressources */}
-          <nav aria-label="Ressources">
+          <nav
+            aria-label="Ressources"
+            className="lp-reveal"
+            data-cascade="3"
+            data-revealed={isVisible || undefined}
+          >
             <p className="lp-footer-col-title">Ressources</p>
             <ul className="lp-footer-col-list">
               {RESSOURCES_LINKS.map((l) => (
@@ -71,7 +89,12 @@ export function LandingFooter() {
           </nav>
 
           {/* Col 4 — Légal */}
-          <nav aria-label="Légal">
+          <nav
+            aria-label="Légal"
+            className="lp-reveal"
+            data-cascade="4"
+            data-revealed={isVisible || undefined}
+          >
             <p className="lp-footer-col-title">Légal</p>
             <ul className="lp-footer-col-list">
               {LEGAL_LINKS.map((l) => (

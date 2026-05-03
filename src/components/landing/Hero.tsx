@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Zap } from 'lucide-react';
+import { usePhoneTilt } from './hooks/usePhoneTilt';
 
 const SIGNUP_HREF = '/quiz';
 
 export function LandingHero() {
+  const phoneTiltRef = usePhoneTilt<HTMLDivElement>();
   return (
     <section className="lp-hero" id="hero">
       <div className="lp-hero-inner">
@@ -40,7 +42,7 @@ export function LandingHero() {
           role="img"
           aria-label="Aperçu de l'application Élio : action du jour, score Élio et montant récupérable"
         >
-          <div className="lp-phone-wrap" aria-hidden="true">
+          <div ref={phoneTiltRef} className="lp-phone-wrap" aria-hidden="true">
             <div className="lp-phone-frame">
               <div className="lp-phone-notch" />
               <div className="lp-phone-screen">

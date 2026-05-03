@@ -1,32 +1,61 @@
+import { useScrollReveal } from './hooks/useScrollReveal';
+import { useCountUp } from './hooks/useCountUp';
+
 const STATS = [
   {
-    value: '10',
+    target: 10,
     unit: 'Md€',
     label: "d'aides non réclamées chaque année en France",
   },
   {
-    value: '2 000',
+    target: 2000,
     unit: '€',
     label: 'récupérables en moyenne par foyer chaque année',
   },
   {
-    value: '90',
+    target: 90,
     unit: 's',
     label: 'pour faire ton diagnostic',
   },
 ];
 
-export function LandingStats() {
+function StatCard({
+  target,
+  unit,
+  label,
+  index,
+  start,
+}: {
+  target: number;
+  unit: string;
+  label: string;
+  index: number;
+  start: boolean;
+}) {
+  const value = useCountUp(target, { start, duration: 1500 });
+  const formatted = target >= 1000 ? value.toLocaleString('fr-FR') : String(value);
   return (
-    <section className="lp-stats" aria-label="Chiffres clés">
+    <div
+      className="lp-stat lp-reveal"
+      data-cascade={index + 1}
+      data-revealed={start || undefined}
+    >
+      <p className="lp-stat-value">
+        {formatted}
+        <span className="lp-stat-unit">&nbsp;{unit}</span>
+      </p>
+      <p className="lp-stat-label">{label}</p>
+    </div>
+  );
+}
+
+export function LandingStats() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+  return (
+    <section ref={ref} className="lp-stats" aria-label="Chiffres clés">
       <div className="lp-stats-inner">
-        {STATS.map((s) => (
-          <div key={s.label} className="lp-stat">
-            <p className="lp-stat-value">
-              {s.value}<span className="lp-stat-unit">&nbsp;{s.unit}</span>
-            </p>
-            <p className="lp-stat-label">{s.label}</p>
-          </div>
+        {STATS.map((s, i) => (
+          <StatCard key={s.label} {...s} index={i} start={isVisible} />
         ))}
       </div>
     </section>

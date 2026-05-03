@@ -2126,4 +2126,89 @@
     width: 18px;
     height: 18px;
   }
+
+  /* ─────────────────────── Landing : Animations (Batch 13) */
+
+  /* Reveal pattern */
+  .lp-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.4s var(--ease),
+      transform 0.4s var(--ease);
+    will-change: opacity, transform;
+  }
+  .lp-reveal[data-revealed] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Variant scale — pour Features bento */
+  .lp-reveal-scale {
+    opacity: 0;
+    transform: scale(0.95);
+    transition:
+      opacity 0.4s var(--ease),
+      transform 0.4s var(--ease);
+    will-change: opacity, transform;
+  }
+  .lp-reveal-scale[data-revealed] {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Cascade delays — par data-cascade (1 à 7) */
+  .lp-reveal[data-cascade="1"],
+  .lp-reveal-scale[data-cascade="1"] { transition-delay: 0.05s; }
+  .lp-reveal[data-cascade="2"],
+  .lp-reveal-scale[data-cascade="2"] { transition-delay: 0.10s; }
+  .lp-reveal[data-cascade="3"],
+  .lp-reveal-scale[data-cascade="3"] { transition-delay: 0.15s; }
+  .lp-reveal[data-cascade="4"],
+  .lp-reveal-scale[data-cascade="4"] { transition-delay: 0.20s; }
+  .lp-reveal[data-cascade="5"],
+  .lp-reveal-scale[data-cascade="5"] { transition-delay: 0.25s; }
+  .lp-reveal[data-cascade="6"],
+  .lp-reveal-scale[data-cascade="6"] { transition-delay: 0.30s; }
+  .lp-reveal[data-cascade="7"],
+  .lp-reveal-scale[data-cascade="7"] { transition-delay: 0.35s; }
+
+  /* Floating cards Hero (CSS infinite) */
+  @keyframes lp-float-up {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  @keyframes lp-float-down {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(8px); }
+  }
+  .lp-floating-card.top    { animation: lp-float-up   3s ease-in-out infinite; }
+  .lp-floating-card.bottom { animation: lp-float-down 3.5s ease-in-out infinite; }
+
+  /* Phone tilt — consomme --tilt CSS variable, fallback +4deg */
+  .lp-phone-wrap {
+    transform: rotateY(var(--tilt, 4deg));
+    transition: transform 0.1s linear;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    will-change: transform;
+  }
+
+  /* Reduced motion overrides */
+  @media (prefers-reduced-motion: reduce) {
+    .lp-reveal,
+    .lp-reveal-scale {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .lp-floating-card.top,
+    .lp-floating-card.bottom {
+      animation: none;
+    }
+    .lp-phone-wrap {
+      transform: none;
+      transition: none;
+    }
+  }
 }

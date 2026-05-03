@@ -1,11 +1,16 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { useScrollReveal } from './hooks/useScrollReveal';
 
 export function LandingFinalCTA() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
   return (
-    <section className="lp-final-cta">
+    <section ref={ref} className="lp-final-cta">
       <div className="lp-final-cta-inner">
-        <div className="lp-final-cta-text">
+        <div
+          className="lp-final-cta-text lp-reveal"
+          data-revealed={isVisible || undefined}
+        >
           <h2 className="lp-final-cta-h2">
             Combien <span className="lp-accent-text">tu perds</span> chaque année sans le savoir&nbsp;?
           </h2>
@@ -14,7 +19,11 @@ export function LandingFinalCTA() {
             et tu sauras ce que tu peux récupérer immédiatement.
           </p>
         </div>
-        <div className="lp-final-cta-actions">
+        <div
+          className="lp-final-cta-actions lp-reveal"
+          data-cascade="1"
+          data-revealed={isVisible || undefined}
+        >
           <Link to="/quiz" className="ds-btn ds-btn-coral lp-final-cta-primary">
             Faire mon diagnostic
             <ArrowRight className="lp-final-cta-primary-icon" aria-hidden="true" />

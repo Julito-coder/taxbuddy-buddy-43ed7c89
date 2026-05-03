@@ -1,4 +1,5 @@
 import { memo, type ReactNode } from 'react';
+import { useScrollReveal } from './hooks/useScrollReveal';
 
 type TrustLogo = { name: string; svg: ReactNode };
 
@@ -60,10 +61,14 @@ const LOGOS: TrustLogo[] = [
 ];
 
 function LandingTrustBase() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
   return (
-    <section className="lp-trust" id="trust">
+    <section ref={ref} className="lp-trust" id="trust">
       <div className="lp-trust-inner">
-        <div className="lp-trust-header">
+        <div
+          className="lp-trust-header lp-reveal"
+          data-revealed={isVisible || undefined}
+        >
           <p className="lp-trust-label">Sources officielles</p>
           <h2 className="lp-trust-h2">Élio s'appuie sur les sources officielles</h2>
           <p className="lp-trust-manifesto">
@@ -73,8 +78,14 @@ function LandingTrustBase() {
           </p>
         </div>
         <ul className="lp-trust-logos" aria-label="Sources de données officielles">
-          {LOGOS.map((logo) => (
-            <li key={logo.name} className="lp-trust-logo" aria-label={logo.name}>
+          {LOGOS.map((logo, i) => (
+            <li
+              key={logo.name}
+              className="lp-trust-logo lp-reveal"
+              data-cascade={i + 1}
+              data-revealed={isVisible || undefined}
+              aria-label={logo.name}
+            >
               {logo.svg}
             </li>
           ))}

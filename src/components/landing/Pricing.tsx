@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
+import { useScrollReveal } from './hooks/useScrollReveal';
 
 const FREE_FEATURES = [
   'Diagnostic en 90 secondes',
@@ -39,12 +40,16 @@ function FeatureCheck() {
 
 export function LandingPricing() {
   const [billing, setBilling] = useState<Billing>('monthly');
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
   const plus = PRICES[billing];
   const plusHref = `/quiz?plan=plus&billing=${billing}`;
 
   return (
-    <section className="lp-pricing" id="pricing">
-      <div className="lp-pricing-header">
+    <section ref={ref} className="lp-pricing" id="pricing">
+      <div
+        className="lp-pricing-header lp-reveal"
+        data-revealed={isVisible || undefined}
+      >
         <p className="lp-pricing-label">Tarifs</p>
         <h2 className="lp-pricing-h2">Choisis ton plan</h2>
         <p className="lp-pricing-subtitle">
@@ -91,7 +96,11 @@ export function LandingPricing() {
 
       <div className="lp-pricing-grid">
         {/* Carte Découverte */}
-        <article className="lp-pricing-card">
+        <article
+          className="lp-pricing-card lp-reveal"
+          data-cascade="1"
+          data-revealed={isVisible || undefined}
+        >
           <h3 className="lp-pricing-card-name">Découverte</h3>
           <p className="lp-pricing-card-tagline">Pour découvrir Élio</p>
           <p className="lp-pricing-card-price">
@@ -112,7 +121,11 @@ export function LandingPricing() {
         </article>
 
         {/* Carte Élio + featured */}
-        <article className="lp-pricing-card featured">
+        <article
+          className="lp-pricing-card featured lp-reveal"
+          data-cascade="2"
+          data-revealed={isVisible || undefined}
+        >
           <span className="lp-pricing-card-badge">Recommandé</span>
           <h3 className="lp-pricing-card-name">Élio +</h3>
           <p className="lp-pricing-card-tagline">Pour récupérer plus, plus vite</p>
