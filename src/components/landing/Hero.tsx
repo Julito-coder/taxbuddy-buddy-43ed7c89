@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { usePhoneTilt } from './hooks/usePhoneTilt';
+import { useMousemoveTilt } from './hooks/useMousemoveTilt';
 
 const SIGNUP_HREF = '/quiz';
 
 export function LandingHero() {
-  const phoneTiltRef = usePhoneTilt<HTMLDivElement>();
+  const phoneTiltRef = useMousemoveTilt<HTMLDivElement>();
   return (
     <section className="lp-hero" id="hero">
       <div className="lp-hero-inner">

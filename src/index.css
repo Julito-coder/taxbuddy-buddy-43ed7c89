@@ -711,10 +711,12 @@
       max-width: 100%;
     }
     .lp-phone-wrap {
-      --tilt: 0deg !important;
+      --tilt-x: 0deg !important;
+      --tilt-y: 0deg !important;
     }
     .lp-floating-card.bottom {
       left: -10px;
+      bottom: -10px;
     }
   }
 
@@ -890,6 +892,7 @@
   /* Floating cards */
   .lp-floating-card {
     position: absolute;
+    z-index: 3;
     display: inline-flex;
     align-items: center;
     gap: var(--s2);
@@ -910,7 +913,7 @@
     animation-delay: 0s;
   }
   .lp-floating-card.bottom {
-    bottom: 40px;
+    bottom: -20px;
     left: -40px;
     animation-delay: 2.5s;
   }
@@ -2259,22 +2262,33 @@
   .lp-floating-card.top    { animation: lp-float-up   3s ease-in-out infinite; }
   .lp-floating-card.bottom { animation: lp-float-down 3.5s ease-in-out infinite; }
 
-  /* Phone tilt — consomme --tilt CSS variable, fallback +4deg */
+  /* Phone tilt — consomme --tilt-x et --tilt-y CSS variables (mousemove parallax 3D) */
   .lp-phone-wrap {
-    transform: rotateY(var(--tilt, 4deg));
-    transition:
-      transform 0.2s var(--ease),
-      filter 0.2s var(--ease);
+    transform:
+      perspective(1000px)
+      rotateY(var(--tilt-y, 0deg))
+      rotateX(var(--tilt-x, 0deg));
+    transition: transform 0.1s linear;
     transform-style: preserve-3d;
-    perspective: 1000px;
     will-change: transform;
   }
+  .lp-phone-wrap.is-leaving {
+    transition: transform 0.6s var(--ease);
+  }
   .lp-phone-wrap:hover {
-    transform: rotateY(var(--tilt, 4deg)) translateY(-6px);
+    transform:
+      perspective(1000px)
+      rotateY(var(--tilt-y, 0deg))
+      rotateX(var(--tilt-x, 0deg))
+      translateY(-6px);
     filter: drop-shadow(0 24px 48px rgba(240, 100, 73, 0.18));
   }
   .lp-phone-wrap:active {
-    transform: rotateY(var(--tilt, 4deg)) translateY(-4px);
+    transform:
+      perspective(1000px)
+      rotateY(var(--tilt-y, 0deg))
+      rotateX(var(--tilt-x, 0deg))
+      translateY(-4px);
     filter: drop-shadow(0 16px 32px rgba(240, 100, 73, 0.14));
   }
 
