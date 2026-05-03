@@ -77,7 +77,7 @@ export function LandingHero() {
             </div>
             <div className="lp-floating-card bottom">
               <span className="lp-floating-dot coral" />
-              3 nouvelles aides éligibles
+              3 aides éligibles
             </div>
           </div>
         </div>

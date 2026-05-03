@@ -1,5 +1,5 @@
 import { memo, type ComponentType, type SVGProps } from 'react';
-import { ScanLine, HandCoins, CalendarClock } from 'lucide-react';
+import { ScanLine, HandCoins, CalendarClock, Bell } from 'lucide-react';
 import { useScrollReveal } from './hooks/useScrollReveal';
 
 type LucideIcon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -90,6 +90,9 @@ function FeaturedCardEl({ card, index, start }: { card: FeaturedCard; index: num
       data-cascade={index + 1}
       data-revealed={start || undefined}
     >
+      <div className="lp-bento-featured-icon" aria-hidden="true">
+        <Bell />
+      </div>
       <h3 className="lp-bento-title">{card.title}</h3>
       <p className="lp-bento-desc">{card.desc}</p>
       <BulletinPreview />
