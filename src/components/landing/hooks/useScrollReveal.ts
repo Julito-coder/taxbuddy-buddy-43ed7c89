@@ -33,6 +33,22 @@ export function useScrollReveal<T extends HTMLElement = HTMLElement>(opts: Optio
       setIsVisible(true);
       return;
     }
+
+    // FIX Batch 17.bis : check visibilité immédiate au mount.
+    // L'IntersectionObserver ne fire pas son callback initial de manière
+    // fiable quand l'élément est déjà intersecting au mount (Hero above-the-fold).
+    const rect = node.getBoundingClientRect();
+    const inViewport =
+      rect.top < window.innerHeight &&
+      rect.bottom > 0 &&
+      rect.left < window.innerWidth &&
+      rect.right > 0;
+
+    if (inViewport) {
+      setIsVisible(true);
+      if (once) return; // si once: true (défaut) et déjà visible, pas besoin d'observer
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
