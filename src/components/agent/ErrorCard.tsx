@@ -58,7 +58,7 @@ const TONE_STYLES: Record<'warn' | 'info' | 'error', { bg: string; border: strin
   warn: {
     bg: 'rgba(240, 100, 73, 0.06)',
     border: 'rgba(240, 100, 73, 0.25)',
-    iconColor: 'var(--coral-600)',
+    iconColor: 'var(--coral-600, #D85535)',
   },
   info: {
     bg: 'hsl(var(--muted))',

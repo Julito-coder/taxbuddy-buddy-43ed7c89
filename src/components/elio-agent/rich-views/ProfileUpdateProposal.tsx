@@ -131,7 +131,7 @@ export const ProfileUpdateProposal = ({ data, onConfirm }: Props) => {
     return (
       <div
         className="mt-3 rounded-xl p-4"
-        style={{ backgroundColor: '#F5F9F5', border: '1px solid #10B981', opacity: 0.85, fontFamily: 'Sora' }}
+        style={{ backgroundColor: '#F5F9F5', border: '1px solid #10B981', opacity: 0.85 }}
       >
         <div className="flex items-center gap-2 mb-2">
           <CheckCircle2 className="w-5 h-5" style={{ color: '#10B981' }} />
@@ -153,7 +153,7 @@ export const ProfileUpdateProposal = ({ data, onConfirm }: Props) => {
     return (
       <div
         className="mt-3 rounded-xl p-3 flex items-center gap-2"
-        style={{ backgroundColor: '#F5F5F5', border: '1px solid #9CA3AF', opacity: 0.75, fontFamily: 'Sora' }}
+        style={{ backgroundColor: '#F5F5F5', border: '1px solid #9CA3AF', opacity: 0.75 }}
       >
         <XCircle className="w-4 h-4" style={{ color: '#9CA3AF' }} />
         <p className="text-xs" style={{ color: '#6B7280' }}>
@@ -167,7 +167,7 @@ export const ProfileUpdateProposal = ({ data, onConfirm }: Props) => {
   return (
     <div
       className="mt-3 rounded-xl p-5"
-      style={{ backgroundColor: '#FFFBF2', border: '2px solid #C8943E', fontFamily: 'Sora' }}
+      style={{ backgroundColor: '#FFFBF2', border: '2px solid #C8943E' }}
     >
       <div className="flex items-center gap-2 mb-1">
         <Sparkles className="w-5 h-5" style={{ color: '#C8943E' }} />

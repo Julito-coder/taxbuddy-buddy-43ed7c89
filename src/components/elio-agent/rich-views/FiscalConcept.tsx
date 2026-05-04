@@ -20,7 +20,7 @@ interface Props {
 export const FiscalConcept = ({ data }: Props) => {
   if (data?.error || !data?.concept) {
     return (
-      <div className="mt-3 p-3 rounded-xl bg-[#FFF4E6] border border-[#F5D4A8]" style={{ fontFamily: 'Sora' }}>
+      <div className="mt-3 p-3 rounded-xl bg-[#FFF4E6] border border-[#F5D4A8]">
         <p className="text-sm text-[#1F3347]">{data?.error || 'Concept introuvable.'}</p>
       </div>
     );
@@ -29,10 +29,7 @@ export const FiscalConcept = ({ data }: Props) => {
   const c = data.concept;
 
   return (
-    <div
-      className="mt-3 rounded-xl bg-white border border-[#E5E7EB] overflow-hidden"
-      style={{ fontFamily: 'Sora' }}
-    >
+    <div className="mt-3 rounded-xl bg-white border border-[#E5E7EB] overflow-hidden">
       <div className="px-4 py-3 bg-[#F8F5F0] border-b border-[#E5DED3]">
         <h3 className="text-base font-semibold text-[#1B3A5C]">{c.title}</h3>
       </div>

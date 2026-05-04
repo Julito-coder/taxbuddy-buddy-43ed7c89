@@ -27,7 +27,7 @@ export const DeadlinesList = ({ data }: Props) => {
 
   return (
     <div className="rounded-xl bg-white border border-[#E5DED3] shadow-sm p-4 mt-3">
-      <h4 className="font-semibold text-[#1B3A5C] mb-3" style={{ fontFamily: 'Sora' }}>
+      <h4 className="font-semibold text-[#1B3A5C] mb-3">
         Tes prochaines échéances
       </h4>
       <div className="space-y-3">
@@ -40,7 +40,7 @@ export const DeadlinesList = ({ data }: Props) => {
               {i < deadlines.length - 1 && <div className="w-px flex-1 bg-[#E5DED3] mt-1" />}
             </div>
             <div className="flex-1 pb-3">
-              <p className="text-sm font-medium text-[#1B3A5C]" style={{ fontFamily: 'Sora' }}>
+              <p className="text-sm font-medium text-[#1B3A5C]">
                 {d.label}
               </p>
               <p className="text-xs text-[#6B7A8D] mt-0.5">{fmtDate(d.date)}</p>
