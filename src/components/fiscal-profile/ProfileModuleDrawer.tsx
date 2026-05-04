@@ -1,9 +1,10 @@
 import { ReactNode, useState } from 'react';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, ChevronDown } from 'lucide-react';
+import { Loader2, Lightbulb, ChevronDown, Check, CloudUpload, AlertCircle } from 'lucide-react';
 import { ModuleMeta } from './moduleRegistry';
 import { useIsMobile } from '@/hooks/use-mobile';
+import type { SaveStatus } from '@/hooks/useFiscalProfileAutosave';
 
 interface Props {
   module: ModuleMeta | null;
@@ -11,6 +12,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onSave: () => void;
   saving: boolean;
+  saveStatus?: SaveStatus;
   children: ReactNode;
 }
 
@@ -20,10 +22,44 @@ export const ProfileModuleDrawer = ({
   onOpenChange,
   onSave,
   saving,
+  saveStatus,
   children,
 }: Props) => {
   const isMobile = useIsMobile();
   const [whyOpen, setWhyOpen] = useState(false);
+
+  const renderStatus = () => {
+    if (!saveStatus || saveStatus === 'idle') return null;
+    if (saveStatus === 'pending')
+      return (
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <CloudUpload className="h-3.5 w-3.5" />
+          Modifications en attente…
+        </span>
+      );
+    if (saveStatus === 'saving')
+      return (
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          Enregistrement…
+        </span>
+      );
+    if (saveStatus === 'saved')
+      return (
+        <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--green-500)' }}>
+          <Check className="h-3.5 w-3.5" />
+          Enregistré
+        </span>
+      );
+    if (saveStatus === 'error')
+      return (
+        <span className="flex items-center gap-1.5 text-xs text-destructive">
+          <AlertCircle className="h-3.5 w-3.5" />
+          Échec — nouvelle tentative au prochain changement
+        </span>
+      );
+    return null;
+  };
 
   if (!module) return null;
   const Icon = module.icon;
@@ -80,25 +116,25 @@ export const ProfileModuleDrawer = ({
 
         <div className="flex-1 overflow-y-auto px-6 py-6">{children}</div>
 
-        <footer className="px-6 py-4 border-t border-border flex items-center justify-between gap-3 bg-card">
-          <Button
-            variant="ghost"
-            onClick={() => onOpenChange(false)}
-            disabled={saving}
-            className="text-muted-foreground"
-          >
-            Fermer
-          </Button>
-          <Button onClick={onSave} disabled={saving} className="min-w-[140px]">
-            {saving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Enregistrement
-              </>
-            ) : (
-              'Enregistrer'
-            )}
-          </Button>
+        <footer className="px-6 py-3 border-t border-border bg-card">
+          <div className="flex items-center justify-between gap-3 mb-2 min-h-[20px]">
+            {renderStatus()}
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-muted-foreground hidden sm:block">
+              Tes modifications sont enregistrées automatiquement.
+            </p>
+            <Button onClick={onSave} disabled={saving} className="min-w-[120px] ml-auto">
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Enregistrement
+                </>
+              ) : (
+                'Terminer'
+              )}
+            </Button>
+          </div>
         </footer>
       </SheetContent>
     </Sheet>

@@ -5,9 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import {
   loadFiscalProfile,
-  saveFiscalProfile,
   FiscalProfileData,
 } from '@/lib/fiscalProfileService';
+import { useFiscalProfileAutosave } from '@/hooks/useFiscalProfileAutosave';
 import {
   MODULES,
   ModuleId,
@@ -33,25 +33,59 @@ export const ProfileHub = () => {
   const [loading, setLoading] = useState(true);
   const [activeModuleId, setActiveModuleId] = useState<ModuleId | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
+
+  const { status, lastError, queueUpdate, flushNow } = useFiscalProfileAutosave({
+    userId: user?.id,
+  });
 
   useEffect(() => {
     if (!user) return;
-    loadFiscalProfile(user.id).then((profile) => {
-      setData(profile);
-      setLoading(false);
-    });
+    let cancelled = false;
+    const load = () => {
+      loadFiscalProfile(user.id).then((profile) => {
+        if (cancelled) return;
+        setData(profile);
+        setLoading(false);
+      });
+    };
+    load();
+
+    // Recharger si une autre source (sync post-quiz, agent, etc.) modifie le profil
+    const onProfileUpdated = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { source?: string } | undefined;
+      // Ignore nos propres autosaves pour éviter une boucle inutile
+      if (detail?.source === 'autosave') return;
+      load();
+    };
+    window.addEventListener('elio:profile-updated', onProfileUpdated);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('elio:profile-updated', onProfileUpdated);
+    };
   }, [user]);
 
-  const handleChange = useCallback((updates: Partial<FiscalProfileData>) => {
-    setData((prev) => (prev ? { ...prev, ...updates } : prev));
-  }, []);
+  const handleChange = useCallback(
+    (updates: Partial<FiscalProfileData>) => {
+      setData((prev) => (prev ? { ...prev, ...updates } : prev));
+      queueUpdate(updates);
+    },
+    [queueUpdate]
+  );
 
   const overall = useMemo(
     () =>
       data
         ? computeOverallProgress(data)
-        : { percentage: 0, qualitativeLabel: 'À démarrer', remainingGain: 0, nextModuleId: undefined as ModuleId | undefined, progresses: [] },
+        : {
+            percentage: 0,
+            qualitativeLabel: 'À démarrer',
+            remainingGain: 0,
+            nextModuleId: undefined as ModuleId | undefined,
+            nextModuleTitle: undefined as string | undefined,
+            nextModuleGain: 0,
+            progresses: [],
+          },
     [data]
   );
 
@@ -62,24 +96,21 @@ export const ProfileHub = () => {
     setDrawerOpen(true);
   };
 
-  const handleSave = async () => {
-    if (!user || !data) return;
-    setSaving(true);
-    const result = await saveFiscalProfile(user.id, data);
-    setSaving(false);
-    if (result.success) {
-      toast({ title: 'Profil mis à jour', description: 'Tes informations sont enregistrées.' });
-      window.dispatchEvent(
-        new CustomEvent('elio:profile-updated', { detail: { source: 'profile_hub' } })
-      );
-      setDrawerOpen(false);
-    } else {
+  // Notify error once per occurrence
+  useEffect(() => {
+    if (status === 'error' && lastError) {
       toast({
-        title: 'Impossible d’enregistrer',
-        description: result.error || 'Réessaie dans un instant.',
+        title: 'Sauvegarde impossible',
+        description: lastError,
         variant: 'destructive',
       });
     }
+  }, [status, lastError, toast]);
+
+  const handleCloseDrawer = async () => {
+    // Flush any pending changes before closing
+    await flushNow();
+    setDrawerOpen(false);
   };
 
   if (loading || !data) {
@@ -131,6 +162,8 @@ export const ProfileHub = () => {
         qualitativeLabel={overall.qualitativeLabel}
         remainingGain={overall.remainingGain}
         hasNextModule={!!overall.nextModuleId}
+        nextModuleTitle={overall.nextModuleTitle}
+        nextModuleGain={overall.nextModuleGain}
         onContinue={() => overall.nextModuleId && openModule(overall.nextModuleId)}
       />
 
@@ -162,11 +195,19 @@ export const ProfileHub = () => {
         module={activeModule}
         open={drawerOpen}
         onOpenChange={(open) => {
-          setDrawerOpen(open);
-          if (!open) setActiveModuleId(null);
+          if (!open) {
+            // Flush pending edits before unmounting the section
+            void flushNow().finally(() => {
+              setDrawerOpen(false);
+              setActiveModuleId(null);
+            });
+          } else {
+            setDrawerOpen(true);
+          }
         }}
-        onSave={handleSave}
-        saving={saving}
+        onSave={handleCloseDrawer}
+        saving={status === 'saving'}
+        saveStatus={status}
       >
         {renderModuleContent()}
       </ProfileModuleDrawer>

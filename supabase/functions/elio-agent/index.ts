@@ -25,6 +25,11 @@ import {
   type RawProfile,
   type DerivedValues,
 } from './profileDeriver.ts';
+import {
+  loadPatrimonySnapshot,
+  buildPatrimonyBlock,
+  type PatrimonySnapshot,
+} from './patrimonySnapshot.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -287,11 +292,21 @@ function buildMissingBlock(p: RawProfile, d: DerivedValues): string {
   return missing.map((m) => `- ${m}`).join('\n');
 }
 
-function buildSystemPrompt(p: RawProfile, d: DerivedValues, profileChangedSinceLastTurn: boolean): string {
+function buildSystemPrompt(
+  p: RawProfile,
+  d: DerivedValues,
+  profileChangedSinceLastTurn: boolean,
+  patrimony: PatrimonySnapshot,
+): string {
   const today = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   const freshnessNotice = profileChangedSinceLastTurn
     ? "\n\n⚠️ L'utilisateur a mis à jour son profil depuis ton dernier message. Reprends en compte les nouvelles valeurs ci-dessous."
     : '';
+
+  const patrimonyBlock = buildPatrimonyBlock(patrimony, {
+    crypto_pnl_2025: p.crypto_pnl_2025,
+    crypto_wallet_address: p.crypto_wallet_address,
+  });
 
   return `Tu es Élio, l'agent IA fiscal et administratif de l'app Élio. Tu aides les particuliers français à comprendre, anticiper et optimiser leur situation fiscale.
 
@@ -316,6 +331,9 @@ ${buildEssentialBlock(p)}
 
 PROFIL CHIFFRÉ
 ${buildNumericBlock(p, d)}
+
+PATRIMOINE DÉTAILLÉ (lu en direct depuis les tables dédiées — source de vérité)
+${patrimonyBlock}
 
 CHAMPS MANQUANTS
 ${buildMissingBlock(p, d)}
@@ -374,8 +392,24 @@ Ne PAS personnaliser (même catégorie A) dans ces cas, remplace la couche 3 par
 - Décision patrimoniale majeure (achat immo, vente entreprise) → explique les paramètres, ne tranche jamais à sa place + suggère un conseiller humain.
 - Question médicale déguisée en fiscale → reste sur l'aspect fiscal uniquement.
 
-RÈGLE 8 — LE PROFIL EST LA SOURCE DE VÉRITÉ
-Avant de poser toute question, regarde si l'info est dans PROFIL ESSENTIEL ou PROFIL CHIFFRÉ. Les valeurs "(dérivé)" sont fiables — ne les recalcule pas.
+RÈGLE 8 — LE PROFIL EST LA SOURCE DE VÉRITÉ (CHECK SYSTÉMATIQUE)
+Avant CHAQUE réponse, balaye dans cet ordre :
+1. PROFIL ESSENTIEL et PROFIL CHIFFRÉ pour identité, famille, revenus, logement.
+2. PATRIMOINE DÉTAILLÉ pour tout ce qui touche crypto, immobilier, placements.
+3. CHAMPS MANQUANTS pour savoir ce qui bloque vraiment.
+Les valeurs "(dérivé)" sont fiables — ne les recalcule pas. Les chiffres du bloc PATRIMOINE proviennent en direct des tables crypto_accounts / crypto_transactions / crypto_tax_computations / real_estate_projects, ils sont à jour à la seconde près.
+
+INTERDICTIONS ABSOLUES :
+- NE JAMAIS demander une info qui figure déjà dans un de ces blocs.
+- NE JAMAIS répondre de façon générique à une question patrimoniale (crypto, immo, placements) si le bloc PATRIMOINE contient des chiffres : tu DOIS les utiliser explicitement dans la couche 2 ("Vu que tu as X € de cessions crypto cette année, ...").
+- NE JAMAIS dire "je n'ai pas accès à tes données" si elles sont visibles ci-dessus.
+
+CAS CRYPTO / FORMULAIRE 2086 :
+Si la question concerne la déclaration crypto (mots-clés : 2086, déclaration crypto, plus-value crypto, cession bitcoin/ETH/etc.) :
+- Si PATRIMOINE → CRYPTO contient un calcul fiscal : utilise total_cessions, total_acquisitions, plus-value nette directement dans ta réponse.
+- Sinon, si transactions saisies > 0 mais pas de calcul : explique qu'il faut lancer le calcul (cite les chiffres bruts disponibles).
+- Si has_foreign_account = true : rappelle systématiquement le 3916-bis.
+- Si aucune donnée crypto en base : demande UNE info clé (montant approximatif des cessions de l'année) avant de lancer get_recommendations.
 
 RÈGLE 9 — APPEL AUTOMATIQUE DES TOOLS
 Quand l'intent matche un tool, appelle-le IMMÉDIATEMENT, SANS paramètres (auto-lecture du profil) :
@@ -527,14 +561,24 @@ serve(async (req) => {
       .maybeSingle();
     const currentCount = usageRow?.messages_count || 0;
 
-    // --- Load profile (frais) ---
-    const { data: profile } = await adminClient
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
+    // --- Load profile + patrimony snapshot in parallel ---
+    const [profileRes, patrimony] = await Promise.all([
+      adminClient
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle(),
+      loadPatrimonySnapshot(adminClient, userId),
+    ]);
+    const profile = profileRes.data;
 
     const derivedCtx = deriveProfile(profile);
+    console.log('[elio-agent] patrimony snapshot loaded', {
+      crypto_accounts: patrimony.crypto.accounts_count,
+      crypto_tx: patrimony.crypto.transactions_count,
+      has_computation: !!patrimony.crypto.computation,
+      re_projects: patrimony.real_estate.projects_count,
+    });
 
     // --- Load conversation history ---
     let conversation: any = null;
@@ -555,7 +599,12 @@ serve(async (req) => {
       : 0;
     const profileChangedSinceLastTurn = !!(conversation && profileUpdatedAt > lastSnapshot);
 
-    const systemPrompt = buildSystemPrompt(derivedCtx.raw, derivedCtx.derived, profileChangedSinceLastTurn);
+    const systemPrompt = buildSystemPrompt(
+      derivedCtx.raw,
+      derivedCtx.derived,
+      profileChangedSinceLastTurn,
+      patrimony,
+    );
 
     const previousMessages: any[] = Array.isArray(conversation?.messages) ? conversation.messages : [];
     const recentHistory = previousMessages

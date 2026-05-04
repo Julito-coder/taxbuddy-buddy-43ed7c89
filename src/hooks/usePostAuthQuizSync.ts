@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { saveModernOnboarding } from '@/lib/modernOnboardingService';
+import { saveModernOnboarding, loadOnboardingStatus } from '@/lib/modernOnboardingService';
 import { ModernOnboardingData } from '@/data/modernOnboardingTypes';
 
 const QUIZ_STORAGE_KEY = 'elio_quiz_data';
@@ -29,8 +29,13 @@ export const clearStoredQuizData = (): void => {
 };
 
 /**
- * After auth, sync any cached quiz data to the user's profile.
- * Returns true while syncing.
+ * After auth, sync any cached quiz data to the user's profile — ONCE.
+ *
+ * Garde-fous :
+ * - Si onboarding_completed = true en DB → skip + clear localStorage.
+ *   Empêche tout rejeu après que l'utilisateur a enrichi son profil.
+ * - Le localStorage est nettoyé EN AMONT de la sync pour éviter qu'un
+ *   re-mount du ProtectedRoute pendant l'écriture relance une 2e sync.
  */
 export const usePostAuthQuizSync = (userId: string | undefined): boolean => {
   const syncing = useRef(false);
@@ -47,15 +52,29 @@ export const usePostAuthQuizSync = (userId: string | undefined): boolean => {
 
     syncing.current = true;
 
-    saveModernOnboarding(userId, quizData.data, false).then((result) => {
-      clearStoredQuizData();
-      synced.current = true;
-      syncing.current = false;
-      if (result.success) {
-        // Notifie l'agent Élio que le profil vient d'être rempli via le quiz
-        window.dispatchEvent(new CustomEvent('elio:profile-updated', { detail: { source: 'modern_onboarding' } }));
+    (async () => {
+      try {
+        // Vérification serveur : si onboarding déjà complété, on ne touche à rien
+        const status = await loadOnboardingStatus(userId);
+        if (status.completed) {
+          clearStoredQuizData();
+          return;
+        }
+
+        // Clear EN AMONT pour qu'un re-mount ne relance pas la sync
+        clearStoredQuizData();
+
+        const result = await saveModernOnboarding(userId, quizData.data, false);
+        if (result.success) {
+          window.dispatchEvent(
+            new CustomEvent('elio:profile-updated', { detail: { source: 'modern_onboarding' } })
+          );
+        }
+      } finally {
+        synced.current = true;
+        syncing.current = false;
       }
-    });
+    })();
   }, [userId]);
 
   return syncing.current;

@@ -200,11 +200,12 @@ export const saveFiscalProfile = async (
     if (data.hasInvestments !== undefined) payload.has_investments = data.hasInvestments;
 
     payload.tax_profile_updated_at = new Date().toISOString();
+    payload.user_id = userId;
 
+    // Upsert pour garantir la persistance même si la ligne profile n'existe pas encore
     const { error } = await supabase
       .from('profiles')
-      .update(payload as any)
-      .eq('user_id', userId);
+      .upsert(payload as any, { onConflict: 'user_id' });
 
     if (error) return { success: false, error: error.message };
     return { success: true };
