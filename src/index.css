@@ -1335,78 +1335,105 @@
      ============================================ */
 
   .lp-bulletin-stack {
+    /* Variables paramétrables pour itération devtools */
+    --bulletin-rotation-duration: 0.8s;
+    --bulletin-stagger-delay: 100ms;
+    --bulletin-translate-y-mid: -34px;
+    --bulletin-translate-y-deep: -56px;
+    --bulletin-translate-z-mid: -40px;
+    --bulletin-translate-z-deep: -80px;
+    --bulletin-scale-mid: 0.93;
+    --bulletin-scale-deep: 0.86;
+    --bulletin-rotate-deep: 8deg;
+    --bulletin-ease-3d: cubic-bezier(0.4, 0, 0.2, 1);
+
     position: relative;
     height: 220px;
     margin-top: var(--s6, 24px);
-    perspective: 800px;
+    perspective: 1200px;
     perspective-origin: 50% 30%;
+    transform-style: preserve-3d;
   }
 
   .lp-bulletin-card {
     position: absolute;
     left: 0;
     right: 0;
+    top: 56px;
     background: #FFFFFF;
     border-radius: var(--r-lg, 16px);
     padding: var(--s4, 16px) var(--s5, 20px);
     box-shadow: 0 8px 24px rgba(11, 25, 41, 0.12);
     transition:
-      transform 0.5s var(--ease, cubic-bezier(0.16, 1, 0.3, 1)),
+      transform var(--bulletin-rotation-duration, 0.8s) var(--bulletin-ease-3d, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity 0.5s var(--ease, cubic-bezier(0.16, 1, 0.3, 1));
     will-change: transform, opacity;
-  }
-
-  /* ============================================
-     Batch 18A — Auto-rotation positions dynamiques
-     ============================================ */
-
-  .lp-bulletin-card[data-position="0"] {
-    top: 56px;
-    transform: translateX(0) scale(1);
-    opacity: 1;
-    z-index: 3;
-    background: linear-gradient(135deg, #FFFFFF 0%, #FAFAF9 100%);
-    border: 1px solid rgba(240, 100, 73, 0.20);
-    box-shadow:
-      0 12px 32px rgba(11, 25, 41, 0.14),
-      0 0 0 1px rgba(240, 100, 73, 0.08);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     display: flex;
     flex-direction: column;
     gap: var(--s2, 8px);
   }
 
+  /* ============================================
+     Batch 18A.bis — 3D depth shuffle staggered
+     ============================================ */
+
+  .lp-bulletin-card[data-position="0"] {
+    transform: translate3d(0, 0, 0) rotateY(0deg) scale(1);
+    opacity: 1;
+    z-index: 3;
+    transition-delay: calc(var(--bulletin-stagger-delay, 100ms) * 2);
+    background: linear-gradient(135deg, #FFFFFF 0%, #FAFAF9 100%);
+    border: 1px solid rgba(240, 100, 73, 0.20);
+    box-shadow:
+      0 12px 32px rgba(11, 25, 41, 0.14),
+      0 0 0 1px rgba(240, 100, 73, 0.08);
+  }
+
   .lp-bulletin-card[data-position="1"] {
-    top: 22px;
-    transform: translateY(0) scale(0.93);
+    transform:
+      translate3d(0, var(--bulletin-translate-y-mid, -34px), var(--bulletin-translate-z-mid, -40px))
+      rotateY(0deg)
+      scale(var(--bulletin-scale-mid, 0.93));
     opacity: 0.60;
     z-index: 2;
+    transition-delay: var(--bulletin-stagger-delay, 100ms);
     background: rgba(255, 255, 255, 0.85);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    border: none;
+    box-shadow: 0 8px 24px rgba(11, 25, 41, 0.12);
   }
 
   .lp-bulletin-card[data-position="2"] {
-    top: 0;
-    transform: translateY(0) scale(0.86);
+    transform:
+      translate3d(0, var(--bulletin-translate-y-deep, -56px), var(--bulletin-translate-z-deep, -80px))
+      rotateY(var(--bulletin-rotate-deep, 8deg))
+      scale(var(--bulletin-scale-deep, 0.86));
     opacity: 0.30;
     z-index: 1;
+    transition-delay: 0ms;
     background: rgba(255, 255, 255, 0.85);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    border: none;
+    box-shadow: 0 8px 24px rgba(11, 25, 41, 0.12);
   }
 
   .lp-bulletin-stack:not(.is-revealed) .lp-bulletin-card[data-position="0"] {
-    transform: translateX(40px);
+    transform: translate3d(40px, 0, 0) rotateY(0deg) scale(1);
     opacity: 0;
   }
   .lp-bulletin-stack:not(.is-revealed) .lp-bulletin-card[data-position="1"] {
-    transform: translateY(-20px) scale(0.93);
+    transform:
+      translate3d(0, calc(var(--bulletin-translate-y-mid, -34px) - 20px), var(--bulletin-translate-z-mid, -40px))
+      rotateY(0deg)
+      scale(var(--bulletin-scale-mid, 0.93));
     opacity: 0;
   }
   .lp-bulletin-stack:not(.is-revealed) .lp-bulletin-card[data-position="2"] {
-    transform: translateY(-20px) scale(0.86);
+    transform:
+      translate3d(0, calc(var(--bulletin-translate-y-deep, -56px) - 20px), var(--bulletin-translate-z-deep, -80px))
+      rotateY(var(--bulletin-rotate-deep, 8deg))
+      scale(var(--bulletin-scale-deep, 0.86));
     opacity: 0;
   }
 
@@ -1460,26 +1487,18 @@
     margin-top: var(--s1, 4px);
   }
 
-  .lp-bulletin-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: rgba(11, 25, 41, 0.55);
-    text-transform: uppercase;
-  }
-
-  .lp-bulletin-content {
-    font-size: 13px;
-    color: var(--navy-800, #0F2540);
-    font-weight: 500;
-  }
-
   .lp-bento-card-featured:hover .lp-bulletin-stack.is-revealed .lp-bulletin-card[data-position="1"] {
-    transform: translateY(-6px) scale(0.93);
+    transform:
+      translate3d(0, calc(var(--bulletin-translate-y-mid, -34px) - 6px), var(--bulletin-translate-z-mid, -40px))
+      rotateY(0deg)
+      scale(var(--bulletin-scale-mid, 0.93));
     opacity: 0.75;
   }
   .lp-bento-card-featured:hover .lp-bulletin-stack.is-revealed .lp-bulletin-card[data-position="2"] {
-    transform: translateY(-12px) scale(0.86);
+    transform:
+      translate3d(0, calc(var(--bulletin-translate-y-deep, -56px) - 12px), var(--bulletin-translate-z-deep, -80px))
+      rotateY(var(--bulletin-rotate-deep, 8deg))
+      scale(var(--bulletin-scale-deep, 0.86));
     opacity: 0.45;
   }
 

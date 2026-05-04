@@ -62,38 +62,56 @@ function AgentPreview() {
 const BULLETIN_CARDS = [
   {
     label: "AUJOURD'HUI",
-    secondary: "1 240 € à récupérer",
-    isHero: true,
+    amount: 1240,
+    displayPrefix: '',
+    caption: "à récupérer en prime d'activité",
+    cta: 'Lancer →' as string | null,
   },
   {
-    label: "DEMAIN",
-    secondary: "Préparer dossier APL",
-    isHero: false,
+    label: 'DEMAIN',
+    amount: 540,
+    displayPrefix: '+',
+    caption: "détectés sur ton APL",
+    cta: null as string | null,
   },
   {
-    label: "VENDREDI",
-    secondary: "Échéance taxe foncière",
-    isHero: false,
+    label: 'VENDREDI',
+    amount: 780,
+    displayPrefix: '+',
+    caption: "optimisables sur tes contrats",
+    cta: null as string | null,
   },
 ] as const;
 
-const ROTATION_INTERVAL_MS = 3000;
+const ROTATION_INTERVAL_MS = 4500;
+const COUNTUP_DELAY_MS = 300;
 
 const FeaturedCardEl = ({ index }: { index: number }) => {
   const { ref: stackRef, isVisible } = useScrollReveal<HTMLDivElement>({ threshold: 0.3 });
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [hasShownCountUp, setHasShownCountUp] = useState(false);
-  const countValue = useCountUp(1240, {
-    duration: 1500,
-    start: hasShownCountUp,
-  });
+  const [hasShown, setHasShown] = useState<[boolean, boolean, boolean]>([false, false, false]);
+
+  const count0 = useCountUp(BULLETIN_CARDS[0].amount, { duration: 1500, start: hasShown[0] });
+  const count1 = useCountUp(BULLETIN_CARDS[1].amount, { duration: 1500, start: hasShown[1] });
+  const count2 = useCountUp(BULLETIN_CARDS[2].amount, { duration: 1500, start: hasShown[2] });
+  const counts: readonly [number, number, number] = [count0, count1, count2];
 
   useEffect(() => {
-    if (isVisible && activeIndex === 0 && !hasShownCountUp) {
-      setHasShownCountUp(true);
-    }
-  }, [isVisible, activeIndex, hasShownCountUp]);
+    if (!isVisible) return;
+    if (hasShown[activeIndex]) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setHasShown((prev) => {
+        if (prev[activeIndex]) return prev;
+        const next = [...prev] as [boolean, boolean, boolean];
+        next[activeIndex] = true;
+        return next;
+      });
+    }, COUNTUP_DELAY_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isVisible, activeIndex, hasShown]);
 
   useEffect(() => {
     if (!isVisible || isPaused) return;
@@ -130,6 +148,7 @@ const FeaturedCardEl = ({ index }: { index: number }) => {
         {BULLETIN_CARDS.map((card, idx) => {
           const position = (idx - activeIndex + BULLETIN_CARDS.length) % BULLETIN_CARDS.length;
           const isHeroPosition = position === 0;
+          const animatedValue = Math.round(counts[idx]);
           return (
             <div
               key={card.label}
@@ -137,23 +156,16 @@ const FeaturedCardEl = ({ index }: { index: number }) => {
               data-position={position}
               aria-hidden={!isHeroPosition}
             >
-              {card.isHero ? (
-                <>
-                  <div className="lp-bulletin-card-header">
-                    <span className="lp-bulletin-dot" aria-hidden="true" />
-                    <span className="lp-bulletin-label-coral">{card.label}</span>
-                  </div>
-                  <div className="lp-bulletin-amount">
-                    {Math.round(countValue).toLocaleString('fr-FR')} €
-                  </div>
-                  <div className="lp-bulletin-context">à récupérer en prime d'activité</div>
-                  <div className="lp-bulletin-action">Lancer →</div>
-                </>
-              ) : (
-                <>
-                  <span className="lp-bulletin-label">{card.label}</span>
-                  <span className="lp-bulletin-content">{card.secondary}</span>
-                </>
+              <div className="lp-bulletin-card-header">
+                <span className="lp-bulletin-dot" aria-hidden="true" />
+                <span className="lp-bulletin-label-coral">{card.label}</span>
+              </div>
+              <div className="lp-bulletin-amount">
+                {card.displayPrefix}{animatedValue.toLocaleString('fr-FR')} €
+              </div>
+              <div className="lp-bulletin-context">{card.caption}</div>
+              {card.cta && (
+                <div className="lp-bulletin-action">{card.cta}</div>
               )}
             </div>
           );
