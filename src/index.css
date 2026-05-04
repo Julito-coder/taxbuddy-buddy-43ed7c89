@@ -905,17 +905,14 @@
     font-weight: 600;
     color: var(--navy-900);
     white-space: nowrap;
-    animation: lp-floatUp 5s var(--ease) infinite;
   }
   .lp-floating-card.top {
     top: 20px;
     right: -30px;
-    animation-delay: 0s;
   }
   .lp-floating-card.bottom {
     bottom: -20px;
     left: -40px;
-    animation-delay: 2.5s;
   }
 
   .lp-floating-dot {
@@ -931,11 +928,6 @@
   .lp-floating-dot.coral {
     background: var(--coral-500);
     box-shadow: 0 0 0 4px rgba(240, 100, 73, 0.15);
-  }
-
-  @keyframes lp-floatUp {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-10px); }
   }
 
   /* ─────────────────────── Landing : Stats bar (Batch 5) */
@@ -2252,12 +2244,12 @@
 
   /* Floating cards Hero (CSS infinite) */
   @keyframes lp-float-up {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-8px); }
+    0%, 100% { transform: translate3d(0, 0, 50px); }
+    50%      { transform: translate3d(0, -8px, 50px); }
   }
   @keyframes lp-float-down {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(8px); }
+    0%, 100% { transform: translate3d(0, 0, 50px); }
+    50%      { transform: translate3d(0, 8px, 50px); }
   }
   .lp-floating-card.top    { animation: lp-float-up   3s ease-in-out infinite; }
   .lp-floating-card.bottom { animation: lp-float-down 3.5s ease-in-out infinite; }
