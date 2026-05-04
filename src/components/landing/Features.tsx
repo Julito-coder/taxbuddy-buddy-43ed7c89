@@ -1,4 +1,4 @@
-import { memo, type ComponentType, type SVGProps } from 'react';
+import { memo, useEffect, useState, type ComponentType, type SVGProps } from 'react';
 import { ScanLine, HandCoins, CalendarClock, Bell } from 'lucide-react';
 import { useScrollReveal } from './hooks/useScrollReveal';
 import { useCountUp } from './hooks/useCountUp';
@@ -59,18 +59,62 @@ function AgentPreview() {
   );
 }
 
+const BULLETIN_CARDS = [
+  {
+    label: "AUJOURD'HUI",
+    secondary: "1 240 € à récupérer",
+    isHero: true,
+  },
+  {
+    label: "DEMAIN",
+    secondary: "Préparer dossier APL",
+    isHero: false,
+  },
+  {
+    label: "VENDREDI",
+    secondary: "Échéance taxe foncière",
+    isHero: false,
+  },
+] as const;
+
+const ROTATION_INTERVAL_MS = 3000;
+
 const FeaturedCardEl = ({ index }: { index: number }) => {
   const { ref: stackRef, isVisible } = useScrollReveal<HTMLDivElement>({ threshold: 0.3 });
-  const countValue = useCountUp(1240, { duration: 1500, start: isVisible });
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [hasShownCountUp, setHasShownCountUp] = useState(false);
+  const countValue = useCountUp(1240, {
+    duration: 1500,
+    start: hasShownCountUp,
+  });
+
+  useEffect(() => {
+    if (isVisible && activeIndex === 0 && !hasShownCountUp) {
+      setHasShownCountUp(true);
+    }
+  }, [isVisible, activeIndex, hasShownCountUp]);
+
+  useEffect(() => {
+    if (!isVisible || isPaused) return;
+    if (typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const id = window.setInterval(() => {
+      setActiveIndex((i) => (i + 1) % BULLETIN_CARDS.length);
+    }, ROTATION_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [isVisible, isPaused]);
 
   return (
     <article
       className="lp-bento-card lp-bento-card-featured lp-reveal-scale"
       data-cascade={index + 1}
       data-revealed={isVisible || undefined}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="lp-bento-featured-icon" aria-hidden="true">
-        <Bell />
+      <div className="lp-bento-featured-icon">
+        <Bell size={20} strokeWidth={2} aria-hidden="true" />
       </div>
       <h3 className="lp-bento-title">Ton bulletin quotidien</h3>
       <p className="lp-bento-desc">
@@ -80,29 +124,58 @@ const FeaturedCardEl = ({ index }: { index: number }) => {
 
       <div
         ref={stackRef}
-        className={`lp-bulletin-stack${isVisible ? ' is-revealed' : ''}`}
+        className={`lp-bulletin-stack ${isVisible ? 'is-revealed' : ''}`}
+        aria-label="Aperçu du bulletin du jour"
       >
-        <div className="lp-bulletin-card lp-bulletin-card-deep">
-          <span className="lp-bulletin-label">VENDREDI</span>
-          <span className="lp-bulletin-content">Échéance taxe foncière</span>
-        </div>
+        {BULLETIN_CARDS.map((card, idx) => {
+          const position = (idx - activeIndex + BULLETIN_CARDS.length) % BULLETIN_CARDS.length;
+          const isHeroPosition = position === 0;
+          return (
+            <div
+              key={card.label}
+              className="lp-bulletin-card"
+              data-position={position}
+              aria-hidden={!isHeroPosition}
+            >
+              {card.isHero ? (
+                <>
+                  <div className="lp-bulletin-card-header">
+                    <span className="lp-bulletin-dot" aria-hidden="true" />
+                    <span className="lp-bulletin-label-coral">{card.label}</span>
+                  </div>
+                  <div className="lp-bulletin-amount">
+                    {Math.round(countValue).toLocaleString('fr-FR')} €
+                  </div>
+                  <div className="lp-bulletin-context">à récupérer en prime d'activité</div>
+                  <div className="lp-bulletin-action">Lancer →</div>
+                </>
+              ) : (
+                <>
+                  <span className="lp-bulletin-label">{card.label}</span>
+                  <span className="lp-bulletin-content">{card.secondary}</span>
+                </>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
-        <div className="lp-bulletin-card lp-bulletin-card-mid">
-          <span className="lp-bulletin-label">DEMAIN</span>
-          <span className="lp-bulletin-content">Préparer dossier APL</span>
-        </div>
-
-        <div className="lp-bulletin-card lp-bulletin-card-hero">
-          <div className="lp-bulletin-card-header">
-            <span className="lp-bulletin-dot" aria-hidden="true" />
-            <span className="lp-bulletin-label-coral">AUJOURD'HUI</span>
-          </div>
-          <div className="lp-bulletin-amount">
-            {Math.round(countValue).toLocaleString('fr-FR')} €
-          </div>
-          <p className="lp-bulletin-context">à récupérer en prime d'activité</p>
-          <span className="lp-bulletin-action">Lancer →</span>
-        </div>
+      <div
+        className="lp-bulletin-dots"
+        role="tablist"
+        aria-label="Navigation entre les cartes du bulletin"
+      >
+        {BULLETIN_CARDS.map((card, idx) => (
+          <button
+            key={card.label}
+            type="button"
+            role="tab"
+            aria-selected={activeIndex === idx}
+            aria-label={`Voir la carte ${card.label}`}
+            onClick={() => setActiveIndex(idx)}
+            className={`lp-bulletin-dot-btn ${activeIndex === idx ? 'is-active' : ''}`}
+          />
+        ))}
       </div>
     </article>
   );
