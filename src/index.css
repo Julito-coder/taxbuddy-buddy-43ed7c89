@@ -60,6 +60,7 @@
     --coral-300: #F5A08E;
     --coral-100: #FDE8E4;
     --coral-50:  #FFF5F3;
+    --coral-700: #C44528; /* Assombri pour texte 13px sur surface claire (WCAG AA, ratio 4.71:1) */
 
     /* Brand (legacy ds-* — accent flippé gold→coral) */
     --ds-color-primary: var(--navy-800);
@@ -70,7 +71,7 @@
     /* Text */
     --ds-color-text-primary: var(--navy-900);
     --ds-color-text-secondary: #475569;
-    --ds-color-text-tertiary: #8896A6;
+    --ds-color-text-tertiary: #576475; /* Assombri pour passer WCAG AA sur surface claire (ratio ~4.7:1, mesuré 4.19 avec #6B7A8D insuffisant) */
     --ds-color-text-inverse: #FFFFFF;
 
     /* Surfaces (alias --surface-* per brief) */
@@ -1021,7 +1022,7 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--coral-500);
+    color: var(--coral-700, #C44528);
   }
 
   .lp-steps-h2 {
@@ -1666,7 +1667,7 @@
     gap: 6px;
     font-size: 13px;
     font-weight: 600;
-    color: var(--coral-500);
+    color: var(--coral-700, #C44528);
     letter-spacing: 0.02em;
   }
   .lp-pricing-toggle-savings-check {
