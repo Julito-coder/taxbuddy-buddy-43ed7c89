@@ -1,21 +1,15 @@
 import { memo, type ComponentType, type SVGProps } from 'react';
 import { ScanLine, HandCoins, CalendarClock, Bell } from 'lucide-react';
 import { useScrollReveal } from './hooks/useScrollReveal';
+import { useCountUp } from './hooks/useCountUp';
 
 type LucideIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
 type CardCommon = { id: string; title: string; desc: string };
 type IconCard = CardCommon & { kind: 'icon'; icon: LucideIcon; iconBg: 'coral' | 'navy' };
-type FeaturedCard = CardCommon & { kind: 'featured' };
 type WideCard = CardCommon & { kind: 'wide' };
 
 const CARDS = {
-  bulletin: {
-    id: 'bulletin',
-    kind: 'featured',
-    title: 'Ton bulletin quotidien',
-    desc: "Chaque matin, une action concrète à faire en moins de 60 secondes. Élio te dit quoi prioriser, sans te noyer.",
-  } as FeaturedCard,
   scanner: {
     id: 'scanner',
     kind: 'icon',
@@ -48,24 +42,6 @@ const CARDS = {
   } as WideCard,
 };
 
-function BulletinPreview() {
-  const rows = [
-    { label: "Aujourd'hui",   value: '1 240 € à récupérer' },
-    { label: 'Demain',        value: 'Demande APL' },
-    { label: 'Cette semaine', value: 'Rappel échéance' },
-  ];
-  return (
-    <div className="lp-bento-preview lp-bento-preview-rows">
-      {rows.map((r) => (
-        <div key={r.label} className="lp-bento-preview-row">
-          <span className="lp-bento-preview-label">{r.label}</span>
-          <span className="lp-bento-preview-value">{r.value}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function AgentPreview() {
   return (
     <div className="lp-bento-preview lp-bento-preview-qa">
@@ -83,22 +59,54 @@ function AgentPreview() {
   );
 }
 
-function FeaturedCardEl({ card, index, start }: { card: FeaturedCard; index: number; start: boolean }) {
+const FeaturedCardEl = ({ index }: { index: number }) => {
+  const { ref: stackRef, isVisible } = useScrollReveal<HTMLDivElement>({ threshold: 0.3 });
+  const countValue = useCountUp(1240, { duration: 1500, start: isVisible });
+
   return (
     <article
       className="lp-bento-card lp-bento-card-featured lp-reveal-scale"
       data-cascade={index + 1}
-      data-revealed={start || undefined}
+      data-revealed={isVisible || undefined}
     >
       <div className="lp-bento-featured-icon" aria-hidden="true">
         <Bell />
       </div>
-      <h3 className="lp-bento-title">{card.title}</h3>
-      <p className="lp-bento-desc">{card.desc}</p>
-      <BulletinPreview />
+      <h3 className="lp-bento-title">Ton bulletin quotidien</h3>
+      <p className="lp-bento-desc">
+        Chaque matin, une action concrète à faire en moins de 60 secondes.
+        Élio te dit quoi prioriser, sans te noyer.
+      </p>
+
+      <div
+        ref={stackRef}
+        className={`lp-bulletin-stack${isVisible ? ' is-revealed' : ''}`}
+      >
+        <div className="lp-bulletin-card lp-bulletin-card-deep">
+          <span className="lp-bulletin-label">VENDREDI</span>
+          <span className="lp-bulletin-content">Échéance taxe foncière</span>
+        </div>
+
+        <div className="lp-bulletin-card lp-bulletin-card-mid">
+          <span className="lp-bulletin-label">DEMAIN</span>
+          <span className="lp-bulletin-content">Préparer dossier APL</span>
+        </div>
+
+        <div className="lp-bulletin-card lp-bulletin-card-hero">
+          <div className="lp-bulletin-card-header">
+            <span className="lp-bulletin-dot" aria-hidden="true" />
+            <span className="lp-bulletin-label-coral">AUJOURD'HUI</span>
+          </div>
+          <div className="lp-bulletin-amount">
+            {Math.round(countValue).toLocaleString('fr-FR')} €
+          </div>
+          <p className="lp-bulletin-context">à récupérer en prime d'activité</p>
+          <span className="lp-bulletin-action">Lancer →</span>
+        </div>
+      </div>
     </article>
   );
-}
+};
 
 function IconCardEl({ card, index, start }: { card: IconCard; index: number; start: boolean }) {
   const Icon = card.icon;
@@ -150,7 +158,7 @@ function LandingFeaturesBase() {
         </p>
       </div>
       <div className="lp-bento">
-        <FeaturedCardEl card={CARDS.bulletin}   index={0} start={isVisible} />
+        <FeaturedCardEl                         index={0} />
         <IconCardEl     card={CARDS.scanner}    index={1} start={isVisible} />
         <IconCardEl     card={CARDS.aides}      index={2} start={isVisible} />
         <IconCardEl     card={CARDS.calendrier} index={3} start={isVisible} />
