@@ -21,3 +21,20 @@ escaladée à l'équipe Brand pour révision en charte v1.1+.
 **Action escalade Brand** : proposer correction charte v1.1 vers
 `#677181` ou `#5C6878` pour préserver l'esprit charte tout en
 respectant WCAG AA.
+
+## DEV-002 · --secondary shadcn token
+
+**Date** : Mai 2026 (Batch 0 ter)
+**Charte v1.0 spec** : pas de spec explicite pour le slot
+shadcn `--secondary`
+**Implémentation** : `213 30% 92%` (navy-pâle warm `#E5EAF1`)
+**Foreground** : `213 37% 20%` (encre `#2A3F56`)
+
+**Raison** : le slot shadcn `--secondary` est une surface neutre
+tinted, pas une couleur de marque. Le mettre en coral violerait
+P.02 charte (« une seule couleur d'action »). Le navy-pâle warm
+respecte la fonction sémantique tout en évitant le gold legacy.
+
+**Composants impactés** : button variant="secondary",
+badge variant="secondary", progress track, slider track,
+~50 usages bg-secondary/text-secondary applicatifs.

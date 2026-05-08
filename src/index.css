@@ -13,8 +13,10 @@
     --popover-foreground: 213 37% 20%;
     --primary: 210 53% 23%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 8 84% 61%;            /* coral #F06449 — Charte v1.0 (ex-gold tué) */
-    --secondary-foreground: 0 0% 100%;
+    /* --secondary : surface neutre tinted (pas couleur marque).
+       Coral est RÉSERVÉ aux CTA primaires (charte P.02). */
+    --secondary: 213 30% 92%;            /* navy-pâle warm #E5EAF1 */
+    --secondary-foreground: 213 37% 20%; /* encre #2A3F56 */
     --muted: 220 14% 96%;
     --muted-foreground: 215 16% 47%;
     --accent: 210 40% 94%;
