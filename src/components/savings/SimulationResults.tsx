@@ -25,7 +25,7 @@ interface SimulationResultsProps {
 
 const PROFILE_COLORS: Record<SavingsProfile, string> = {
   prudent: '#94a3b8',
-  equilibre: '#1B3A5C',
+  equilibre: '#0F1E33',
   dynamique: '#4B8264',
 };
 
@@ -161,8 +161,8 @@ export function SimulationResults({ title, simulations, showTaxSavings = false }
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorCapital" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1B3A5C" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#1B3A5C" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#0F1E33" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#0F1E33" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorInterest" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#4B8264" stopOpacity={0.3} />
@@ -191,7 +191,7 @@ export function SimulationResults({ title, simulations, showTaxSavings = false }
                 <Area
                   type="monotone"
                   dataKey="Capital total"
-                  stroke="#1B3A5C"
+                  stroke="#0F1E33"
                   fill="url(#colorCapital)"
                   strokeWidth={2}
                 />

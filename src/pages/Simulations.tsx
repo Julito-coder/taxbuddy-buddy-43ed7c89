@@ -54,7 +54,7 @@ const Simulations = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           onClick={() => navigate('/simulations/immobilier')}
-          className="w-full bg-gradient-to-br from-[#1B3A5C] to-[#2A5A8C] text-white rounded-2xl p-6 text-left shadow-md hover:shadow-lg transition-all group"
+          className="w-full bg-gradient-to-br from-[#0F1E33] to-[#2A5A8C] text-white rounded-2xl p-6 text-left shadow-md hover:shadow-lg transition-all group"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2 flex-1">
@@ -107,14 +107,14 @@ const Simulations = () => {
                     className={`bg-card rounded-xl border border-[#E5E7EB] p-4 text-left transition-all flex items-start gap-3 group ${
                       disabled
                         ? 'opacity-60 cursor-not-allowed'
-                        : 'hover:border-[#1B3A5C]/30 hover:shadow-sm'
+                        : 'hover:border-[#0F1E33]/30 hover:shadow-sm'
                     }`}
                   >
                     <div className="h-9 w-9 rounded-lg bg-[#F8F5F0] flex items-center justify-center shrink-0">
-                      <item.icon className="h-4 w-4 text-[#1B3A5C]" />
+                      <item.icon className="h-4 w-4 text-[#0F1E33]" />
                     </div>
                     <div className="flex-1 min-w-0 space-y-1.5">
-                      <p className="text-sm font-medium text-foreground leading-tight group-hover:text-[#1B3A5C] transition-colors">
+                      <p className="text-sm font-medium text-foreground leading-tight group-hover:text-[#0F1E33] transition-colors">
                         {item.label}
                       </p>
                       <StatusBadge status={item.status} />

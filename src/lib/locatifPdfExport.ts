@@ -43,8 +43,8 @@ const defaultConfig: PDFConfig = {
 // =============================================================================
 
 const COLORS = {
-  primary: [27, 58, 92] as [number, number, number],       // Navy #1B3A5C
-  primaryLight: [200, 148, 62] as [number, number, number], // Gold #C8943E
+  primary: [15, 30, 51] as [number, number, number],       // Navy primary #0F1E33 — Charte v1.0
+  primaryLight: [15, 30, 51] as [number, number, number], // Navy primary #0F1E33 (gold #C8943E supprimé)
   success: [75, 130, 100] as [number, number, number],      // Sage Green #4B8264
   successLight: [220, 240, 225] as [number, number, number],
   warning: [217, 119, 6] as [number, number, number],       // Amber #D97706

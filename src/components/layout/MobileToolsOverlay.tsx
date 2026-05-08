@@ -323,7 +323,7 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
                         className="text-left bg-card border border-[#E5E7EB] rounded-xl p-3 hover:border-primary/30 hover:shadow-sm transition-all flex items-start gap-2.5"
                       >
                         <div className="h-9 w-9 rounded-lg bg-[#F8F5F0] flex items-center justify-center shrink-0">
-                          <Icon className="h-4 w-4 text-[#1B3A5C]" />
+                          <Icon className="h-4 w-4 text-[#0F1E33]" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-semibold text-foreground leading-tight">{l.label}</p>
@@ -405,7 +405,7 @@ export const MobileToolsOverlay = ({ open, onOpenChange }: Props) => {
                                       }`}
                                     >
                                       <div className="h-7 w-7 rounded-md bg-[#F8F5F0] flex items-center justify-center shrink-0">
-                                        <ItemIcon className="h-3.5 w-3.5 text-[#1B3A5C]" />
+                                        <ItemIcon className="h-3.5 w-3.5 text-[#0F1E33]" />
                                       </div>
                                       <span className="flex-1 text-[13px] font-medium text-foreground leading-tight">
                                         {item.label}
