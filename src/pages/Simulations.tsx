@@ -54,7 +54,7 @@ const Simulations = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           onClick={() => navigate('/simulations/immobilier')}
-          className="w-full bg-gradient-to-br from-[#0F1E33] to-[#2A5A8C] text-white rounded-2xl p-6 text-left shadow-md hover:shadow-lg transition-all group"
+          className="w-full bg-gradient-to-br from-[#0F1E33] to-[#2A5580] text-white rounded-2xl p-6 text-left shadow-md hover:shadow-lg transition-all group"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2 flex-1">
