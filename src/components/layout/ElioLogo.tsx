@@ -1,102 +1,179 @@
-import elioSymbol from '@/assets/elio-symbol-blue.svg';
-import elioHorizontal from '@/assets/elio-logo-horizontal-blue.svg';
+/**
+ * ElioLogo — Charte v1.0 Mai 2026 (pages 5-6, 17)
+ *
+ * - Wordmark "élio" + point coral en suffixe (Inter ExtraBold 800,
+ *   tracking -0.045em, lowercase).
+ * - Symbol carré arrondi (radius 22%) avec É majuscule + point coral.
+ * - 5 variants × 4 modes pour couvrir light/dark/mono/on-coral.
+ *
+ * API rétro-compatible avec les 4 call sites existants
+ * (Sidebar, Auth, Legal, WelcomeStep) — pas de prop variant="full"
+ * en usage, le nouveau défaut "horizontal" reproduit le lockup
+ * symbol + wordmark.
+ */
+
+export type ElioLogoVariant = 'horizontal' | 'symbol' | 'wordmark' | 'compact' | 'favicon';
+export type ElioLogoMode = 'light' | 'dark' | 'mono-dark' | 'on-coral';
 
 interface ElioLogoProps {
-  variant?: 'full' | 'symbol' | 'wordmark' | 'compact' | 'favicon';
-  className?: string;
+  variant?: ElioLogoVariant;
+  mode?: ElioLogoMode;
   size?: number;
+  className?: string;
+  ariaLabel?: string;
 }
 
-export const ElioLogo = ({ variant = 'full', className = '', size = 40 }: ElioLogoProps) => {
-  if (variant === 'symbol') {
-    return (
-      <img
-        src={elioSymbol}
-        alt="Élio"
-        width={size}
-        height={size * 1.08}
-        className={className}
-      />
-    );
-  }
+const NAVY = '#0F1E33';
+const CREAM = '#F4F2EC';
+const CORAL = '#F06449';
 
-  if (variant === 'wordmark') {
-    return (
+const DEFAULT_SIZE: Record<ElioLogoVariant, number> = {
+  horizontal: 40,
+  symbol: 48,
+  wordmark: 32,
+  compact: 24,
+  favicon: 32,
+};
+
+const FONT_STACK = "'Inter', system-ui, -apple-system, sans-serif";
+
+function paint(mode: ElioLogoMode): { letter: string; dot: string } {
+  switch (mode) {
+    case 'dark':
+      return { letter: CREAM, dot: CORAL };
+    case 'mono-dark':
+      return { letter: CREAM, dot: CREAM };
+    case 'on-coral':
+      return { letter: CREAM, dot: CREAM };
+    case 'light':
+    default:
+      return { letter: NAVY, dot: CORAL };
+  }
+}
+
+function symbolBackground(mode: ElioLogoMode): string {
+  switch (mode) {
+    case 'dark':
+    case 'mono-dark':
+      return 'rgba(244, 242, 236, 0.06)';
+    case 'on-coral':
+      return 'transparent';
+    case 'light':
+    default:
+      return CREAM;
+  }
+}
+
+interface PartProps {
+  size: number;
+  mode: ElioLogoMode;
+}
+
+const Wordmark = ({ size, mode }: PartProps) => {
+  const { letter, dot } = paint(mode);
+  return (
+    <span
+      style={{
+        fontFamily: FONT_STACK,
+        fontWeight: 800,
+        letterSpacing: '-0.045em',
+        lineHeight: 1,
+        fontSize: size * 0.55,
+        color: letter,
+        display: 'inline-flex',
+        alignItems: 'baseline',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      élio
+      <span style={{ color: dot }} aria-hidden="true">.</span>
+    </span>
+  );
+};
+
+const Symbol = ({ size, mode }: PartProps) => {
+  const { letter, dot } = paint(mode);
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: size,
+        height: size,
+        borderRadius: size * 0.22,
+        background: symbolBackground(mode),
+        flexShrink: 0,
+      }}
+      aria-hidden="true"
+    >
       <span
-        className={`font-bold ${className}`}
         style={{
-          fontSize: size * 0.85,
+          fontFamily: FONT_STACK,
+          fontWeight: 800,
           letterSpacing: '-0.04em',
-          background: 'linear-gradient(135deg, #1B3A5C 0%, #2A5580 60%, #C8943E 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
+          lineHeight: 1,
+          fontSize: size * 0.5,
+          color: letter,
+          display: 'inline-flex',
+          alignItems: 'baseline',
         }}
       >
-        élio
+        É
+        <span style={{ color: dot, marginLeft: -size * 0.04 }}>.</span>
       </span>
-    );
-  }
+    </span>
+  );
+};
 
-  // Compact: symbole + wordmark serrés, optimisé mobile / header dense
-  if (variant === 'compact') {
-    return (
-      <span className={`inline-flex items-center gap-1.5 ${className}`}>
-        <img
-          src={elioSymbol}
-          alt="Élio"
-          width={size}
-          height={size * 1.08}
-          style={{ flexShrink: 0 }}
-        />
-        <span
-          className="font-bold leading-none"
-          style={{
-            fontSize: size * 0.62,
-            letterSpacing: '-0.04em',
-            background: 'linear-gradient(135deg, #1B3A5C 0%, #2A5580 60%, #C8943E 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}
-        >
-          élio
-        </span>
-      </span>
-    );
-  }
+export const ElioLogo = ({
+  variant = 'horizontal',
+  mode = 'light',
+  size,
+  className,
+  ariaLabel = 'Élio',
+}: ElioLogoProps) => {
+  const renderSize = size ?? DEFAULT_SIZE[variant];
 
-  // Favicon: SVG inline ultra-lisible à très petite taille (16/32px)
-  // Aplatissements: pas de dégradé fin, contraste max, glyphe épais
-  if (variant === 'favicon') {
+  if (variant === 'symbol' || variant === 'favicon') {
     return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 64 64"
-        width={size}
-        height={size}
+      <span
         className={className}
-        aria-label="Élio"
+        role="img"
+        aria-label={ariaLabel}
+        style={{ display: 'inline-flex' }}
       >
-        <path
-          d="M32 2C12 2 2 12 2 32s10 30 30 30 30-10 30-30S52 2 32 2Z"
-          fill="#1B3A5C"
-        />
-        <circle cx="32.5" cy="13" r="3.4" fill="#C8943E" />
-        <path
-          d="M42 28c0-5.4-4.3-9.2-10-9.2-6.6 0-11.2 4.8-11.2 11.4 0 6.9 4.9 11.4 11.9 11.4 3.7 0 6.8-1.1 9.1-3l-2.8-3.9c-1.7 1.3-3.7 2-5.9 2-3.4 0-5.9-1.8-6.5-4.8H41.8c.1-.7.2-1.5.2-2.4Zm-15.4-2c.6-2.7 2.6-4.4 5.3-4.4 2.6 0 4.6 1.7 4.9 4.4H26.6Z"
-          fill="#FAFAF7"
-        />
-      </svg>
+        <Symbol size={renderSize} mode={mode} />
+      </span>
+    );
+  }
+
+  if (variant === 'wordmark' || variant === 'compact') {
+    return (
+      <span
+        className={className}
+        role="img"
+        aria-label={ariaLabel}
+        style={{ display: 'inline-flex' }}
+      >
+        <Wordmark size={renderSize} mode={mode} />
+      </span>
     );
   }
 
   return (
-    <img
-      src={elioHorizontal}
-      alt="Élio"
+    <span
       className={className}
-      style={{ height: `${size}px`, width: 'auto' }}
-    />
+      role="img"
+      aria-label={ariaLabel}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: renderSize * 0.3,
+      }}
+    >
+      <Symbol size={renderSize} mode={mode} />
+      <Wordmark size={renderSize} mode={mode} />
+    </span>
   );
 };

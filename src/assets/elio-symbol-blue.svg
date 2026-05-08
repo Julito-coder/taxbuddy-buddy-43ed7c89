@@ -1,20 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <defs>
-    <linearGradient id="elioGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#1B3A5C"/>
-      <stop offset="65%" stop-color="#2A5580"/>
-      <stop offset="100%" stop-color="#C8943E"/>
-    </linearGradient>
-    <linearGradient id="elioHighlight" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
-      <stop offset="55%" stop-color="#ffffff" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
-  <!-- Soft squircle background -->
-  <path d="M32 2C12 2 2 12 2 32s10 30 30 30 30-10 30-30S52 2 32 2Z" fill="url(#elioGrad)"/>
-  <path d="M32 2C12 2 2 12 2 32s10 30 30 30 30-10 30-30S52 2 32 2Z" fill="url(#elioHighlight)"/>
-  <!-- Stylized 'é' mark -->
-  <path d="M40.5 26.5c0-5-4-8.5-9.2-8.5-6 0-10.3 4.6-10.3 10.8 0 6.5 4.5 10.7 11 10.7 3.4 0 6.3-1 8.4-2.7l-2.4-3.6c-1.6 1.2-3.5 1.9-5.6 1.9-3.2 0-5.6-1.7-6.2-4.6h14.1c.1-.6.2-1.4.2-2Zm-14.2-1.8c.6-2.6 2.5-4.2 5-4.2s4.3 1.6 4.6 4.2H26.3Z" fill="#FAFAF7"/>
-  <!-- Accent dot (acute accent) -->
-  <circle cx="32.5" cy="13" r="2.4" fill="#C8943E"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Élio">
+  <rect width="256" height="256" rx="56" ry="56" fill="#F4F2EC"/>
+  <text x="128" y="128"
+        text-anchor="middle"
+        dominant-baseline="central"
+        style="font-family: 'Inter', system-ui, sans-serif; font-weight: 800; font-size: 128px; letter-spacing: -5.12px;"
+        fill="#0F1E33">É<tspan fill="#F06449">.</tspan></text>
 </svg>
