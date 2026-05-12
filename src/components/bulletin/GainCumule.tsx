@@ -46,12 +46,12 @@ export const GainCumule = ({ totalCents, weeklyDeltaCents }: GainCumuleProps) =>
           transition={{ delay: 0.15, duration: 0.5, ease: 'easeOut' }}
           className="bg-card rounded-2xl border border-border shadow-sm p-6 mx-5 lg:mx-8 cursor-pointer hover:shadow-md transition-shadow"
         >
-          <p className="text-sm text-muted-foreground">Élio t'a fait gagner</p>
+          <p className="text-sm text-coral-700 font-medium">Élio t'a fait gagner</p>
           <motion.p
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.3, type: 'spring', stiffness: 120 }}
-            className="text-5xl lg:text-6xl font-bold text-primary mt-2"
+            className="text-5xl lg:text-6xl font-bold text-coral-500 mt-2"
           >
             <AnimatedNumber value={Math.round(totalCents / 100)} />
           </motion.p>

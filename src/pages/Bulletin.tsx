@@ -17,7 +17,7 @@ import { getBulletinHistory, DailyBulletinRow } from '@/lib/bulletinService';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Bulletin = () => {
-  const { data, loading, newsLoading, handleActionStatus } = useDailyBulletin();
+  const { data, bulletinState, newsLoading, handleActionStatus, reload } = useDailyBulletin();
   const { user } = useAuth();
   const [history, setHistory] = useState<DailyBulletinRow[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
@@ -35,7 +35,7 @@ const Bulletin = () => {
     }
   };
 
-  if (loading) {
+  if (bulletinState === 'loading') {
     return (
       <AppLayout>
         <BulletinSkeleton />
@@ -43,7 +43,21 @@ const Bulletin = () => {
     );
   }
 
-  const showEmptyState = !data || data.profileCompletionPct < 50;
+  if (bulletinState === 'E1' || bulletinState === 'E2' || bulletinState === 'E3') {
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background pb-24 lg:pb-8">
+          <BulletinEmptyState
+            state={bulletinState}
+            completionPct={data?.profileCompletionPct ?? 0}
+            onRefresh={reload}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (!data) return null;
 
   return (
     <AppLayout>
@@ -51,8 +65,8 @@ const Bulletin = () => {
         {/* Header avec bouton historique */}
         <div className="relative">
           <BulletinHeader
-            userName={data?.userName || ''}
-            currentStreak={data?.streak.current_streak || 0}
+            userName={data.userName || ''}
+            currentStreak={data.streak.current_streak || 0}
           />
           <Drawer onOpenChange={(open) => open && loadHistory()}>
             <DrawerTrigger asChild>
@@ -97,8 +111,8 @@ const Bulletin = () => {
 
         {/* Gain cumulé */}
         <GainCumule
-          totalCents={data?.cumulativeGainCents || 0}
-          weeklyDeltaCents={data?.weeklyDeltaCents || 0}
+          totalCents={data.cumulativeGainCents || 0}
+          weeklyDeltaCents={data.weeklyDeltaCents || 0}
         />
 
         {/* Synthèse fiscale issue des transactions bancaires (tags) */}
@@ -107,29 +121,25 @@ const Bulletin = () => {
         {/* Carte Coach épinglée — la « glu » entre les piliers */}
         <CoachPinnedCard />
 
-        {/* Action du jour ou empty state */}
-        {showEmptyState ? (
-          <BulletinEmptyState />
-        ) : data && (
-          <ActionDuJour
-            action={data.action}
-            status={data.bulletin.action_status}
-            onStatusChange={handleActionStatus}
-          />
-        )}
+        {/* Action du jour */}
+        <ActionDuJour
+          action={data.action}
+          status={data.bulletin.action_status}
+          onStatusChange={handleActionStatus}
+        />
 
         {/* Prochaine échéance */}
-        {data?.deadline && (
+        {data.deadline && (
           <ProchaineEcheance deadline={data.deadline} />
         )}
 
         {/* News personnalisée — skeleton si en cours de génération */}
-        {(data?.bulletin || newsLoading) && (
+        {(data.bulletin || newsLoading) && (
           <NewsPersonnalisee
-            context={data?.bulletin?.news_context ?? null}
-            title={data?.bulletin?.news_title ?? null}
-            body={data?.bulletin?.news_body ?? null}
-            loading={newsLoading && !data?.bulletin?.news_title}
+            context={data.bulletin?.news_context ?? null}
+            title={data.bulletin?.news_title ?? null}
+            body={data.bulletin?.news_body ?? null}
+            loading={newsLoading && !data.bulletin?.news_title}
           />
         )}
 

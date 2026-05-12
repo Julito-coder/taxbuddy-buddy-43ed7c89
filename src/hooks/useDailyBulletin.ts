@@ -32,6 +32,17 @@ export interface BulletinData {
   profileCompletionPct: number;
 }
 
+/**
+ * État global du Bulletin pour dispatching UI :
+ * - 'loading'  : chargement initial des données utilisateur
+ * - 'E1'       : premier login, profil utilisateur absent (pas même un dashboard profile)
+ * - 'E2'       : profil partiellement saisi (calculateProfileCompletion < 50%)
+ * - 'E3'       : profil suffisamment complet mais bulletin/action non générés
+ *                (edge function en attente, échec silencieux, race)
+ * - 'full'     : bulletin du jour disponible, action prête, état nominal
+ */
+export type BulletinState = 'loading' | 'E1' | 'E2' | 'E3' | 'full';
+
 export function useDailyBulletin() {
   const { user } = useAuth();
   const [data, setData] = useState<BulletinData | null>(null);
@@ -222,5 +233,12 @@ export function useDailyBulletin() {
     }
   }, [data]);
 
-  return { data, loading, newsLoading, error, handleActionStatus, reload: loadBulletin };
+  const bulletinState: BulletinState =
+    loading ? 'loading' :
+    !data ? 'E1' :
+    data.profileCompletionPct < 50 ? 'E2' :
+    (!data.bulletin || !data.action) ? 'E3' :
+    'full';
+
+  return { data, loading, newsLoading, error, handleActionStatus, reload: loadBulletin, bulletinState };
 }

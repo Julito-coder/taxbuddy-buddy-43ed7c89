@@ -6,8 +6,8 @@ export const BulletinFooter = () => {
   const navigate = useNavigate();
 
   const shortcuts = [
-    { icon: Calendar, label: 'Calendrier', path: '/outils/calendrier' },
-    { icon: ScanSearch, label: 'Scanner', path: '/outils/scanner' },
+    { icon: Calendar, label: 'Calendrier', path: '/calendrier' },
+    { icon: ScanSearch, label: 'Scanner', path: '/simulations/scanner' },
     { icon: MessageCircle, label: 'Élio Agent', path: '/agent' },
   ];
 
