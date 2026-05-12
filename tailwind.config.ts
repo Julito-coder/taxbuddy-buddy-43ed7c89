@@ -107,6 +107,10 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        coral: {
+          500: "rgb(240 100 73 / <alpha-value>)",
+          700: "rgb(196 69 40 / <alpha-value>)",
+        },
         // Design system landing — couleurs accessibles WCAG AA
         ds: {
           primary: "var(--ds-color-primary)",
