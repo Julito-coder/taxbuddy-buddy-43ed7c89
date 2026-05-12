@@ -2,6 +2,19 @@ import { ReactNode, useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import { MobileToolsOverlay } from './MobileToolsOverlay';
+import { SidebarProvider } from '@/components/ui/sidebar';
+
+/**
+ * Relit le cookie `sidebar:state` au mount pour restaurer l'état expanded/collapsed
+ * de la sidebar entre rechargements (la primitive shadcn écrit le cookie mais ne
+ * le relit pas — utile uniquement en SSR Next.js, pas en SPA Vite).
+ * Synchrone (lu pendant le render, pas en useEffect) → pas de flash visuel au mount.
+ */
+const getInitialSidebarState = (): boolean => {
+  if (typeof document === 'undefined') return true;
+  const match = document.cookie.match(/sidebar:state=([^;]+)/);
+  return match ? match[1] === 'true' : true;
+};
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -20,17 +33,14 @@ export const AppLayout = ({ children, variant = 'default' }: AppLayoutProps) => 
   const isChat = variant === 'chat';
 
   return (
-    <div className="min-h-screen bg-background">
+    <SidebarProvider defaultOpen={getInitialSidebarState()} className="bg-background">
       <div className="hidden lg:block">
         <Sidebar />
       </div>
 
       {isChat ? (
-        // Chat mode: <main> is a flex container that fills the dynamic
-        // viewport height, leaves room for the mobile bottom nav, and gives
-        // its child a flex column to occupy precisely.
         <main
-          className="lg:ml-64 flex flex-col overflow-hidden pb-[68px] lg:pb-0"
+          className="flex flex-1 flex-col overflow-hidden pb-[68px] lg:pb-0 min-w-0"
           style={{ height: '100dvh' }}
         >
           <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden">
@@ -38,13 +48,13 @@ export const AppLayout = ({ children, variant = 'default' }: AppLayoutProps) => 
           </div>
         </main>
       ) : (
-        <main className="lg:ml-64 min-h-screen pb-20 lg:pb-0 overflow-x-hidden">
-          <div className="relative overflow-x-hidden">
+        <main className="flex flex-1 flex-col min-h-screen pb-20 lg:pb-0 overflow-x-hidden min-w-0">
+          <div className="relative flex-1 overflow-x-hidden">
             <div
               className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-full h-[300px] pointer-events-none"
               style={{
                 background:
-                  'radial-gradient(ellipse at top, rgba(27,58,92,0.08), transparent 50%)',
+                  'radial-gradient(ellipse at top, rgba(15,30,51,0.08), transparent 50%)',
               }}
             />
             <div className="relative p-4 lg:p-8">{children}</div>
@@ -54,6 +64,6 @@ export const AppLayout = ({ children, variant = 'default' }: AppLayoutProps) => 
 
       <BottomNav toolsOpen={toolsOpen} onToolsOpenChange={setToolsOpen} />
       <MobileToolsOverlay open={toolsOpen} onOpenChange={setToolsOpen} />
-    </div>
+    </SidebarProvider>
   );
 };
