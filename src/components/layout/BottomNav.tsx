@@ -108,7 +108,7 @@ export const BottomNav = ({ toolsOpen, onToolsOpenChange }: Props) => {
                 : 'border-2 border-coral-500/30 shadow-md'
             }`}
           >
-            <ElioFox animation="idle-breathe" size={48} />
+            <ElioFox animation="ear-wiggle" size={48} />
           </NavLink>
         </div>
 
