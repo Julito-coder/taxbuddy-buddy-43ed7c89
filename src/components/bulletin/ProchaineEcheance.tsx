@@ -25,7 +25,7 @@ export const ProchaineEcheance = forwardRef<HTMLDivElement, ProchaineEcheancePro
         transition={{ delay: 0.35, duration: 0.5, ease: 'easeOut' }}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
-        onClick={() => navigate('/outils/calendrier')}
+        onClick={() => navigate('/calendrier')}
         className="bg-card rounded-xl border border-border p-5 mx-5 lg:mx-8 mt-4 flex items-center gap-4 cursor-pointer hover:shadow-sm transition-shadow"
       >
         <CalendarClock className={`h-6 w-6 flex-shrink-0 ${isUrgent ? 'text-warning' : 'text-muted-foreground'}`} />
