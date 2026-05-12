@@ -1,5 +1,5 @@
 /**
- * ElioFox — Mascot statique d'Élio, 9 expressions canoniques.
+ * ElioFox — Mascot d'Élio, 9 expressions canoniques + 8 animations Lottie.
  *
  * Spec : Charte graphique Élio v1.0, section 07 (Compagnon de marque).
  * V frontal, truffe et contour restent constants entre les expressions.
@@ -13,12 +13,19 @@
  *   #FF3D17  corail saturé (joues, cœurs love)
  *
  * Usage:
- *   <ElioFox expression="happy" size={96} />
+ *   <ElioFox expression="happy" size={96} />       // SVG statique
+ *   <ElioFox animation="bounce" size={96} />       // Lottie lazy-loaded
+ *   <ElioFox animation="wave" expression="hi" />   // Suspense fallback explicite
  *
- * Version statique. Animations Lottie : ElioFox v2 (Batch 3).
+ * Mode statique vs animé :
+ * - Si `animation` est défini → prend la priorité sur `expression` et
+ *   déclenche le lazy-load du runtime Lottie (chunk séparé ~180 kB).
+ *   Pendant le download, fallback SVG = `expression` si fournie, sinon
+ *   mapping FALLBACK_EXPRESSION interne.
+ * - Sinon → rendu SVG statique (chunk principal, zéro fetch).
  */
 
-import { type ReactNode } from 'react';
+import { lazy, Suspense, type ReactNode } from 'react';
 
 export type ElioFoxExpression =
   | 'neutral'    // idle · défaut
@@ -31,12 +38,33 @@ export type ElioFoxExpression =
   | 'sleep'      // off-hours
   | 'love';      // favori ajouté
 
+export type ElioFoxAnimation =
+  | 'idle-breathe'
+  | 'blink'
+  | 'ear-wiggle'
+  | 'head-tilt'
+  | 'bounce'
+  | 'wave'
+  | 'thinking'
+  | 'sleeping';
+
 export interface ElioFoxProps {
-  /** Expression rendue. Défaut : `neutral`. */
+  /** Expression rendue (mode statique ou fallback Suspense). Défaut : `neutral`. */
   expression?: ElioFoxExpression;
+  /**
+   * Animation Lottie. Si défini, prend la priorité sur `expression` et déclenche
+   * le lazy-load du runtime Lottie. Sinon, rendu SVG statique.
+   */
+  animation?: ElioFoxAnimation;
   /** Taille en pixels (carré). Défaut : `64`. */
   size?: number;
-  /** Classes additionnelles passées au `<svg>`. */
+  /** Loop de l'animation. Ignoré si `animation` undefined. */
+  loop?: boolean | number;
+  /** Autoplay de l'animation. Défaut : `true`. Ignoré si `animation` undefined. */
+  autoplay?: boolean;
+  /** Callback fin d'animation. Ignoré si `animation` undefined. */
+  onComplete?: () => void;
+  /** Classes additionnelles. */
   className?: string;
   /** Label accessibilité. Défaut : `'Élio'`. */
   ariaLabel?: string;
@@ -206,24 +234,88 @@ const FACE_PATHS: Record<ElioFoxExpression, ReactNode> = {
   ),
 };
 
+const FALLBACK_EXPRESSION: Record<ElioFoxAnimation, ElioFoxExpression> = {
+  'idle-breathe': 'neutral',
+  'blink': 'neutral',
+  'ear-wiggle': 'neutral',
+  'head-tilt': 'focused',
+  'bounce': 'happy',
+  'wave': 'hi',
+  'thinking': 'focused',
+  'sleeping': 'sleep',
+};
+
+interface StaticElioFoxProps {
+  expression: ElioFoxExpression;
+  size: number;
+  className?: string;
+  ariaLabel?: string;
+}
+
+const StaticElioFox = ({
+  expression,
+  size,
+  className,
+  ariaLabel,
+}: StaticElioFoxProps) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 380 380"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    role="img"
+    aria-label={ariaLabel}
+  >
+    {FACE_PATHS[expression]}
+  </svg>
+);
+
+const ElioFoxAnimated = lazy(() => import('./ElioFoxAnimated'));
+
 export const ElioFox = ({
-  expression = 'neutral',
+  expression,
+  animation,
   size = 64,
+  loop,
+  autoplay,
+  onComplete,
   className,
   ariaLabel = 'Élio',
 }: ElioFoxProps) => {
+  if (animation) {
+    const fallbackExpr = expression ?? FALLBACK_EXPRESSION[animation];
+    return (
+      <Suspense
+        fallback={
+          <StaticElioFox
+            expression={fallbackExpr}
+            size={size}
+            className={className}
+            ariaLabel={ariaLabel}
+          />
+        }
+      >
+        <ElioFoxAnimated
+          animation={animation}
+          size={size}
+          loop={loop}
+          autoplay={autoplay}
+          onComplete={onComplete}
+          className={className}
+          ariaLabel={ariaLabel}
+        />
+      </Suspense>
+    );
+  }
+
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 380 380"
-      xmlns="http://www.w3.org/2000/svg"
+    <StaticElioFox
+      expression={expression ?? 'neutral'}
+      size={size}
       className={className}
-      role="img"
-      aria-label={ariaLabel}
-    >
-      {FACE_PATHS[expression]}
-    </svg>
+      ariaLabel={ariaLabel}
+    />
   );
 };
 
