@@ -28,7 +28,7 @@ export const sections: Section[] = [
     title: 'Famille & Couple',
     subtitle: 'Union, séparation, enfants, transmission',
     icon: Heart,
-    accent: 'bg-[#1B3A5C]/10 text-[#1B3A5C]',
+    accent: 'bg-[#0F1E33]/10 text-[#0F1E33]',
     items: [
       { label: 'PACS / Mariage', icon: Heart, status: 'available', to: '/simulations/pacs' },
       { label: 'Régime matrimonial', icon: Users, status: 'agent', prompt: 'Compare les régimes matrimoniaux (communauté réduite, séparation de biens, participation aux acquêts) dans ma situation.' },
@@ -80,7 +80,7 @@ export const sections: Section[] = [
     title: 'Épargne & placements',
     subtitle: 'PER, AV, PEA, SCPI, crypto',
     icon: PiggyBank,
-    accent: 'bg-[#1B3A5C]/10 text-[#1B3A5C]',
+    accent: 'bg-[#0F1E33]/10 text-[#0F1E33]',
     items: [
       { label: 'Simulateur épargne PEA / PER', icon: PiggyBank, status: 'available', to: '/simulations/epargne' },
       { label: 'Versement PER (déduction IR)', icon: Wallet, status: 'agent', prompt: "Combien verser sur mon PER pour optimiser ma déduction d'impôt ?" },

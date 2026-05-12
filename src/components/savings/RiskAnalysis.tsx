@@ -179,8 +179,8 @@ export function RiskAnalysis({ selectedProfileId, horizon, monthlyContribution }
                   <Radar
                     name="Score"
                     dataKey="value"
-                    stroke="#1B3A5C"
-                    fill="#1B3A5C"
+                    stroke="#0F1E33"
+                    fill="#0F1E33"
                     fillOpacity={0.3}
                   />
                   <Tooltip />

@@ -206,7 +206,7 @@ export function PersonalizationStep({
                       className="h-full"
                       style={{
                         width: `${alloc.weight}%`,
-                        backgroundColor: ['#1B3A5C', '#4B8264', '#f59e0b', '#8b5cf6', '#ec4899'][i % 5],
+                        backgroundColor: ['#0F1E33', '#4B8264', '#f59e0b', '#8b5cf6', '#ec4899'][i % 5],
                       }}
                       title={`${alloc.indexId}: ${alloc.weight}%`}
                     />

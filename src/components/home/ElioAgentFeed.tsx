@@ -15,7 +15,7 @@ interface FeedItem {
 
 const TYPE_STYLE: Record<string, { bg: string; icon: any; iconColor: string }> = {
   deadline:     { bg: '#FFF4E6', icon: Clock,        iconColor: '#C8943E' },
-  optimization: { bg: '#F0F7FF', icon: TrendingUp,   iconColor: '#1B3A5C' },
+  optimization: { bg: '#F0F7FF', icon: TrendingUp,   iconColor: '#0F1E33' },
   alert:        { bg: '#FFE8E8', icon: AlertCircle,  iconColor: '#C9432E' },
   insight:      { bg: '#F5F0FF', icon: Lightbulb,    iconColor: '#7B5BC0' },
 };
@@ -62,7 +62,7 @@ export const ElioAgentFeed = () => {
     return (
       <div className="rounded-xl border border-[#E5DED3] bg-white p-5 text-center">
         <Sparkles className="w-5 h-5 text-[#C8943E] mx-auto mb-2" />
-        <p className="text-sm font-medium text-[#1B3A5C]">Tout est à jour</p>
+        <p className="text-sm font-medium text-[#0F1E33]">Tout est à jour</p>
         <p className="text-xs text-[#6B7A8D] mt-1">
           Élio vérifiera à nouveau lundi prochain.
         </p>
@@ -72,7 +72,7 @@ export const ElioAgentFeed = () => {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-base font-semibold text-[#1B3A5C] flex items-center gap-2">
+      <h2 className="text-base font-semibold text-[#0F1E33] flex items-center gap-2">
         <Sparkles className="w-4 h-4 text-[#C8943E]" />
         Ce qu'Élio a repéré pour toi
       </h2>
@@ -94,7 +94,7 @@ export const ElioAgentFeed = () => {
             )}
             <button
               onClick={() => handleDismiss(item.id)}
-              className="absolute top-3 right-3 text-[#6B7A8D] hover:text-[#1B3A5C] transition-colors"
+              className="absolute top-3 right-3 text-[#6B7A8D] hover:text-[#0F1E33] transition-colors"
               aria-label="Ignorer"
             >
               <X className="w-4 h-4" />
@@ -104,11 +104,11 @@ export const ElioAgentFeed = () => {
                 <Icon className="w-5 h-5" style={{ color: style.iconColor }} />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold text-[#1B3A5C]">{item.title}</h3>
+                <h3 className="text-sm font-semibold text-[#0F1E33]">{item.title}</h3>
                 <p className="text-sm text-[#1F3347] mt-1 leading-relaxed">{item.message}</p>
                 <button
                   onClick={() => handleAction(item)}
-                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#C8943E] hover:text-[#1B3A5C] transition-colors"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#C8943E] hover:text-[#0F1E33] transition-colors"
                 >
                   {actionLabel}
                   <ArrowRight className="w-3.5 h-3.5" />

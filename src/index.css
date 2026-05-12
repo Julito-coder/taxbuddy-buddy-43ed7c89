@@ -13,19 +13,21 @@
     --popover-foreground: 213 37% 20%;
     --primary: 210 53% 23%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 37 55% 51%;
-    --secondary-foreground: 0 0% 100%;
+    /* --secondary : surface neutre tinted (pas couleur marque).
+       Coral est RÉSERVÉ aux CTA primaires (charte P.02). */
+    --secondary: 213 30% 92%;            /* navy-pâle warm #E5EAF1 */
+    --secondary-foreground: 213 37% 20%; /* encre #2A3F56 */
     --muted: 220 14% 96%;
     --muted-foreground: 215 16% 47%;
     --accent: 210 40% 94%;
     --accent-foreground: 210 53% 23%;
-    --destructive: 12 65% 50%;
+    --destructive: 12 73% 45%;        /* #C8501F — Charte v1.0 erreur */
     --destructive-foreground: 0 0% 100%;
-    --warning: 37 90% 51%;
+    --warning: 37 90% 51%;            /* #F4A923 — Charte v1.0 warning (aligné) */
     --warning-foreground: 213 37% 20%;
-    --success: 152 35% 45%;
+    --success: 140 25% 54%;           /* #6BAA82 — Charte v1.0 succès */
     --success-foreground: 0 0% 100%;
-    --info: 210 55% 50%;
+    --info: 207 47% 53%;              /* #4A8AC2 — Charte v1.0 info */
     --info-foreground: 0 0% 100%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
@@ -45,11 +47,15 @@
        shadows, motion, alias --s- et --r- (brief).
        Seules les classes .ds-, .lp- et utilities Tailwind ds- les consomment. */
 
-    /* Palette navy étendue */
-    --navy-950: #0B1929;
-    --navy-900: #0F2137;
-    --navy-800: #1C3B5A;
-    --navy-700: #24506F;
+    /* Palette navy — Charte Élio v1.0 Mai 2026
+       Renommage: deep/primary (ancrage), mid (gradient stop), bridge
+       (gradient stop coral), soft (encre body). Auxiliaires 600/100/50
+       conservées pour shades hors charte (bento icons, surfaces tintées). */
+    --navy-deep:    #0F1E33;
+    --navy-primary: #0F1E33;
+    --navy-mid:     #1B3A5C;
+    --navy-bridge:  #2A5580;
+    --navy-soft:    #2A3F56;
     --navy-600: #2D6A8A;
     --navy-100: #D4E4F1;
     --navy-50:  #EDF4FA;
@@ -63,26 +69,28 @@
     --coral-700: #C44528; /* Assombri pour texte 13px sur surface claire (WCAG AA, ratio 4.71:1) */
 
     /* Brand (legacy ds-* — accent flippé gold→coral) */
-    --ds-color-primary: var(--navy-800);
+    --ds-color-primary: var(--navy-primary);
     --ds-color-primary-hover: #15304A;
     --ds-color-accent: var(--coral-500);
     --ds-color-accent-light: var(--coral-400);
 
-    /* Text */
-    --ds-color-text-primary: var(--navy-900);
-    --ds-color-text-secondary: #475569;
-    --ds-color-text-tertiary: #576475; /* Assombri pour passer WCAG AA sur surface claire (ratio ~4.7:1, mesuré 4.19 avec #6B7A8D insuffisant) */
+    /* Text — Charte v1.0: encre #2A3F56 (body), muted #6B7689 (target,
+       non migré ici car ratio 4.39:1 < WCAG AA 4.5:1 sur fond crème
+       #FAFAF7 — on conserve #576475 à 4.7:1). */
+    --ds-color-text-primary: var(--navy-primary);
+    --ds-color-text-secondary: #2A3F56;
+    --ds-color-text-tertiary: #576475; /* WCAG AA sur cream #FAFAF7 (4.7:1). Cible charte #6B7689 = 4.39:1 → trop bas. */
     --ds-color-text-inverse: #FFFFFF;
 
-    /* Surfaces (alias --surface-* per brief) */
+    /* Surfaces (alias --surface-* per brief, surface-1 alignée Charte v1.0 #FAFAF7) */
     --surface-0: #FFFFFF;
-    --surface-1: #FAFAF9;
+    --surface-1: #FAFAF7;
     --surface-2: #F5F3F0;
     --surface-3: #EDEBE8;
     --ds-color-bg-primary: var(--surface-1);
     --ds-color-bg-secondary: var(--surface-2);
     --ds-color-bg-tertiary: var(--surface-0);
-    --ds-color-bg-dark: var(--navy-900);
+    --ds-color-bg-dark: var(--navy-primary);
 
     /* Borders */
     --border-light: rgba(0, 0, 0, 0.06);
@@ -169,9 +177,16 @@
     --shadow-glow-coral: 0 0 40px rgba(240, 100, 73, 0.25);
     --shadow-glow-navy:  0 0 40px rgba(28, 59, 90, 0.20);
 
-    /* Motion */
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    /* Motion — Charte v1.0 ease */
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
     --duration: 300ms;
+
+    /* Gradients signature — Charte v1.0 (utilisés Batch 1+ pour wordmark
+       et backgrounds atmosphériques) */
+    --gradient-mark: linear-gradient(135deg, #0F1E33 0%, #1B3A5C 60%, #F06449 100%);
+    --gradient-aurora:
+      radial-gradient(60% 50% at 80% 0%, hsl(8 84% 61% / 0.16), transparent 60%),
+      radial-gradient(60% 50% at 10% 20%, hsl(214 56% 13% / 0.12), transparent 60%);
   }
 }
 
@@ -274,7 +289,7 @@
     height: 40px;
     display: inline-flex;
     align-items: center;
-    background: var(--navy-900);
+    background: var(--navy-primary);
     color: var(--ds-color-text-inverse);
     font-size: 14px;
     font-weight: 600;
@@ -317,11 +332,11 @@
   }
 
   .ds-btn-primary {
-    background: var(--navy-900);
+    background: var(--navy-primary);
     color: var(--ds-color-text-inverse);
   }
   .ds-btn-primary:hover {
-    background: var(--navy-950);
+    background: var(--navy-deep);
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg), var(--shadow-glow-navy);
   }
@@ -342,7 +357,7 @@
     border: 1.5px solid var(--border-default);
   }
   .ds-btn-secondary:hover {
-    border-color: var(--navy-800);
+    border-color: var(--navy-mid);
     box-shadow: var(--shadow-sm);
   }
 
@@ -457,7 +472,7 @@
     width: 38px;
     height: 38px;
     border-radius: var(--r-md);
-    background: linear-gradient(135deg, var(--navy-900), var(--navy-700));
+    background: linear-gradient(135deg, var(--navy-primary), var(--navy-bridge));
     color: var(--ds-color-text-inverse);
     font-size: 20px;
     font-weight: 800;
@@ -776,7 +791,7 @@
     transform: translateX(-50%);
     width: 80px;
     height: 24px;
-    background: var(--navy-900);
+    background: var(--navy-primary);
     border-radius: 0 0 16px 16px;
     z-index: 2;
   }
@@ -805,14 +820,14 @@
     margin: 0;
     font-size: 18px;
     font-weight: 700;
-    color: var(--navy-900);
+    color: var(--navy-primary);
     letter-spacing: -0.02em;
   }
 
   .lp-phone-action {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, var(--navy-900), var(--navy-700));
+    background: linear-gradient(135deg, var(--navy-primary), var(--navy-bridge));
     border-radius: var(--r-xl);
     padding: var(--s5);
     color: var(--ds-color-text-inverse);
@@ -884,7 +899,7 @@
     font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.02em;
-    color: var(--navy-900);
+    color: var(--navy-primary);
   }
   .lp-phone-stat-value.coral {
     color: var(--coral-500);
@@ -904,7 +919,7 @@
     box-shadow: var(--shadow-lg);
     font-size: 13px;
     font-weight: 600;
-    color: var(--navy-900);
+    color: var(--navy-primary);
     white-space: nowrap;
   }
   .lp-floating-card.top {
@@ -1200,7 +1215,7 @@
   /* Featured dark variant — border coral signature forte + glow ::before */
   .lp-bento-card-featured {
     padding: var(--s10);
-    background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 100%);
+    background: linear-gradient(135deg, var(--navy-primary) 0%, var(--navy-bridge) 100%);
     border: 2px solid rgba(240, 100, 73, 0.40);
     color: var(--ds-color-text-inverse);
     box-shadow: var(--shadow-md);
@@ -1285,7 +1300,7 @@
     stroke-width: 2;
   }
   .lp-bento-icon-coral { background: var(--coral-50); color: var(--coral-500); }
-  .lp-bento-icon-navy  { background: var(--navy-50);  color: var(--navy-800); }
+  .lp-bento-icon-navy  { background: var(--navy-50);  color: var(--navy-mid); }
 
   .lp-bento-title {
     margin: 0;
@@ -1367,7 +1382,7 @@
     box-shadow: 0 8px 24px rgba(11, 25, 41, 0.12);
     transition:
       transform var(--bulletin-rotation-duration, 0.8s) var(--bulletin-ease-3d, cubic-bezier(0.4, 0, 0.2, 1)),
-      opacity 0.5s var(--ease, cubic-bezier(0.16, 1, 0.3, 1));
+      opacity 0.5s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
     will-change: transform, opacity;
     transform-style: preserve-3d;
     backface-visibility: hidden;
@@ -1386,7 +1401,7 @@
     opacity: 1;
     z-index: 3;
     transition-delay: calc(var(--bulletin-stagger-delay, 100ms) * 2);
-    background: linear-gradient(135deg, #FFFFFF 0%, #FAFAF9 100%);
+    background: linear-gradient(135deg, #FFFFFF 0%, #FAFAF7 100%);
     border: 1px solid rgba(240, 100, 73, 0.20);
     box-shadow:
       0 12px 32px rgba(11, 25, 41, 0.14),
@@ -1468,7 +1483,7 @@
   .lp-bulletin-amount {
     font-size: 36px;
     font-weight: 800;
-    color: var(--navy-900, #0B1929);
+    color: var(--navy-primary, #0F1E33);
     line-height: 1;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
@@ -1476,7 +1491,7 @@
 
   .lp-bulletin-context {
     font-size: 14px;
-    color: var(--navy-700, #1B3A5C);
+    color: var(--navy-mid, #1B3A5C);
     line-height: 1.4;
   }
 
@@ -1520,8 +1535,8 @@
     cursor: pointer;
     padding: 0;
     transition:
-      background 0.3s var(--ease, cubic-bezier(0.16, 1, 0.3, 1)),
-      transform 0.3s var(--ease, cubic-bezier(0.16, 1, 0.3, 1));
+      background 0.3s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+      transform 0.3s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
   }
 
   .lp-bulletin-dot-btn:hover {
@@ -1825,7 +1840,7 @@
   .lp-trust {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%);
+    background: linear-gradient(180deg, var(--navy-primary) 0%, var(--navy-deep) 100%);
     padding: var(--s24) var(--s4) var(--s32);
   }
   @media (min-width: 640px) {
@@ -2095,7 +2110,7 @@
   .lp-final-cta {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%);
+    background: linear-gradient(180deg, var(--navy-primary) 0%, var(--navy-deep) 100%);
     padding: var(--s24) var(--s4);
   }
   @media (min-width: 640px) {

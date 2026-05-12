@@ -70,8 +70,8 @@ interface RPPDFConfig {
 
 const COLORS = {
   // Brand
-  navy: [27, 58, 92] as [number, number, number],       // #1B3A5C - Primary
-  navyLight: [200, 148, 62] as [number, number, number], // #C8943E - Gold accent
+  navy: [15, 30, 51] as [number, number, number],       // #0F1E33 - Charte v1.0 primary
+  navyLight: [15, 30, 51] as [number, number, number], // #0F1E33 - Navy primary (gold accent supprimé)
   
   // Status
   success: [75, 130, 100] as [number, number, number],  // #4B8264 - Sage Green
@@ -87,8 +87,8 @@ const COLORS = {
   white: [255, 255, 255] as [number, number, number],
   
   // Chart colors
-  chart1: [27, 58, 92] as [number, number, number],     // Navy
-  chart2: [200, 148, 62] as [number, number, number],    // Gold
+  chart1: [15, 30, 51] as [number, number, number],     // Navy primary #0F1E33
+  chart2: [240, 100, 73] as [number, number, number],    // Coral #F06449 - Charte v1.0 accent
   chart3: [75, 130, 100] as [number, number, number],    // Sage
   chart4: [139, 92, 246] as [number, number, number],    // Purple
 };
