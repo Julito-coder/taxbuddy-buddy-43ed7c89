@@ -23,7 +23,6 @@ interface DirectLink {
 const directLinks: DirectLink[] = [
   { to: '/bulletin', label: 'Bulletin du jour', icon: Newspaper, desc: 'Ton brief fiscal quotidien' },
   { to: '/coach', label: 'Coach', icon: Compass, desc: 'Plan d\'action personnalisé' },
-  { to: '/agent', label: 'Élio Agent', icon: Sparkles, desc: 'Pose une question fiscale' },
   { to: '/finances', label: 'Mes finances', icon: Wallet, desc: 'Vue d\'ensemble patrimoine' },
   { to: '/calendrier', label: 'Calendrier fiscal', icon: CalendarIcon, desc: 'Échéances à venir' },
   { to: '/profil', label: 'Profil fiscal', icon: UserCircle, desc: 'Tes données et formulaires' },

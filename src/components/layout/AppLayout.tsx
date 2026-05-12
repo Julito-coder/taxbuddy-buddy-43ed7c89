@@ -40,7 +40,7 @@ export const AppLayout = ({ children, variant = 'default' }: AppLayoutProps) => 
 
       {isChat ? (
         <main
-          className="flex flex-1 flex-col overflow-hidden pb-[68px] lg:pb-0 min-w-0"
+          className="flex flex-1 flex-col overflow-hidden pb-[calc(88px+env(safe-area-inset-bottom))] lg:pb-0 min-w-0"
           style={{ height: '100dvh' }}
         >
           <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden">
@@ -48,7 +48,7 @@ export const AppLayout = ({ children, variant = 'default' }: AppLayoutProps) => 
           </div>
         </main>
       ) : (
-        <main className="flex flex-1 flex-col min-h-screen pb-20 lg:pb-0 overflow-x-hidden min-w-0">
+        <main className="flex flex-1 flex-col min-h-screen pb-[calc(88px+env(safe-area-inset-bottom))] lg:pb-0 overflow-x-hidden min-w-0">
           <div className="relative flex-1 overflow-x-hidden">
             <div
               className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-full h-[300px] pointer-events-none"
