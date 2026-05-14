@@ -43,7 +43,8 @@ export const CoachRecoCard = ({ reco, index, onAccept, onComplete, onSnooze, onD
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.04 }}
         className={cn(
-          'bg-card rounded-xl border p-4 sm:p-5 shadow-sm space-y-3',
+          'bg-card rounded-xl border border-border p-4 sm:p-5 shadow-sm space-y-3 transition-all',
+          !isDone && !isDismissed && 'hover:shadow-md hover:border-coral-500/30',
           isDone && 'opacity-70 border-success/30',
           isDismissed && 'opacity-60'
         )}
