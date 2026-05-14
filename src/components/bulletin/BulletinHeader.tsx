@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ElioFox, type ElioFoxAnimation } from '@/components/brand/ElioFox';
 
 interface BulletinHeaderProps {
   userName: string;
@@ -32,6 +34,25 @@ function formatDateFr(): string {
     day: 'numeric',
     month: 'long',
   });
+}
+
+/**
+ * Taille responsive ElioFox : 80px < lg, 96px ≥ lg.
+ * Initial state lu synchroniquement depuis matchMedia (SPA Vite, pas de SSR).
+ */
+function useResponsiveFoxSize(): number {
+  const getSize = () => {
+    if (typeof window === 'undefined') return 80;
+    return window.matchMedia('(min-width: 1024px)').matches ? 96 : 80;
+  };
+  const [size, setSize] = useState(getSize);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const handler = () => setSize(mq.matches ? 96 : 80);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return size;
 }
 
 export const BulletinHeader = ({ userName, currentStreak }: BulletinHeaderProps) => {
