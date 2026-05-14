@@ -59,7 +59,7 @@ export const CoachPinnedCard = () => {
       className="px-5 py-3"
     >
       <button
-        onClick={() => navigate(action.deepLink)}
+        onClick={() => navigate('/coach')}
         className="w-full bg-gradient-to-br from-secondary/10 via-card to-card border border-secondary/30 rounded-2xl p-4 text-left hover:shadow-md transition-all group"
       >
         <div className="flex items-start gap-3">
