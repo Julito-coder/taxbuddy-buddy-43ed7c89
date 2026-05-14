@@ -96,7 +96,7 @@ export const TaxSavingsChart = ({ months, totalCentsYTD, totalCentsCurrentMonth,
               />
               <Bar dataKey="cents" radius={[6, 6, 0, 0]}>
                 {series.map((b, i) => (
-                  <Cell key={i} fill={b.isCurrent ? 'hsl(var(--primary))' : 'hsl(var(--primary) / 0.35)'} />
+                  <Cell key={i} fill={b.isCurrent ? '#0F1E33' : 'rgba(15, 30, 51, 0.35)'} />
                 ))}
               </Bar>
             </BarChart>
