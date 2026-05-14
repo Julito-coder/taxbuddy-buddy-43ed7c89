@@ -99,7 +99,7 @@ const Coach = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#FFF5F3]/40 border border-[#FDE8E4] rounded-2xl p-6 lg:p-8 space-y-2"
+          className="bg-[#FFF5F3]/40 border border-[#FDE8E4] rounded-2xl shadow-sm p-6 lg:p-8 space-y-2"
         >
           <div className="flex items-center gap-2 text-secondary">
             <Sparkles className="h-5 w-5" />
