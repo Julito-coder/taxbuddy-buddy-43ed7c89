@@ -35,6 +35,7 @@ import { useMonthlyTaxSavings } from '@/hooks/useMonthlyTaxSavings';
 import { TaxSavingsChart } from '@/components/finances/TaxSavingsChart';
 import { OptimisationsFeed } from '@/components/finances/OptimisationsFeed';
 import { TransactionFiscalBadge } from '@/components/finances/TransactionFiscalBadge';
+import { FinancesEmptyState } from '@/components/finances/FinancesEmptyState';
 import { runCategorization, type OptimisationItem } from '@/lib/financesService';
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: typeof Zap; color: string }> = {
@@ -53,7 +54,9 @@ const FREQ_LABELS: Record<string, string> = {
   annually: 'Annuel',
 };
 
-const FinancesPage = () => {
+const VALID_TABS = ['optimisations', 'comptes', 'prelevements', 'operations'] as const;
+
+const Finances = () => {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -62,7 +65,14 @@ const FinancesPage = () => {
   const [accounts, setAccounts] = useState<BankAccount[]>([]);
   const [transactions, setTransactions] = useState<BankTransaction[]>([]);
   const [recurring, setRecurring] = useState<RecurringDeadline[]>([]);
-  const [activeTab, setActiveTab] = useState('optimisations');
+  // Initial tab from ?tab=X query string (validated contre VALID_TABS),
+  // sinon 'optimisations' par défaut. Cohérent avec BankFiscalSummary qui
+  // pointe vers /finances?tab=optimisations depuis Bulletin.
+  const initialTab = (() => {
+    const param = searchParams.get('tab');
+    return param && (VALID_TABS as readonly string[]).includes(param) ? param : 'optimisations';
+  })();
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   const taxSavings = useMonthlyTaxSavings();
   const optimisationsByTxId = new Map<string, OptimisationItem>(
@@ -229,15 +239,27 @@ const FinancesPage = () => {
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-6">
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Wallet className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Mes finances</h1>
-            <p className="text-sm text-muted-foreground">
-              Élio analyse tes flux bancaires pour transformer chaque euro déductible en économie d'impôt.
-            </p>
+        {/*
+         * Hero Finances — carte coral cohérente Coach Batch 7.
+         * bg-[#FFF5F3]/40 + border-[#FDE8E4] + shadow-sm = même pattern
+         * que CoachPage. Icône Wallet conservée en bg-primary/10 pour
+         * différencier subtilement de Coach (text-secondary Sparkles).
+         */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#FFF5F3]/40 border border-[#FDE8E4] rounded-2xl shadow-sm p-6 lg:p-8"
+        >
+          <div className="flex items-start gap-3">
+            <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+              <Wallet className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Mes finances</h1>
+              <p className="text-sm text-muted-foreground">
+                Élio analyse tes flux bancaires pour transformer chaque euro déductible en économie d'impôt.
+              </p>
+            </div>
           </div>
         </motion.div>
 
@@ -246,21 +268,11 @@ const FinancesPage = () => {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : !status.connected ? (
-          <Card className="shadow-sm">
-            <CardContent className="p-6 space-y-4 text-center">
-              <Building2 className="h-12 w-12 text-muted-foreground mx-auto" />
-              <div>
-                <h3 className="font-semibold text-foreground">Aucune banque connectée</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  La connexion est sécurisée et conforme DSP2. Tu peux te déconnecter à tout moment.
-                </p>
-              </div>
-              <Button onClick={handleConnect} disabled={busy === 'connect'} className="w-full sm:w-auto">
-                {busy === 'connect' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plug className="h-4 w-4 mr-2" />}
-                Connecter ma banque
-              </Button>
-            </CardContent>
-          </Card>
+          <FinancesEmptyState
+            variant="no-bank"
+            onConnect={handleConnect}
+            busy={busy === 'connect'}
+          />
         ) : (
           <>
             {/* Game-changer #2 : Tax savings chart */}
@@ -537,4 +549,4 @@ const FinancesPage = () => {
   );
 };
 
-export default FinancesPage;
+export default Finances;

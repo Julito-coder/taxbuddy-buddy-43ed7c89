@@ -24,7 +24,7 @@ import SavingsSimulator from "./pages/SavingsSimulator";
 import PacsSimulator from "./pages/simulators/PacsSimulator";
 import FreelanceSimulator from "./pages/simulators/FreelanceSimulator";
 import AidesDetector from "./pages/AidesDetector";
-import Banques from "./pages/Banques";
+import Finances from "./pages/Finances";
 import Coach from "./pages/Coach";
 import FiscalProfile from "./pages/FiscalProfile";
 import Settings from "./pages/Settings";
@@ -58,7 +58,7 @@ const App = () => (
             <Route path="/agent" element={<ProtectedRoute><AgentPage /></ProtectedRoute>} />
 
             {/* Mes finances (pillar 2) */}
-            <Route path="/finances" element={<ProtectedRoute><Banques /></ProtectedRoute>} />
+            <Route path="/finances" element={<ProtectedRoute><Finances /></ProtectedRoute>} />
 
             {/* Pilotage (pillar 3) */}
             <Route path="/calendrier" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
