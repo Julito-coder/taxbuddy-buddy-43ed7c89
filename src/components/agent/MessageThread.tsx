@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ElioMascot3D } from './ElioMascot3D';
+import { ElioFox } from '@/components/brand/ElioFox';
 import { ErrorCard } from './ErrorCard';
 import { RichViewRenderer } from '@/components/elio-agent/RichViewRenderer';
 import type { AgentMessage, AgentErrorPayload } from '@/hooks/useElioAgent';
@@ -143,7 +143,7 @@ export const MessageThread = ({
               return (
                 <div key={m.id} className="flex items-start gap-2 min-w-0">
                   <div className="shrink-0 pt-0.5">
-                    <ElioMascot3D state="idle" size={mascotSize} />
+                    <ElioFox animation="ear-wiggle" size={mascotSize} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <ErrorCard
@@ -160,7 +160,7 @@ export const MessageThread = ({
             return (
               <div key={m.id} className="flex items-start gap-2 min-w-0">
                 <div className="shrink-0 pt-0.5">
-                  <ElioMascot3D state="idle" size={mascotSize} />
+                  <ElioFox animation="ear-wiggle" size={mascotSize} />
                 </div>
                 <div className="min-w-0 flex-1">
                   {m.content && (
@@ -201,7 +201,7 @@ export const MessageThread = ({
               className="flex items-center gap-2"
             >
               <div className="shrink-0">
-                <ElioMascot3D state="thinking" size={mascotSize} />
+                <ElioFox animation="thinking" size={mascotSize} />
               </div>
               <div className="flex items-center gap-1.5 px-2">
                 {[0, 1, 2].map((i) => (
