@@ -1,13 +1,9 @@
 import { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import { motion, useReducedMotion } from 'framer-motion';
 import { loadUserProfile, calculateDashboardMetrics } from '@/lib/dashboardService';
 import { loadFiscalProfile, calculateProfileCompletion } from '@/lib/fiscalProfileService';
-import { ElioMascot3D, type MascotState } from './ElioMascot3D';
-
-interface Props {
-  state?: MascotState;
-}
+import { ElioFox, type ElioFoxAnimation } from '@/components/brand/ElioFox';
 
 const extractFirstName = (fullName: string): string => {
   if (!fullName) return '';
@@ -16,11 +12,37 @@ const extractFirstName = (fullName: string): string => {
   return trimmed.split(/\s+/)[0];
 };
 
-export const AgentHero = ({ state = 'idle' }: Props) => {
+/**
+ * Taille responsive ElioFox dans le hero Agent :
+ * - Mobile (< lg) : 96px
+ * - Desktop (≥ lg) : 112px
+ * Initial state lu synchroniquement depuis matchMedia (SPA Vite, pas de SSR).
+ */
+function useResponsiveFoxSize(): number {
+  const getSize = () => {
+    if (typeof window === 'undefined') return 96;
+    return window.matchMedia('(min-width: 1024px)').matches ? 112 : 96;
+  };
+  const [size, setSize] = useState(getSize);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const handler = () => setSize(mq.matches ? 112 : 96);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return size;
+}
+
+export const AgentHero = () => {
   const { user } = useAuth();
   const reduce = useReducedMotion();
   const [firstName, setFirstName] = useState('');
   const [subtitle, setSubtitle] = useState('Qu\'est-ce qu\'on regarde ensemble aujourd\'hui ?');
+  const foxSize = useResponsiveFoxSize();
+
+  // State machine α inline : wave intro one-shot → idle-breathe loop.
+  // Cohérent avec BulletinHeader Batch 6 (pattern brand standard).
+  const [anim, setAnim] = useState<ElioFoxAnimation>('wave');
 
   useEffect(() => {
     if (!user) return;
@@ -85,7 +107,12 @@ export const AgentHero = ({ state = 'idle' }: Props) => {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
-        <ElioMascot3D state={state} />
+        <ElioFox
+          animation={anim}
+          onComplete={() => anim === 'wave' && setAnim('idle-breathe')}
+          size={foxSize}
+          ariaLabel="Élio, ton agent fiscal"
+        />
       </motion.div>
 
       <motion.div
