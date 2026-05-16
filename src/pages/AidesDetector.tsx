@@ -6,6 +6,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { AideCard } from '@/components/aides/AideCard';
+import { AidesEmptyState, type AidesEmptyStateVariant } from '@/components/aides/AidesEmptyState';
 import { AidesResult, loadAidesForUser } from '@/lib/aidesService';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
@@ -56,10 +57,8 @@ const AidesDetector = () => {
   if (!result) {
     return (
       <AppLayout>
-        <div className="max-w-5xl mx-auto text-center py-12 space-y-4">
-          <HandCoins className="h-12 w-12 text-muted-foreground mx-auto" />
-          <p className="text-muted-foreground">Impossible de charger ton profil.</p>
-          <Button onClick={() => navigate('/profil/fiscal')}>Compléter mon profil</Button>
+        <div className="max-w-5xl mx-auto py-12">
+          <AidesEmptyState variant="no-profile" />
         </div>
       </AppLayout>
     );
@@ -67,10 +66,10 @@ const AidesDetector = () => {
 
   const { eligible, toVerify, notEligible, totalEligibleAnnual, profileComplete } = result;
 
-  const renderColumn = (items: typeof eligible, emptyMsg: string) => (
+  const renderColumn = (items: typeof eligible, emptyVariant: AidesEmptyStateVariant) => (
     <div className="space-y-3">
       {items.length === 0 ? (
-        <p className="text-xs text-muted-foreground text-center py-6">{emptyMsg}</p>
+        <AidesEmptyState variant={emptyVariant} />
       ) : (
         items.map((item, i) => <AideCard key={item.aide.key} item={item} index={i} />)
       )}
@@ -80,12 +79,40 @@ const AidesDetector = () => {
   return (
     <AppLayout>
       <div className="max-w-5xl mx-auto space-y-6">
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Détecteur d'aides</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Découvre les aides auxquelles tu as droit selon ta situation.
-          </p>
+        {/*
+         * Hero Aides — carte success doux englobante (tier 3 charte v4).
+         * Pattern : bg-success/5 + border-success/20 + shadow-sm cohérent
+         * Coach Batch 7 + Finances Batch 8 (mêmes shadow + rounded + padding),
+         * teinte success (vert) sémantique "gain monétaire à activer".
+         */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-success/5 border border-success/20 rounded-2xl shadow-sm p-6 lg:p-8"
+        >
+          <div className="flex items-start gap-4">
+            <div className="h-12 w-12 rounded-2xl bg-success/10 flex items-center justify-center shrink-0">
+              <HandCoins className="h-6 w-6 text-success" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Détecteur d'aides</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Découvre les aides auxquelles tu as droit selon ta situation.
+              </p>
+            </div>
+          </div>
+
+          {totalEligibleAnnual > 0 && (
+            <div className="mt-5 pt-5 border-t border-success/20 text-center">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Tu pourrais récupérer jusqu'à</p>
+              <p className="text-3xl md:text-4xl font-bold text-success mt-1">
+                {formatCurrency(totalEligibleAnnual)}<span className="text-base font-normal">/an</span>
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {eligible.length} aide{eligible.length > 1 ? 's' : ''} identifiée{eligible.length > 1 ? 's' : ''}
+              </p>
+            </div>
+          )}
         </motion.div>
 
         {/* Banner profil incomplet */}
@@ -108,19 +135,6 @@ const AidesDetector = () => {
           </motion.div>
         )}
 
-        {/* Total eligible */}
-        {totalEligibleAnnual > 0 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-success/5 border border-success/20 rounded-xl p-5 text-center"
-          >
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Tu pourrais récupérer jusqu'à</p>
-            <p className="text-3xl md:text-4xl font-bold text-success mt-1">{formatCurrency(totalEligibleAnnual)}<span className="text-base font-normal">/an</span></p>
-            <p className="text-xs text-muted-foreground mt-1">{eligible.length} aide{eligible.length > 1 ? 's' : ''} identifiée{eligible.length > 1 ? 's' : ''}</p>
-          </motion.div>
-        )}
-
         {/* Kanban / Tabs */}
         {isMobile ? (
           <Tabs defaultValue="eligible" className="w-full">
@@ -135,9 +149,9 @@ const AidesDetector = () => {
                 <XCircle className="h-3 w-3" /> Non ({notEligible.length})
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="eligible">{renderColumn(eligible, 'Aucune aide éligible détectée pour le moment.')}</TabsContent>
-            <TabsContent value="verify">{renderColumn(toVerify, 'Aucune aide à vérifier.')}</TabsContent>
-            <TabsContent value="no">{renderColumn(notEligible, 'Toutes les aides ont été analysées.')}</TabsContent>
+            <TabsContent value="eligible">{renderColumn(eligible, 'no-eligible')}</TabsContent>
+            <TabsContent value="verify">{renderColumn(toVerify, 'no-verify')}</TabsContent>
+            <TabsContent value="no">{renderColumn(notEligible, 'all-analyzed')}</TabsContent>
           </Tabs>
         ) : (
           <div className="grid grid-cols-3 gap-4">
@@ -147,7 +161,7 @@ const AidesDetector = () => {
                 <div className="h-2 w-2 rounded-full bg-success" />
                 <h2 className="text-sm font-semibold text-foreground">Éligible ({eligible.length})</h2>
               </div>
-              {renderColumn(eligible, 'Aucune aide éligible détectée.')}
+              {renderColumn(eligible, 'no-eligible')}
             </div>
             {/* À vérifier */}
             <div>
@@ -155,7 +169,7 @@ const AidesDetector = () => {
                 <div className="h-2 w-2 rounded-full bg-warning" />
                 <h2 className="text-sm font-semibold text-foreground">À vérifier ({toVerify.length})</h2>
               </div>
-              {renderColumn(toVerify, 'Aucune aide à vérifier.')}
+              {renderColumn(toVerify, 'no-verify')}
             </div>
             {/* Non concerné */}
             <div>
@@ -163,7 +177,7 @@ const AidesDetector = () => {
                 <div className="h-2 w-2 rounded-full bg-muted-foreground" />
                 <h2 className="text-sm font-semibold text-foreground">Non concerné ({notEligible.length})</h2>
               </div>
-              {renderColumn(notEligible, 'Toutes les aides sont analysées.')}
+              {renderColumn(notEligible, 'all-analyzed')}
             </div>
           </div>
         )}
