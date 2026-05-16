@@ -3,6 +3,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { DeadlineCard } from '@/components/calendar/DeadlineCard';
 import { DeadlineActionPanel } from '@/components/calendar/DeadlineActionPanel';
+import { CalendarEmptyState } from '@/components/calendar/CalendarEmptyState';
 import { EnrichedDeadline, FiscalDeadline } from '@/lib/deadlinesTypes';
 import { URGENCY_CONFIG } from '@/lib/deadlinesTypes';
 import { FISCAL_DEADLINES } from '@/lib/deadlinesData';
@@ -251,12 +252,15 @@ const CalendarPage = () => {
   return (
     <AppLayout>
       <div className="max-w-lg mx-auto space-y-5 pb-8">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-primary/10">
-            <Calendar className="h-5 w-5 text-primary" />
+        {/* Header — tier 4 sobre : icône + h1 + sub-line, pas de carte hero coloré */}
+        <div>
+          <div className="flex items-center gap-3">
+            <Calendar className="h-6 w-6 text-muted-foreground" />
+            <h1 className="text-xl font-bold text-foreground">Calendrier</h1>
           </div>
-          <h1 className="text-xl font-bold text-foreground">Calendrier</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Toutes tes échéances fiscales en un coup d'œil
+          </p>
         </div>
 
         {/* Tabs */}
@@ -360,9 +364,7 @@ const CalendarPage = () => {
             <div className="space-y-3">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1">{sectionTitle}</h2>
               {displayedDeadlines.length === 0 && displayedRecurring.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-sm text-muted-foreground">Aucune échéance pour cette période.</p>
-                </div>
+                <CalendarEmptyState variant="no-active" />
               ) : (
                 <>
                   {displayedDeadlines.map((d) => (
@@ -507,15 +509,7 @@ const CalendarPage = () => {
 
             {/* List */}
             {recurringDeadlines.length === 0 && !showAddForm ? (
-              <div className="text-center py-8">
-                <Repeat className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground mb-3">
-                  Aucun prélèvement récurrent pour l'instant.
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Ajoute-les manuellement ou uploade un contrat dans le coffre-fort pour une détection automatique.
-                </p>
-              </div>
+              <CalendarEmptyState variant="no-personal" onAdd={() => setShowAddForm(true)} />
             ) : (
               <div className="space-y-2">
                 {recurringDeadlines.map((d, i) => {
@@ -571,9 +565,7 @@ const CalendarPage = () => {
                 Tes échéances actives ({deadlines.length})
               </h2>
               {deadlines.length === 0 ? (
-                <div className="text-center py-4">
-                  <p className="text-sm text-muted-foreground">Complète ton profil pour découvrir tes échéances.</p>
-                </div>
+                <CalendarEmptyState variant="no-profile" />
               ) : (
                 deadlines.map((d) => (
                   <DeadlineCard key={d.key} deadline={d} onClick={() => { setTab('mine'); setSelectedDeadline(d); }} />
