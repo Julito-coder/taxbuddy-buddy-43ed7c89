@@ -46,8 +46,15 @@ const ProfilPage = () => {
   return (
     <AppLayout>
       <div className="max-w-2xl mx-auto space-y-6">
+        {/* Header — tier 4 enrichi : page racine domaine compte, text-3xl conservé */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-bold text-foreground">Mon profil</h1>
+          <div className="flex items-center gap-3">
+            <UserCircle className="h-8 w-8 text-muted-foreground" />
+            <h1 className="text-3xl font-bold text-foreground">Mon profil</h1>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            Tes infos et préférences
+          </p>
         </motion.div>
 
         <Card className="shadow-sm">
