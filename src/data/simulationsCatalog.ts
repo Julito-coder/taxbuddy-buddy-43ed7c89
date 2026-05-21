@@ -28,7 +28,7 @@ export const sections: Section[] = [
     title: 'Famille & Couple',
     subtitle: 'Union, séparation, enfants, transmission',
     icon: Heart,
-    accent: 'bg-[#0F1E33]/10 text-[#0F1E33]',
+    accent: 'bg-primary/10 text-primary',
     items: [
       { label: 'PACS / Mariage', icon: Heart, status: 'available', to: '/simulations/pacs' },
       { label: 'Régime matrimonial', icon: Users, status: 'agent', prompt: 'Compare les régimes matrimoniaux (communauté réduite, séparation de biens, participation aux acquêts) dans ma situation.' },
@@ -45,7 +45,7 @@ export const sections: Section[] = [
     title: 'Vie professionnelle',
     subtitle: 'Statut, rémunération, transitions',
     icon: Briefcase,
-    accent: 'bg-[#C8943E]/15 text-[#C8943E]',
+    accent: 'bg-coral-500/10 text-coral-700',
     items: [
       { label: 'CDI vs Freelance', icon: Briefcase, status: 'available', to: '/simulations/freelance' },
       { label: 'Choix IR vs IS', icon: FileText, status: 'agent', prompt: "Mon entreprise doit-elle être à l'IR ou à l'IS ? Compare les deux dans ma situation." },
@@ -62,7 +62,7 @@ export const sections: Section[] = [
     title: 'Immobilier',
     subtitle: 'Achat, locatif, travaux, revente',
     icon: Building2,
-    accent: 'bg-[#4B8264]/15 text-[#4B8264]',
+    accent: 'bg-success/10 text-success',
     items: [
       { label: 'Simulateur immobilier complet', icon: Building2, status: 'available', to: '/simulations/immobilier' },
       { label: 'Résidence principale vs location', icon: Home, status: 'available', to: '/simulations/immobilier' },
@@ -80,7 +80,7 @@ export const sections: Section[] = [
     title: 'Épargne & placements',
     subtitle: 'PER, AV, PEA, SCPI, crypto',
     icon: PiggyBank,
-    accent: 'bg-[#0F1E33]/10 text-[#0F1E33]',
+    accent: 'bg-primary/10 text-primary',
     items: [
       { label: 'Simulateur épargne PEA / PER', icon: PiggyBank, status: 'available', to: '/simulations/epargne' },
       { label: 'Versement PER (déduction IR)', icon: Wallet, status: 'agent', prompt: "Combien verser sur mon PER pour optimiser ma déduction d'impôt ?" },
@@ -97,7 +97,7 @@ export const sections: Section[] = [
     title: 'Retraite & événements',
     subtitle: 'Préparer, anticiper, transmettre',
     icon: Sun,
-    accent: 'bg-[#C8943E]/15 text-[#C8943E]',
+    accent: 'bg-coral-500/10 text-coral-700',
     items: [
       { label: 'Rachat de trimestres', icon: CalendarIcon, status: 'agent', prompt: 'Le rachat de trimestres pour ma retraite est-il rentable dans ma situation ?' },
       { label: 'Date optimale de départ', icon: CalendarIcon, status: 'agent', prompt: 'Quelle est la date optimale pour partir à la retraite (taux plein, surcote) ?' },
