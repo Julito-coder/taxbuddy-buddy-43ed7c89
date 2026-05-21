@@ -7,14 +7,14 @@ import { sections, type SubItem, type Status } from '@/data/simulationsCatalog';
 const StatusBadge = ({ status }: { status: Status }) => {
   if (status === 'available') {
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#4B8264] bg-[#4B8264]/10 px-2 py-0.5 rounded-full">
+      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-success bg-success/10 px-2 py-0.5 rounded-full">
         <Check className="h-3 w-3" /> Disponible
       </span>
     );
   }
   if (status === 'agent') {
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#C8943E] bg-[#C8943E]/10 px-2 py-0.5 rounded-full">
+      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-coral-700 bg-coral-500/10 px-2 py-0.5 rounded-full">
         <Sparkles className="h-3 w-3" /> Via Élio
       </span>
     );
@@ -54,12 +54,12 @@ const Simulations = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           onClick={() => navigate('/simulations/immobilier')}
-          className="w-full bg-gradient-to-br from-[#0F1E33] to-[#2A5580] text-white rounded-2xl p-6 text-left shadow-md hover:shadow-lg transition-all group"
+          className="w-full bg-gradient-to-br from-ds-primary to-[var(--navy-bridge)] text-white rounded-2xl p-6 text-left shadow-md hover:shadow-lg transition-all group"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2 flex-1">
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-[#C8943E] text-white px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-coral-500 text-white px-2 py-0.5 rounded-full">
                   <Sparkles className="h-3 w-3" /> Outil complet
                 </span>
               </div>
@@ -104,17 +104,17 @@ const Simulations = () => {
                     key={item.label}
                     onClick={() => handleClick(item)}
                     disabled={disabled}
-                    className={`bg-card rounded-xl border border-[#E5E7EB] p-4 text-left transition-all flex items-start gap-3 group ${
+                    className={`bg-card rounded-xl border border-border p-4 text-left transition-all flex items-start gap-3 group ${
                       disabled
                         ? 'opacity-60 cursor-not-allowed'
-                        : 'hover:border-[#0F1E33]/30 hover:shadow-sm'
+                        : 'hover:border-ds-primary/30 hover:shadow-sm'
                     }`}
                   >
-                    <div className="h-9 w-9 rounded-lg bg-[#F8F5F0] flex items-center justify-center shrink-0">
-                      <item.icon className="h-4 w-4 text-[#0F1E33]" />
+                    <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <item.icon className="h-4 w-4 text-ds-primary" />
                     </div>
                     <div className="flex-1 min-w-0 space-y-1.5">
-                      <p className="text-sm font-medium text-foreground leading-tight group-hover:text-[#0F1E33] transition-colors">
+                      <p className="text-sm font-medium text-foreground leading-tight group-hover:text-ds-primary transition-colors">
                         {item.label}
                       </p>
                       <StatusBadge status={item.status} />
