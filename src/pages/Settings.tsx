@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
-import { User, Lock, Bell, Shield, Trash2, LogOut, Moon, Sun } from 'lucide-react';
+import { User, Lock, Bell, Shield, Trash2, LogOut, Settings as SettingsIcon } from 'lucide-react';
 
 const passwordSchema = z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères');
 
@@ -47,7 +47,7 @@ const Settings = () => {
     const result = passwordSchema.safeParse(newPassword);
     if (!result.success) errors.newPassword = result.error.errors[0].message;
     if (newPassword !== confirmPassword) errors.confirmPassword = 'Les mots de passe ne correspondent pas';
-    if (!currentPassword) errors.currentPassword = 'Veuillez entrer ton mot de passe actuel';
+    if (!currentPassword) errors.currentPassword = 'Entre ton mot de passe actuel';
 
     setPasswordErrors(errors);
     if (Object.keys(errors).length > 0) return;
@@ -151,9 +151,13 @@ const Settings = () => {
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-6">
+        {/* Header — tier 4 strict : icône + h1 text-xl + sub-line tutoyée */}
         <div>
-          <h1 className="text-3xl font-bold">Paramètres</h1>
-          <p className="text-muted-foreground mt-1">Gérez ton compte et vos préférences</p>
+          <div className="flex items-center gap-3">
+            <SettingsIcon className="h-6 w-6 text-muted-foreground" />
+            <h1 className="text-xl font-bold text-foreground">Paramètres</h1>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">Gère ton compte et tes préférences</p>
         </div>
 
         {/* Profile Section */}
@@ -163,7 +167,7 @@ const Settings = () => {
               <User className="h-5 w-5 text-primary" />
               <CardTitle>Informations personnelles</CardTitle>
             </div>
-            <CardDescription>Modifie vos informations de profil</CardDescription>
+            <CardDescription>Modifie tes informations de profil</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleProfileUpdate} className="space-y-4">
@@ -178,7 +182,7 @@ const Settings = () => {
                   id="settings-name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Votre nom"
+                  placeholder="Ton nom"
                 />
               </div>
               <Button type="submit" disabled={profileLoading}>
@@ -252,7 +256,7 @@ const Settings = () => {
               <Bell className="h-5 w-5 text-primary" />
               <CardTitle>Notifications</CardTitle>
             </div>
-            <CardDescription>Gérez vos préférences de notifications</CardDescription>
+            <CardDescription>Gère tes préférences de notifications</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
@@ -280,11 +284,11 @@ const Settings = () => {
               <Shield className="h-5 w-5 text-primary" />
               <CardTitle>Sessions</CardTitle>
             </div>
-            <CardDescription>Gérez vos sessions actives</CardDescription>
+            <CardDescription>Gère tes sessions actives</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Déconnectez-vous de toutes les sessions actives sur tous les appareils.
+              Déconnecte-toi de toutes les sessions actives sur tous les appareils.
             </p>
             <Button variant="outline" onClick={handleSignOutAll} className="gap-2">
               <LogOut className="h-4 w-4" />
@@ -326,7 +330,7 @@ const Settings = () => {
                     </ul>
                     <div className="pt-2 space-y-2">
                       <Label htmlFor="delete-confirm">
-                        Tapez <strong>SUPPRIMER</strong> pour confirmer
+                        Tape <strong>SUPPRIMER</strong> pour confirmer
                       </Label>
                       <Input
                         id="delete-confirm"

@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { analyzeDocumentForDeadlines } from '@/lib/recurringDeadlinesService';
+import { CoffreEmptyState } from '@/components/coffre/CoffreEmptyState';
 
 interface StoredFile {
   name: string;
@@ -134,10 +135,14 @@ const CoffreFortPage = () => {
   return (
     <AppLayout>
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header — tier 4 strict : icône + h1 + sub-line, pas de carte hero coloré */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-bold text-foreground">Coffre-fort</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Tes documents fiscaux en sécurité, accessibles à tout moment. Les échéances sont détectées automatiquement.
+          <div className="flex items-center gap-3">
+            <FolderLock className="h-6 w-6 text-muted-foreground" />
+            <h1 className="text-xl font-bold text-foreground">Coffre-fort</h1>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            Tes documents fiscaux en sécurité, accessibles à tout moment.
           </p>
         </motion.div>
 
@@ -192,14 +197,7 @@ const CoffreFortPage = () => {
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           ) : files.length === 0 ? (
-            <Card className="shadow-sm">
-              <CardContent className="p-8 text-center">
-                <FolderLock className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">
-                  Aucun document pour l'instant. Ajoute ton premier contrat ou avis d'imposition.
-                </p>
-              </CardContent>
-            </Card>
+            <CoffreEmptyState variant="no-document" />
           ) : (
             <div className="space-y-2">
               {files.map((file, i) => {
