@@ -106,7 +106,7 @@ const Scanner = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-foreground">
-                Tu arrives depuis ton Coach
+                Tu arrives depuis tes optimisations
                 {FOCUS_LABELS[focus] ? <> · focus sur <span className="text-secondary">{FOCUS_LABELS[focus]}</span></> : null}
               </p>
               {amountCents > 0 && (

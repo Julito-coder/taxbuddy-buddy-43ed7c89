@@ -6,9 +6,6 @@
  * - 'no-active'   (consommé) : aucune échéance active pour la période/profil
  * - 'no-personal' (consommé) : aucun prélèvement récurrent, CTA onAdd optionnel
  * - 'no-tracking' (placeholder) : aucune action marquée fait (future tab)
- *
- * Style aligné Coach/Finances/AidesEmptyState : bg-card rounded-xl border
- * border-border p-8 text-center. Pas d'accent coloré (tier 4 sobre).
  */
 
 import { Calendar, CheckCircle2, Repeat, Plus, ArrowRight, type LucideIcon } from 'lucide-react';

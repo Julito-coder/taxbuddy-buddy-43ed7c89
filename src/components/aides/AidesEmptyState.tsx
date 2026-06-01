@@ -6,11 +6,6 @@
  * - 'no-eligible'  : aucune aide éligible détectée (tab/colonne Éligible)
  * - 'no-verify'    : aucune aide à vérifier (tab/colonne À vérifier)
  * - 'all-analyzed' : toutes les aides traitées (tab/colonne Non concerné)
- *
- * Style aligné CoachEmptyState Batch 7 + FinancesEmptyState Batch 8 :
- * bg-card rounded-xl border border-border p-8 text-center.
- * Accent border-t-success/10 sur 'no-profile' uniquement (tier 3 brand
- * accent — signal d'invitation à compléter le profil).
  */
 
 import { HandCoins, AlertTriangle, CheckCircle2, ArrowRight, type LucideIcon } from 'lucide-react';

@@ -1,34 +1,15 @@
 /**
  * BottomNav — Navigation principale mobile (< lg breakpoint, 1024px).
  *
- * Structure 5 entrées (D1 brief Batch 5) :
+ * Structure 4 entrées + FAB central :
  *   1. Bulletin (NavLink /bulletin)
- *   2. Coach (NavLink /coach)
- *   3. FAB central Élio (NavLink /agent, ElioFox idle-breathe 48px, pattern Option B "élevé notch")
- *   4. Outils (button → ouvre MobileToolsOverlay)
- *   5. Profil (NavLink /profil)
- *
- * Pattern FAB (D2) :
- * - Cercle 64px translaté -20px au-dessus de la barre (effet perché)
- * - Repos : border-2 border-coral-500/30 + shadow-md
- * - Actif (/agent) : ring-4 ring-coral-500/20 + shadow-lg shadow-coral-500/30
- *
- * Active state entrées NavLink (D4) :
- * - border-t-2 border-coral-500 (barre supérieure 2px coral)
- * - text-coral-700 + strokeWidth 2.5 sur l'icône
- * - Pas de bg-coral-500/10 (la barre a déjà son fond bg-card/95)
- *
- * Safe-area iOS (D5) : paddingBottom env(safe-area-inset-bottom) sur le <nav>.
- *
- * Scroll-to-top (D6) : tap sur entrée déjà active déclenche window.scrollTo({ top: 0 }).
- * S'applique aux 4 NavLinks + au FAB, jamais au bouton Outils.
- *
- * CHECKPOINT-FOX-LAZY : ce composant est le 1er consommateur d'<ElioFox animation>
- * en production. Le chunk lazy lottie-react + ElioFoxAnimated se matérialise ici.
+ *   2. FAB central Élio (NavLink /agent, ElioFox idle-breathe 48px, pattern Option B "élevé notch")
+ *   3. Outils (button → ouvre MobileToolsOverlay)
+ *   4. Profil (NavLink /profil)
  */
 
 import { NavLink, useLocation } from 'react-router-dom';
-import { Newspaper, Compass, LayoutGrid, UserCircle, type LucideIcon } from 'lucide-react';
+import { Newspaper, LayoutGrid, UserCircle, type LucideIcon } from 'lucide-react';
 import { ElioFox } from '@/components/brand/ElioFox';
 
 interface Props {
@@ -77,7 +58,6 @@ export const BottomNav = ({ toolsOpen, onToolsOpenChange }: Props) => {
   };
 
   const bulletinActive = isPathActive('/bulletin');
-  const coachActive = isPathActive('/coach');
   const agentActive = isPathActive('/agent');
   const profilActive = isPathActive('/profil');
 
@@ -95,7 +75,6 @@ export const BottomNav = ({ toolsOpen, onToolsOpenChange }: Props) => {
     >
       <div className="flex items-stretch justify-around" style={{ height: '68px' }}>
         <NavEntry to="/bulletin" icon={Newspaper} label="Bulletin" active={bulletinActive} />
-        <NavEntry to="/coach" icon={Compass} label="Coach" active={coachActive} />
 
         <div className="relative w-16 h-full flex items-center justify-center">
           <NavLink

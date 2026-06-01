@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  X, Newspaper, Compass, Sparkles, Wallet, Calendar as CalendarIcon,
+  X, Newspaper, Sparkles, Wallet, Calendar as CalendarIcon,
   UserCircle, HandCoins, FolderLock, Settings, LogOut, ChevronDown, Check, Clock,
 } from 'lucide-react';
 import { sections as simulationSections, type SubItem, type Status } from '@/data/simulationsCatalog';
@@ -22,7 +22,6 @@ interface DirectLink {
 
 const directLinks: DirectLink[] = [
   { to: '/bulletin', label: 'Bulletin du jour', icon: Newspaper, desc: 'Ton brief fiscal quotidien' },
-  { to: '/coach', label: 'Coach', icon: Compass, desc: 'Plan d\'action personnalisé' },
   { to: '/finances', label: 'Mes finances', icon: Wallet, desc: 'Vue d\'ensemble patrimoine' },
   { to: '/calendrier', label: 'Calendrier fiscal', icon: CalendarIcon, desc: 'Échéances à venir' },
   { to: '/profil', label: 'Profil fiscal', icon: UserCircle, desc: 'Tes données et formulaires' },

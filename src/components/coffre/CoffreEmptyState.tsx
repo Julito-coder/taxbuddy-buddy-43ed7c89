@@ -2,11 +2,6 @@
  * CoffreEmptyState — État vide pour la page Coffre-fort.
  *
  * Variant V1 unique : 'no-document' (aucun document uploadé).
- *
- * Style aligné CoachEmptyState Batch 7 + FinancesEmptyState Batch 8 +
- * AidesEmptyState Batch 10 + CalendarEmptyState Batch 11 : bg-card
- * rounded-xl border border-border p-8 text-center. Accent subtil
- * border-t-primary/10 (signature brand discrète tier 4).
  */
 
 import { FolderLock } from 'lucide-react';

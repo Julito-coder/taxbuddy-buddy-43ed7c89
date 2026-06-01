@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Check, Clock, X, ExternalLink, AlertTriangle, Sparkles, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +10,6 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   reco: CoachRecommendation;
-  index: number;
   onAccept: (r: CoachRecommendation) => void;
   onComplete: (r: CoachRecommendation) => void;
   onSnooze: (r: CoachRecommendation) => void;
@@ -27,7 +25,7 @@ const categoryLabel: Record<CoachRecommendation['category'], string> = {
   declaration: 'Déclaration',
 };
 
-export const CoachRecoCard = ({ reco, index, onAccept, onComplete, onSnooze, onDismiss, onReopen }: Props) => {
+export const OptimisationCard = ({ reco, onAccept, onComplete, onSnooze, onDismiss, onReopen }: Props) => {
   const [dismissOpen, setDismissOpen] = useState(false);
   const [reason, setReason] = useState('');
 
@@ -38,10 +36,7 @@ export const CoachRecoCard = ({ reco, index, onAccept, onComplete, onSnooze, onD
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.04 }}
+      <div
         className={cn(
           'bg-card rounded-xl border border-border p-4 sm:p-5 shadow-sm space-y-3 transition-all',
           !isDone && !isDismissed && 'hover:shadow-md hover:border-coral-500/30',
@@ -49,7 +44,6 @@ export const CoachRecoCard = ({ reco, index, onAccept, onComplete, onSnooze, onD
           isDismissed && 'opacity-60'
         )}
       >
-        {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
@@ -87,7 +81,6 @@ export const CoachRecoCard = ({ reco, index, onAccept, onComplete, onSnooze, onD
           <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-success" /> ROI immédiat</span>
         </div>
 
-        {/* Actions */}
         {!isDone && !isDismissed && (
           <div className="flex flex-wrap gap-2 pt-2">
             {reco.externalUrl ? (
@@ -126,7 +119,7 @@ export const CoachRecoCard = ({ reco, index, onAccept, onComplete, onSnooze, onD
             </Button>
           </div>
         )}
-      </motion.div>
+      </div>
 
       <Dialog open={dismissOpen} onOpenChange={setDismissOpen}>
         <DialogContent>

@@ -138,9 +138,9 @@ const HomePage = () => {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-secondary" /> Coach fiscal
+                <Sparkles className="h-4 w-4 text-secondary" /> Mes optimisations
               </h2>
-              <Link to="/coach" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline">
+              <Link to="/profil/mes-optimisations" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline">
                 Voir tout ({actions.length}) <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>

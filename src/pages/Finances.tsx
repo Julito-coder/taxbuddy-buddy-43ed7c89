@@ -239,12 +239,7 @@ const Finances = () => {
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-6">
-        {/*
-         * Hero Finances — carte coral cohérente Coach Batch 7.
-         * bg-[#FFF5F3]/40 + border-[#FDE8E4] + shadow-sm = même pattern
-         * que CoachPage. Icône Wallet conservée en bg-primary/10 pour
-         * différencier subtilement de Coach (text-secondary Sparkles).
-         */}
+        {/* Hero Finances — carte coral */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}

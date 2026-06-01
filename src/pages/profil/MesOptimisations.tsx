@@ -1,12 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Loader2, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { CoachRecoCard } from '@/components/coach/CoachRecoCard';
-import { CoachEmptyState } from '@/components/coach/CoachEmptyState';
+import { OptimisationCard } from '@/components/optimisations/OptimisationCard';
+import { OptimisationsEmptyState } from '@/components/optimisations/OptimisationsEmptyState';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -22,7 +21,7 @@ import {
   type CoachRecommendation,
 } from '@/lib/coachService';
 
-const Coach = () => {
+const MesOptimisations = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [feed, setFeed] = useState<CoachFeed | null>(null);
@@ -32,8 +31,8 @@ const Coach = () => {
     try {
       const f = await getCoachFeed(user.id);
       setFeed(f);
-    } catch (e) {
-      toast({ title: 'Erreur', description: 'Impossible de charger les recommandations.', variant: 'destructive' });
+    } catch {
+      toast({ title: 'Erreur', description: 'Impossible de charger les optimisations.', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -41,11 +40,10 @@ const Coach = () => {
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  // Realtime: refresh on profile or reco changes
   useEffect(() => {
     if (!user) return;
     const channel = supabase
-      .channel('coach-changes')
+      .channel('optimisations-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'user_recommendations', filter: `user_id=eq.${user.id}` }, () => refresh())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `user_id=eq.${user.id}` }, () => refresh())
       .subscribe();
@@ -59,7 +57,7 @@ const Coach = () => {
   const handleComplete = async (r: CoachRecommendation) => {
     if (!user) return;
     await markCompleted(user.id, r.id, r.gain);
-    toast({ title: '🎉 Bien joué !', description: `Tu viens de récupérer ${formatCurrency(r.gain)}/an avec Élio.` });
+    toast({ title: 'Bien joué !', description: `Tu viens de récupérer ${formatCurrency(r.gain)}/an avec Élio.` });
   };
   const handleSnooze = async (r: CoachRecommendation) => {
     if (!user) return;
@@ -90,20 +88,10 @@ const Coach = () => {
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-6">
-        {/*
-         * Hero Coach — carte coral très douce.
-         * bg-[#FFF5F3]/40 = coral-50 à 40% d'opacité (token non exposé en Tailwind, arbitrary value).
-         * border-[#FDE8E4] = coral-100 (idem). Effet aérien, pas premium-contrasté comme Bulletin.
-         * Montant en text-coral-700 (ratio WCAG 4.53:1 sur ce fond, passe AA normal + large text).
-         */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-[#FFF5F3]/40 border border-[#FDE8E4] rounded-2xl shadow-sm p-6 lg:p-8 space-y-2"
-        >
+        <div className="bg-[#FFF5F3]/40 border border-[#FDE8E4] rounded-2xl shadow-sm p-6 lg:p-8 space-y-2">
           <div className="flex items-center gap-2 text-secondary">
             <Sparkles className="h-5 w-5" />
-            <span className="text-sm font-medium uppercase tracking-wide">Coach fiscal</span>
+            <span className="text-sm font-medium uppercase tracking-wide">Mes optimisations</span>
           </div>
           <h1 className="text-3xl font-bold text-foreground">
             Élio te fait gagner{' '}
@@ -115,9 +103,8 @@ const Coach = () => {
               Tu as déjà récupéré <span className="font-semibold text-foreground">{formatCurrency(feed.recoveredGain)}/an</span> avec Élio.
             </p>
           )}
-        </motion.div>
+        </div>
 
-        {/* Profile incomplete banner */}
         {!feed.profileComplete && (
           <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
@@ -133,7 +120,6 @@ const Coach = () => {
           </div>
         )}
 
-        {/* Tabs */}
         <Tabs defaultValue="todo" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="todo">À faire ({feed.pending.length})</TabsTrigger>
@@ -143,17 +129,16 @@ const Coach = () => {
 
           <TabsContent value="todo" className="space-y-3 mt-4">
             {feed.pending.length === 0 ? (
-              <CoachEmptyState
+              <OptimisationsEmptyState
                 variant="idle"
                 title="Profil complet, aucune optimisation détectée."
                 subtitle="Reviens dans 1 mois — Élio surveille en continu."
               />
             ) : (
-              feed.pending.map((r, i) => (
-                <CoachRecoCard
+              feed.pending.map((r) => (
+                <OptimisationCard
                   key={r.id}
                   reco={r}
-                  index={i}
                   onAccept={handleAccept}
                   onComplete={handleComplete}
                   onSnooze={handleSnooze}
@@ -165,17 +150,16 @@ const Coach = () => {
 
           <TabsContent value="done" className="space-y-3 mt-4">
             {feed.completed.length === 0 ? (
-              <CoachEmptyState
+              <OptimisationsEmptyState
                 variant="done"
                 title="Aucune action complétée pour l'instant."
                 subtitle="Marque tes premières actions comme faites pour suivre tes économies."
               />
             ) : (
-              feed.completed.map((r, i) => (
-                <CoachRecoCard
+              feed.completed.map((r) => (
+                <OptimisationCard
                   key={r.id}
                   reco={r}
-                  index={i}
                   onAccept={handleAccept}
                   onComplete={handleComplete}
                   onSnooze={handleSnooze}
@@ -188,17 +172,16 @@ const Coach = () => {
 
           <TabsContent value="dismissed" className="space-y-3 mt-4">
             {feed.dismissed.length === 0 ? (
-              <CoachEmptyState
+              <OptimisationsEmptyState
                 variant="dismissed"
                 title="Aucune reco ignorée."
                 subtitle="Tu peux ignorer les recos qui ne te concernent pas."
               />
             ) : (
-              feed.dismissed.map((r, i) => (
-                <CoachRecoCard
+              feed.dismissed.map((r) => (
+                <OptimisationCard
                   key={r.id}
                   reco={r}
-                  index={i}
                   onAccept={handleAccept}
                   onComplete={handleComplete}
                   onSnooze={handleSnooze}
@@ -218,4 +201,4 @@ const Coach = () => {
   );
 };
 
-export default Coach;
+export default MesOptimisations;
