@@ -7,7 +7,6 @@ import { NewsPersonnalisee } from '@/components/bulletin/NewsPersonnalisee';
 import { BulletinFooter } from '@/components/bulletin/BulletinFooter';
 import { BulletinSkeleton } from '@/components/bulletin/BulletinSkeleton';
 import { BulletinEmptyState } from '@/components/bulletin/BulletinEmptyState';
-import { CoachPinnedCard } from '@/components/coach/CoachPinnedCard';
 import { BankFiscalSummary } from '@/components/bulletin/BankFiscalSummary';
 import { useDailyBulletin } from '@/hooks/useDailyBulletin';
 import { History } from 'lucide-react';
@@ -117,9 +116,6 @@ const Bulletin = () => {
 
         {/* Synthèse fiscale issue des transactions bancaires (tags) */}
         <BankFiscalSummary />
-
-        {/* Carte Coach épinglée — la « glu » entre les piliers */}
-        <CoachPinnedCard />
 
         {/* Action du jour */}
         <ActionDuJour

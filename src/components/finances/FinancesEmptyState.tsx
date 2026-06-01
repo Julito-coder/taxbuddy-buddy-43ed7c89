@@ -5,10 +5,6 @@
  * - 'no-bank' (consommé en V1) : aucune banque connectée, CTA Powens
  * - 'no-data' (placeholder V2) : pas de tags fiscaux après synchro
  * - 'no-recurring' (placeholder V2) : pas de prélèvements récurrents détectés
- *
- * Style aligné CoachEmptyState Batch 7 : bg-card rounded-xl border border-border
- * p-8 text-center. Accent border-t-coral-500/10 sur 'no-bank' uniquement
- * (signal d'invitation à se connecter).
  */
 
 import { Building2, Sparkles, Calendar, Plug, Loader2, type LucideIcon } from 'lucide-react';

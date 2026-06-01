@@ -21,7 +21,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Newspaper,
-  Sparkles,
   Bot,
   Wallet,
   Calendar,
@@ -68,7 +67,6 @@ const SECTIONS: NavSection[] = [
     label: 'Accueil',
     items: [
       { path: '/bulletin', icon: Newspaper, label: 'Bulletin' },
-      { path: '/coach', icon: Sparkles, label: 'Coach' },
       { path: '/agent', icon: Bot, label: 'Agent' },
     ],
   },

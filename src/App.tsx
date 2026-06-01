@@ -25,7 +25,6 @@ import PacsSimulator from "./pages/simulators/PacsSimulator";
 import FreelanceSimulator from "./pages/simulators/FreelanceSimulator";
 import AidesDetector from "./pages/AidesDetector";
 import Finances from "./pages/Finances";
-import Coach from "./pages/Coach";
 import MesOptimisations from "./pages/profil/MesOptimisations";
 import FiscalProfile from "./pages/FiscalProfile";
 import Settings from "./pages/Settings";
@@ -55,7 +54,7 @@ const App = () => (
 
             {/* Accueil (pillar 1) */}
             <Route path="/bulletin" element={<ProtectedRoute><Bulletin /></ProtectedRoute>} />
-            <Route path="/coach" element={<ProtectedRoute><Coach /></ProtectedRoute>} />
+            <Route path="/coach" element={<Navigate to="/profil/mes-optimisations" replace />} />
             <Route path="/agent" element={<ProtectedRoute><AgentPage /></ProtectedRoute>} />
 
             {/* Mes finances (pillar 2) */}

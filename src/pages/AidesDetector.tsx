@@ -79,12 +79,7 @@ const AidesDetector = () => {
   return (
     <AppLayout>
       <div className="max-w-5xl mx-auto space-y-6">
-        {/*
-         * Hero Aides — carte success doux englobante (tier 3 charte v4).
-         * Pattern : bg-success/5 + border-success/20 + shadow-sm cohérent
-         * Coach Batch 7 + Finances Batch 8 (mêmes shadow + rounded + padding),
-         * teinte success (vert) sémantique "gain monétaire à activer".
-         */}
+        {/* Hero Aides — carte success doux englobante (tier 3 charte v4) */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
