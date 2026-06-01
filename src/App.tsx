@@ -25,7 +25,7 @@ import PacsSimulator from "./pages/simulators/PacsSimulator";
 import FreelanceSimulator from "./pages/simulators/FreelanceSimulator";
 import AidesDetector from "./pages/AidesDetector";
 import Finances from "./pages/Finances";
-import MesOptimisations from "./pages/profil/MesOptimisations";
+import MesOptimisations from "./pages/MesOptimisations";
 import FiscalProfile from "./pages/FiscalProfile";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
@@ -54,7 +54,7 @@ const App = () => (
 
             {/* Accueil (pillar 1) */}
             <Route path="/bulletin" element={<ProtectedRoute><Bulletin /></ProtectedRoute>} />
-            <Route path="/coach" element={<Navigate to="/profil/mes-optimisations" replace />} />
+            <Route path="/coach" element={<Navigate to="/optimisations" replace />} />
             <Route path="/agent" element={<ProtectedRoute><AgentPage /></ProtectedRoute>} />
 
             {/* Mes finances (pillar 2) */}
@@ -66,7 +66,7 @@ const App = () => (
             <Route path="/profil" element={<ProtectedRoute><ProfilPage /></ProtectedRoute>} />
             <Route path="/profil/fiscal" element={<ProtectedRoute><FiscalProfile /></ProtectedRoute>} />
             <Route path="/profil/parametres" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="/profil/mes-optimisations" element={<ProtectedRoute><MesOptimisations /></ProtectedRoute>} />
+            <Route path="/optimisations" element={<ProtectedRoute><MesOptimisations /></ProtectedRoute>} />
 
             {/* Simulations (pillar 4) - hub fusionné */}
             <Route path="/simulations" element={<ProtectedRoute><Simulations /></ProtectedRoute>} />

@@ -45,7 +45,7 @@ export const BulletinOptimisations = () => {
           <Sparkles className="h-3.5 w-3.5" /> Optimisations
         </span>
         <Link
-          to="/profil/mes-optimisations"
+          to="/optimisations"
           className="text-[11px] font-semibold text-primary hover:underline inline-flex items-center gap-0.5"
         >
           Voir toutes <ArrowRight className="h-3 w-3" />
@@ -55,7 +55,7 @@ export const BulletinOptimisations = () => {
       {recos.map((r) => (
         <Link
           key={r.id}
-          to="/profil/mes-optimisations"
+          to="/optimisations"
           className="block bg-card border border-border rounded-xl p-3.5 hover:shadow-sm hover:border-coral-500/30 transition-all"
         >
           <div className="flex items-start justify-between gap-3">
