@@ -8,6 +8,7 @@ import { BulletinFooter } from '@/components/bulletin/BulletinFooter';
 import { BulletinSkeleton } from '@/components/bulletin/BulletinSkeleton';
 import { BulletinEmptyState } from '@/components/bulletin/BulletinEmptyState';
 import { BankFiscalSummary } from '@/components/bulletin/BankFiscalSummary';
+import { BulletinOptimisations } from '@/components/bulletin/BulletinOptimisations';
 import { useDailyBulletin } from '@/hooks/useDailyBulletin';
 import { History } from 'lucide-react';
 import { useState } from 'react';
@@ -116,6 +117,9 @@ const Bulletin = () => {
 
         {/* Synthèse fiscale issue des transactions bancaires (tags) */}
         <BankFiscalSummary />
+
+        {/* Top optimisations */}
+        <BulletinOptimisations />
 
         {/* Action du jour */}
         <ActionDuJour
