@@ -26,6 +26,7 @@ import FreelanceSimulator from "./pages/simulators/FreelanceSimulator";
 import AidesDetector from "./pages/AidesDetector";
 import Finances from "./pages/Finances";
 import Coach from "./pages/Coach";
+import MesOptimisations from "./pages/profil/MesOptimisations";
 import FiscalProfile from "./pages/FiscalProfile";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/profil" element={<ProtectedRoute><ProfilPage /></ProtectedRoute>} />
             <Route path="/profil/fiscal" element={<ProtectedRoute><FiscalProfile /></ProtectedRoute>} />
             <Route path="/profil/parametres" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/profil/mes-optimisations" element={<ProtectedRoute><MesOptimisations /></ProtectedRoute>} />
 
             {/* Simulations (pillar 4) - hub fusionné */}
             <Route path="/simulations" element={<ProtectedRoute><Simulations /></ProtectedRoute>} />
